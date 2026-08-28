@@ -1,1 +1,1 @@
-PCB theo ế hoạch thì sẽ gửi SMT 
+PCB theo kế hoạch thì sẽ gửi SMT 
