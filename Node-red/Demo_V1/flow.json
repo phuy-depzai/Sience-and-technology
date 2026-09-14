@@ -1,0 +1,131 @@
+[
+    {
+        "id": "06afeb540dc8fb08",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "282ae5bab43aebb9",
+        "type": "json",
+        "z": "06afeb540dc8fb08",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 530,
+        "y": 140,
+        "wires": [
+            [
+                "464f20605bbb812e"
+            ]
+        ]
+    },
+    {
+        "id": "85dd71f2e269a48f",
+        "type": "mqtt in",
+        "z": "06afeb540dc8fb08",
+        "name": "",
+        "topic": "a/nv/d",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "ecf865147996c78b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 310,
+        "y": 140,
+        "wires": [
+            [
+                "282ae5bab43aebb9"
+            ]
+        ]
+    },
+    {
+        "id": "464f20605bbb812e",
+        "type": "debug",
+        "z": "06afeb540dc8fb08",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 480,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "13c9d483769bcd5b",
+        "type": "mqtt in",
+        "z": "06afeb540dc8fb08",
+        "name": "",
+        "topic": "a/nv/s",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "ecf865147996c78b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 310,
+        "y": 200,
+        "wires": [
+            [
+                "2e083c7ac20de007"
+            ]
+        ]
+    },
+    {
+        "id": "2e083c7ac20de007",
+        "type": "debug",
+        "z": "06afeb540dc8fb08",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 500,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "ecf865147996c78b",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "localhost",
+        "port": 1883,
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "air/node01/data",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    }
+]
