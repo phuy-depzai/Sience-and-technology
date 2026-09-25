@@ -28,8 +28,8 @@ PubSubClient client(
 
 
 wifi net(
-    "Ken Lun 2.4G",
-    "khongcomatkhau1308"
+    "SSID",
+    "PASSWORD"
 );
 
 
@@ -224,7 +224,7 @@ void setup()
     // MQTT
 
     client.setServer(
-        "192.168.1.8",
+        "IP ADRESS",
         1883
     );
 
