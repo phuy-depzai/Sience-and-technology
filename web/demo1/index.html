@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>AirWatch — Hệ thống quan trắc không khí</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="landing">
+    <nav class="nav">
+        <div class="logo">AirWatch</div>
+        <ul class="nav-links">
+            <li><a href="#about">Giới thiệu</a></li>
+            <li><a href="#how">Cách hoạt động</a></li>
+            <li class="dropdown">
+                <button onclick="toggleMenu(event)" class="btn-primary" id="auth-btn" style="padding: 8px 16px; font-size: 13px;">Guest ▾</button>
+                <div class="dropdown-menu" id="dropdown-menu">
+                    <button onclick="toggleTheme()"><span id="theme-icon">🌙</span><span id="theme-label">Chế độ tối</span></button>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" id="auth-action" onclick="handleAuthAction(); return false;">🔑 Đăng nhập</a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+
+    <header class="hero">
+        <h1>Theo dõi chất lượng không khí <br><span class="accent">mọi lúc, mọi nơi</span></h1>
+        <p class="subtitle">
+            Hệ thống quan trắc không khí ứng dụng công nghệ LoRa —
+            chi phí thấp, tự chủ năng lượng, phù hợp triển khai mật độ cao tại Việt Nam.
+        </p>
+        <div class="hero-actions">
+            <a href="dashboard.html" class="btn-primary">Xem Dashboard</a>
+            <a href="#about" class="btn-secondary">Tìm hiểu thêm</a>
+        </div>
+    </header>
+
+    <section id="about" class="section">
+        <h2>Vì sao cần hệ thống này?</h2>
+        <div class="features">
+            <div class="feature">
+                <div class="icon">🌍</div>
+                <h3>Ô nhiễm ngày càng tăng</h3>
+                <p>PM2.5 từ giao thông và công nghiệp ảnh hưởng trực tiếp đến sức khỏe cộng đồng.</p>
+            </div>
+            <div class="feature">
+                <div class="icon">📍</div>
+                <h3>Trạm quan trắc còn thưa</h3>
+                <p>Các tỉnh lẻ hầu như chưa có trạm quan trắc chất lượng không khí.</p>
+            </div>
+            <div class="feature">
+                <div class="icon">💰</div>
+                <h3>Chi phí thấp</h3>
+                <p>Trạm nhà nước hàng tỷ đồng. Hệ thống này dưới 2 triệu/trạm.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="how" class="section">
+        <h2>Cách hoạt động</h2>
+        <div class="pipeline">
+            <div class="pipe-step">
+                <div class="pipe-num">1</div>
+                <div class="pipe-label">Node cảm biến</div>
+                <div class="pipe-desc">STM32 + cảm biến + solar + pin. Chạy ngoài trời 24/7.</div>
+            </div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipe-step">
+                <div class="pipe-num">2</div>
+                <div class="pipe-label">Truyền LoRa</div>
+                <div class="pipe-desc">Dữ liệu gửi qua LoRa 920MHz, xa 2–5km.</div>
+            </div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipe-step">
+                <div class="pipe-num">3</div>
+                <div class="pipe-label">Gateway ESP32</div>
+                <div class="pipe-desc">Nhận LoRa, đẩy lên server qua MQTT.</div>
+            </div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipe-step">
+                <div class="pipe-num">4</div>
+                <div class="pipe-label">Dashboard</div>
+                <div class="pipe-desc">Hiển thị realtime, tính AQI, cảnh báo.</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section cta-section">
+        <h2>Sẵn sàng xem dữ liệu?</h2>
+        <a href="dashboard.html" class="btn-primary btn-large">Mở Dashboard</a>
+    </section>
+
+    <footer>
+        <p>Dự án Khoa học Kỹ thuật — 2026</p>
+        <p>Node ID: 001 | Địa điểm: An Giang</p>
+    </footer>
+
+    <div class="modal-overlay" id="login-modal" style="display:none;">
+        <div class="modal">
+            <button class="modal-close" onclick="closeLogin()">×</button>
+            <div class="login-logo">AirWatch</div>
+            <h2>Đăng nhập Admin</h2>
+            <form id="login-form">
+                <label>
+                    <span>Tài khoản</span>
+                    <input type="text" id="login-user" autocomplete="username" required>
+                </label>
+                <label>
+                    <span>Mật khẩu</span>
+                    <input type="password" id="login-pass" autocomplete="current-password" required>
+                </label>
+                <button type="submit" class="btn-primary btn-full">Đăng nhập</button>
+                <div class="login-error" id="login-error"></div>
+            </form>
+        </div>
+    </div>
+
+    <script src="auth-check.js"></script>
+    <script>
+        (async () => {
+            await checkAuth();
+            updateAuthUI();
+            applyTheme();
+        })();
+
+        function updateAuthUI() {
+            const btn = document.getElementById('auth-btn');
+            const action = document.getElementById('auth-action');
+
+            if (isAdmin()) {
+                btn.textContent = 'Admin ▾';
+                action.textContent = '🚪 Đăng xuất';
+            } else {
+                btn.textContent = 'Guest ▾';
+                action.textContent = '🔑 Đăng nhập';
+            }
+        }
+
+        function toggleMenu(e) {
+            e.stopPropagation();
+            document.getElementById('dropdown-menu').classList.toggle('open');
+        }
+
+        document.addEventListener('click', () => {
+            document.getElementById('dropdown-menu').classList.remove('open');
+        });
+
+        function handleAuthAction() {
+            if (isAdmin()) {
+                logout();
+            } else {
+                document.getElementById('login-modal').style.display = 'flex';
+            }
+        }
+
+        function closeLogin() {
+            document.getElementById('login-modal').style.display = 'none';
+        }
+
+        function toggleTheme() {
+            const isLight = document.body.classList.toggle('light');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            updateThemeLabel();
+        }
+
+        function applyTheme() {
+            const saved = localStorage.getItem('theme') || 'dark';
+            if (saved === 'light') {
+                document.body.classList.add('light');
+            } else {
+                document.body.classList.remove('light');
+            }
+            updateThemeLabel();
+        }
+
+        function updateThemeLabel() {
+            const icon = document.getElementById('theme-icon');
+            const label = document.getElementById('theme-label');
+            if (!icon || !label) return;
+
+            if (document.body.classList.contains('light')) {
+                icon.textContent = '☀️';
+                label.textContent = 'Chế độ sáng';
+            } else {
+                icon.textContent = '🌙';
+                label.textContent = 'Chế độ tối';
+            }
+        }
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const user = document.getElementById('login-user').value.trim();
+            const pass = document.getElementById('login-pass').value;
+            const errEl = document.getElementById('login-error');
+            errEl.textContent = '';
+
+            const ok = await login(user, pass);
+            if (ok) {
+                closeLogin();
+                await checkAuth();
+                updateAuthUI();
+                document.getElementById('login-user').value = '';
+                document.getElementById('login-pass').value = '';
+            } else {
+                errEl.textContent = 'Sai tài khoản hoặc mật khẩu';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard — Quan trắc không khí</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="nav">
+        <div class="logo"><a href="index.html">AirWatch</a></div>
+        <ul class="nav-links">
+            <li class="dropdown">
+                <button onclick="toggleMenu(event)" class="btn-primary" id="auth-btn" style="padding: 8px 16px; font-size: 13px;">Guest ▾</button>
+                <div class="dropdown-menu" id="dropdown-menu">
+                    <button onclick="toggleTheme()"><span id="theme-icon">🌙</span><span id="theme-label">Chế độ tối</span></button>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" id="auth-action" onclick="handleAuthAction(); return false;">🔑 Đăng nhập</a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+
+    <header>
+        <h1>
+            Dashboard
+            <span class="status" id="status">LIVE</span>
+        </h1>
+    </header>
+
+    <section class="grid">
+        <div class="card temp">
+            <div class="label">Nhiệt độ</div>
+            <div class="value"><span id="temp">--</span><span class="unit">°C</span></div>
+        </div>
+        <div class="card hum">
+            <div class="label">Độ ẩm</div>
+            <div class="value"><span id="hum">--</span><span class="unit">%</span></div>
+        </div>
+        <div class="card volt admin-only" style="display:none;">
+            <div class="label">Điện áp</div>
+            <div class="value"><span id="volt">--</span><span class="unit">V</span></div>
+        </div>
+        <div class="card curr admin-only" style="display:none;">
+            <div class="label">Dòng điện</div>
+            <div class="value"><span id="curr">--</span><span class="unit">mA</span></div>
+        </div>
+    </section>
+
+    <section class="chart-container">
+        <h2 class="chart-title">Môi trường</h2>
+        <canvas id="chart-env"></canvas>
+    </section>
+
+    <section class="chart-container admin-only" style="display:none;">
+        <h2 class="chart-title">Điện áp</h2>
+        <canvas id="chart-volt"></canvas>
+    </section>
+
+    <section class="chart-container admin-only" style="display:none;">
+        <h2 class="chart-title">Dòng điện</h2>
+        <canvas id="chart-curr"></canvas>
+    </section>
+
+    <section class="chart-container admin-only" style="display:none;">
+        <h2 class="chart-title">Dữ liệu hệ thống (Admin)</h2>
+        <div class="grid">
+            <div class="card">
+                <div class="label">Record DB</div>
+                <div class="value"><span id="db-count">--</span></div>
+            </div>
+            <div class="card">
+                <div class="label">Cập nhật cuối</div>
+                <div class="value" style="font-size: 16px;"><span id="last-seen">--</span></div>
+            </div>
+            <div class="card">
+                <div class="label">Role</div>
+                <div class="value" style="font-size: 20px;"><span id="role-display">--</span></div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        Node ID: 001 | Cập nhật: <span id="updated">--</span>
+    </footer>
+
+    <script src="chart.min.js"></script>
+    <script src="auth-check.js"></script>
+    <script>
+        function toggleMenu(e) {
+            e.stopPropagation();
+            document.getElementById('dropdown-menu').classList.toggle('open');
+        }
+        document.addEventListener('click', () => {
+            const m = document.getElementById('dropdown-menu');
+            if (m) m.classList.remove('open');
+        });
+        function handleAuthAction() {
+            if (isAdmin()) {
+                logout();
+            } else {
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
+    <script src="app.js"></script>
+</body>
+</html>

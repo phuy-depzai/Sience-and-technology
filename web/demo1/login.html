@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng nhập — AirWatch</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="login-page">
+    <div class="login-box">
+        <div class="login-logo">AirWatch</div>
+        <h1>Đăng nhập</h1>
+        <form id="login-form">
+            <label>
+                <span>Tài khoản</span>
+                <input type="text" id="user" autocomplete="username" required>
+            </label>
+            <label>
+                <span>Mật khẩu</span>
+                <input type="password" id="pass" autocomplete="current-password" required>
+            </label>
+            <button type="submit" class="btn-primary btn-full">Đăng nhập</button>
+            <div class="login-error" id="error"></div>
+        </form>
+        <div class="login-footer">
+            <a href="index.html">← Về trang chủ</a>
+        </div>
+    </div>
+
+    <script>
+        const API = 'http://192.168.1.54:1880';
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const user = document.getElementById('user').value.trim();
+            const pass = document.getElementById('pass').value;
+            const errEl = document.getElementById('error');
+            errEl.textContent = '';
+
+            try {
+                const r = await fetch(API + '/api/login', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user, pass })
+                });
+                const data = await r.json();
+
+                if (data.ok) {
+                    window.location.href = 'dashboard.html';
+                } else {
+                    errEl.textContent = data.error || 'Đăng nhập thất bại';
+                }
+            } catch(e) {
+                errEl.textContent = 'Không kết nối được server';
+            }
+        });
+    </script>
+</body>
+</html>
