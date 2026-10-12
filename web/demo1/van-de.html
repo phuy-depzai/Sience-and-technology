@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Vấn đề — AirWatch</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234CAF50'/><text x='50' y='68' font-size='60' font-family='Arial' font-weight='bold' fill='white' text-anchor='middle'>A</text></svg>">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="landing">
+    <nav class="nav">
+        <a href="index.html" class="logo">AirWatch</a>
+        <ul class="nav-links">
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li class="dropdown">
+                <button onclick="toggleMenu(event)" class="btn-primary" id="auth-btn" style="padding: 8px 16px; font-size: 13px;">Guest ▾</button>
+                <div class="dropdown-menu" id="dropdown-menu">
+                    <button onclick="toggleTheme()"><span id="theme-icon">🌙</span><span id="theme-label">Chế độ tối</span></button>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" id="auth-action" onclick="handleAuthAction(); return false;">🔑 Đăng nhập</a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+    <header class="hero">
+        <h1>Vấn đề</h1>
+        <p class="subtitle">Trạm quan trắc còn quá thưa — dữ liệu môi trường thiếu minh bạch</p>
+    </header>
+
+    <section class="content-section">
+        <div class="content-row">
+            <div class="content-img">
+                <img src="tqt.jpg" alt="Trạm quan trắc">
+            </div>
+            <div class="content-text">
+                <h3>Trạm quan trắc còn quá thưa</h3>
+                <p>Cả nước chỉ có vài chục trạm quan trắc không khí, tập trung chủ yếu ở các thành phố lớn. Các tỉnh lẻ, vùng nông thôn gần như không có dữ liệu.</p>
+            </div>
+        </div>
+
+        <div class="content-row reverse">
+            <div class="content-text">
+                <h3>Hạn chế của hệ thống hiện tại</h3>
+                <ul>
+                    <li><strong>Độ phủ thấp:</strong> người dân không biết chất lượng không khí nơi mình sống.</li>
+                    <li><strong>Dữ liệu chậm:</strong> không cảnh báo kịp thời khi ô nhiễm tăng đột biến.</li>
+                    <li><strong>Phụ thuộc điện lưới:</strong> khó triển khai ở vùng sâu, vùng xa.</li>
+                    <li><strong>Thiếu minh bạch:</strong> nhiều vụ việc làm sai lệch kết quả quan trắc đã bị phát hiện.</li>
+                </ul>
+            </div>
+            <div class="content-img" style="background: linear-gradient(135deg, #1a4d2e, #4CAF50); min-height: 300px; display: flex; align-items: center; justify-content: center;">
+                <div style="font-size: 80px;">⚠️</div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 60px;">
+            <a href="giai-phap.html" class="btn-primary btn-large">Xem giải pháp →</a>
+        </div>
+    </section>
+
+    <footer>
+        <p><strong>AirWatch</strong> — Hệ thống quan trắc không khí LoRa</p>
+        <p>Dự án Khoa học Kỹ thuật 2026</p>
+    </footer>
+
+    <script src="auth-check.js"></script>
+    <script src="auth-ui.js"></script>
+</body>
+</html>

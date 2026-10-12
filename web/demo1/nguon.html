@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Nguồn ô nhiễm — AirWatch</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234CAF50'/><text x='50' y='68' font-size='60' font-family='Arial' font-weight='bold' fill='white' text-anchor='middle'>A</text></svg>">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="landing">
+    <nav class="nav">
+        <a href="index.html" class="logo">AirWatch</a>
+        <ul class="nav-links">
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li class="dropdown">
+                <button onclick="toggleMenu(event)" class="btn-primary" id="auth-btn" style="padding: 8px 16px; font-size: 13px;">Guest ▾</button>
+                <div class="dropdown-menu" id="dropdown-menu">
+                    <button onclick="toggleTheme()"><span id="theme-icon">🌙</span><span id="theme-label">Chế độ tối</span></button>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" id="auth-action" onclick="handleAuthAction(); return false;">🔑 Đăng nhập</a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+
+    <header class="hero">
+        <h1>Nguồn ô nhiễm không khí</h1>
+        <p class="subtitle">Từ đâu chất độc bay vào không khí?</p>
+    </header>
+
+    <section class="content-section">
+        <div class="content-text" style="text-align: center; margin-bottom: 60px; max-width: 800px; margin-left: auto; margin-right: auto;">
+            <p>Ô nhiễm không khí có thể do tự nhiên hoặc con người gây ra. Các nguồn nhân tạo là tác nhân chính ở đô thị và có thể kiểm soát bằng quy định.</p>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <div class="icon">🏭</div>
+                <h3>Công nghiệp</h3>
+                <p>Nhà máy, mỏ, nhà máy lọc dầu, nhà máy điện than. Phát thải NOx, VOC và hạt vật chất.</p>
+            </div>
+            <div class="feature">
+                <div class="icon">🚗</div>
+                <h3>Giao thông</h3>
+                <p>Ô tô, xe tải, tàu hỏa, máy bay, tàu thủy. Nguồn chính gây PM2.5, ozone và NO2.</p>
+            </div>
+            <div class="feature">
+                <div class="icon">🌾</div>
+                <h3>Nông nghiệp</h3>
+                <p>Sử dụng phân bón, đốt rơm rạ. Phát sinh PM2.5 tại nhiều khu vực trên thế giới.</p>
+            </div>
+            <div class="feature">
+                <div class="icon">🏠</div>
+                <h3>Hộ gia đình</h3>
+                <p>Nấu ăn, sưởi ấm bằng than hoặc củi. Gây ô nhiễm không khí trong nhà.</p>
+            </div>
+            <div class="feature">
+                <div class="icon">🔥</div>
+                <h3>Cháy rừng & đốt ngoài trời</h3>
+                <p>Thải PM, NOx, CO, SO2, chì, thủy ngân — ô nhiễm diện rộng.</p>
+            </div>
+            <div class="feature">
+                <div class="icon">🌋</div>
+                <h3>Nguồn tự nhiên</h3>
+                <p>Núi lửa, cháy rừng, bão cát, bụi sa mạc. Phụ thuộc vị trí địa lý.</p>
+            </div>
+        </div>
+
+        <div class="content-text" style="max-width: 800px; margin: 80px auto 40px; text-align: center;">
+            <h3>Nguồn gây ô nhiễm PM2.5</h3>
+            <p>Vì PM2.5 có thể xâm nhập sâu vào phổi và đi vào máu, các nguồn phát sinh rất đa dạng:</p>
+        </div>
+
+        <div class="pollution-grid">
+            <div class="pollution-item">
+                <svg class="pollution-icon" viewBox="0 0 24 24" fill="none" stroke="#2196F3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 21h18M5 21V10l4-3v14M13 21V8l4-3v16M9 21v-4h4v4"/>
+                </svg>
+                <span>Sự đốt than</span>
+            </div>
+            <div class="pollution-item">
+                <svg class="pollution-icon" viewBox="0 0 24 24" fill="none" stroke="#2196F3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2v6M8 8h8M9 8v6l-2 3v5h10v-5l-2-3V8M7 22h10"/>
+                </svg>
+                <span>Sự đốt cháy xăng</span>
+            </div>
+            <div class="pollution-item">
+                <svg class="pollution-icon" viewBox="0 0 24 24" fill="none" stroke="#2196F3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="1" y="7" width="14" height="10" rx="1"/>
+                    <path d="M15 10h4l3 3v4h-7M6 21a2 2 0 1 1 0-4 2 2 0 0 1 0 4zM18 21a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/>
+                </svg>
+                <span>Đốt cháy dầu diesel</span>
+            </div>
+            <div class="pollution-item">
+                <svg class="pollution-icon" viewBox="0 0 24 24" fill="none" stroke="#2196F3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 22V12H4L2 8l3-3h10l2 3h3a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-3"/>
+                    <path d="M6 22v-4M14 22v-4"/>
+                </svg>
+                <span>Đốt gỗ</span>
+            </div>
+            <div class="pollution-item">
+                <svg class="pollution-icon" viewBox="0 0 24 24" fill="none" stroke="#2196F3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 17h14l-1.5-7.5A2 2 0 0 0 15.5 8h-7a2 2 0 0 0-2 1.5L5 17z"/>
+                    <circle cx="7.5" cy="19.5" r="1.5"/>
+                    <circle cx="16.5" cy="19.5" r="1.5"/>
+                </svg>
+                <span>Động cơ đốt trong</span>
+            </div>
+            <div class="pollution-item">
+                <svg class="pollution-icon" viewBox="0 0 24 24" fill="none" stroke="#2196F3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 20h20M4 20V9l5-4v15M11 20V9l5-4v15M16 20V9l5-4v15"/>
+                    <path d="M6 12v2M13 12v2M18 12v2"/>
+                </svg>
+                <span>Quy trình công nghiệp</span>
+            </div>
+            <div class="pollution-item">
+                <svg class="pollution-icon" viewBox="0 0 24 24" fill="none" stroke="#2196F3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2c1 3 4 4 4 8a4 4 0 0 1-8 0c0-1 .5-2 1-3-2 1-4 4-4 7a7 7 0 0 0 14 0c0-5-5-8-7-12z"/>
+                </svg>
+                <span>Cháy rừng</span>
+            </div>
+            <div class="pollution-item">
+                <svg class="pollution-icon" viewBox="0 0 24 24" fill="none" stroke="#2196F3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="2"/>
+                    <ellipse cx="12" cy="12" rx="10" ry="4"/>
+                    <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/>
+                    <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/>
+                </svg>
+                <span>Chuyển đổi khí thành hạt</span>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 60px;">
+            <a href="index.html#giai-phap" class="btn-primary btn-large">Xem giải pháp →</a>
+        </div>
+    </section>
+
+    <footer>
+        <p><strong>AirWatch</strong> — Hệ thống quan trắc không khí LoRa</p>
+        <p>Dự án Khoa học Kỹ thuật 2026</p>
+    </footer>
+
+    <script src="auth-check.js"></script>
+    <script src="auth-ui.js"></script>
+</body>
+</html>

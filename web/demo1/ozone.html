@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Ozone — AirWatch</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234CAF50'/><text x='50' y='68' font-size='60' font-family='Arial' font-weight='bold' fill='white' text-anchor='middle'>A</text></svg>">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="landing">
+    <nav class="nav">
+        <a href="index.html" class="logo">AirWatch</a>
+        <ul class="nav-links">
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li class="dropdown">
+                <button onclick="toggleMenu(event)" class="btn-primary" id="auth-btn" style="padding: 8px 16px; font-size: 13px;">Guest ▾</button>
+                <div class="dropdown-menu" id="dropdown-menu">
+                    <button onclick="toggleTheme()"><span id="theme-icon">🌙</span><span id="theme-label">Chế độ tối</span></button>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" id="auth-action" onclick="handleAuthAction(); return false;">🔑 Đăng nhập</a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+
+    <header class="hero">
+        <h1>Ozone là gì?</h1>
+        <p class="subtitle">O₃ — khí độc ở tầng mặt đất</p>
+    </header>
+
+    <section class="content-section">
+        <div class="content-row">
+            <div class="content-img" style="background: linear-gradient(135deg, #4a2a1a, #f44336); min-height: 350px; display: flex; align-items: center; justify-content: center;">
+                <div style="font-size: 100px;">☀️</div>
+            </div>
+            <div class="content-text">
+                <h3>Định nghĩa</h3>
+                <p>Ozone (O₃) là khí được hình thành bởi bức xạ cực tím mặt trời và các phân tử oxy.</p>
+                <p>Ở tầng bình lưu, ozone đóng vai trò quan trọng ngăn chặn tia tử ngoại có hại từ Mặt Trời. Tuy nhiên, ở <strong>tầng mặt đất</strong>, ozone là một <strong>khí độc</strong> gây hại cho hệ hô hấp.</p>
+            </div>
+        </div>
+
+        <div class="content-row reverse">
+            <div class="content-text">
+                <h3>Tác động sức khỏe</h3>
+                <ul>
+                    <li>Giảm chức năng phổi.</li>
+                    <li>Bệnh hen suyễn trầm trọng hơn.</li>
+                    <li>Kích ứng cổ họng và ho.</li>
+                    <li>Đau ngực và khó thở.</li>
+                    <li>Viêm mô phổi.</li>
+                    <li>Khả năng mắc bệnh nhiễm trùng đường hô hấp cao hơn.</li>
+                </ul>
+            </div>
+            <div class="content-img" style="background: linear-gradient(135deg, #1a2a4d, #2196F3); min-height: 300px; display: flex; align-items: center; justify-content: center;">
+                <div style="font-size: 100px;">🫁</div>
+            </div>
+        </div>
+
+        <div class="content-text" style="max-width: 800px; margin: 60px auto 40px; text-align: center;">
+            <h3>Nguồn phát sinh Ozone mặt đất</h3>
+            <p>Ozone mặt đất hình thành từ phản ứng quang hóa giữa các chất ô nhiễm dưới ánh nắng mặt trời:</p>
+        </div>
+
+        <div class="pollution-grid">
+            <div class="pollution-item">
+                <svg class="pollution-icon" viewBox="0 0 24 24" fill="none" stroke="#2196F3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 17h14l-1.5-7.5A2 2 0 0 0 15.5 8h-7a2 2 0 0 0-2 1.5L5 17z"/>
+                    <circle cx="7.5" cy="19.5" r="1.5"/>
+                    <circle cx="16.5" cy="19.5" r="1.5"/>
+                </svg>
+                <span>Khí thải xe cộ</span>
+            </div>
+            <div class="pollution-item">
+                <svg class="pollution-icon" viewBox="0 0 24 24" fill="none" stroke="#2196F3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 20h20M4 20V9l5-4v15M11 20V9l5-4v15M16 20V9l5-4v15"/>
+                    <path d="M6 12v2M13 12v2M18 12v2"/>
+                </svg>
+                <span>Nhà máy điện</span>
+            </div>
+            <div class="pollution-item">
+                <svg class="pollution-icon" viewBox="0 0 24 24" fill="none" stroke="#2196F3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 3v6l-4 8a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-4-8V3"/>
+                    <path d="M7 3h10M9 14h6"/>
+                </svg>
+                <span>Dung môi hữu cơ</span>
+            </div>
+            <div class="pollution-item">
+                <svg class="pollution-icon" viewBox="0 0 24 24" fill="none" stroke="#2196F3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2v6M8 8h8M9 8v6l-2 3v5h10v-5l-2-3V8M7 22h10"/>
+                </svg>
+                <span>Trạm xăng dầu</span>
+            </div>
+            <div class="pollution-item">
+                <svg class="pollution-icon" viewBox="0 0 24 24" fill="none" stroke="#2196F3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="9"/>
+                    <circle cx="9" cy="10" r="1"/>
+                    <circle cx="15" cy="10" r="1"/>
+                    <circle cx="12" cy="15" r="1"/>
+                </svg>
+                <span>Sơn, hóa chất</span>
+            </div>
+            <div class="pollution-item">
+                <svg class="pollution-icon" viewBox="0 0 24 24" fill="none" stroke="#2196F3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="4"/>
+                    <path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1l2.1-2.1M17 7l2.1-2.1"/>
+                </svg>
+                <span>Ánh nắng mặt trời</span>
+            </div>
+            <div class="pollution-item">
+                <svg class="pollution-icon" viewBox="0 0 24 24" fill="none" stroke="#2196F3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="2"/>
+                    <ellipse cx="12" cy="12" rx="10" ry="4"/>
+                    <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/>
+                    <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/>
+                </svg>
+                <span>Phản ứng NOx + VOC</span>
+            </div>
+            <div class="pollution-item">
+                <svg class="pollution-icon" viewBox="0 0 24 24" fill="none" stroke="#2196F3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10 3v10.5a4 4 0 1 0 4 0V3"/>
+                    <circle cx="12" cy="18" r="2"/>
+                </svg>
+                <span>Nhiệt độ cao</span>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 60px;">
+            <a href="nguon.html" class="btn-primary btn-large">Tiếp: Nguồn ô nhiễm →</a>
+        </div>
+    </section>
+
+    <footer>
+        <p><strong>AirWatch</strong> — Hệ thống quan trắc không khí LoRa</p>
+        <p>Dự án Khoa học Kỹ thuật 2026</p>
+    </footer>
+
+    <script src="auth-check.js"></script>
+    <script src="auth-ui.js"></script>
+</body>
+</html>

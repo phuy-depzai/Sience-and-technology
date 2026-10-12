@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>PM10 — AirWatch</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234CAF50'/><text x='50' y='68' font-size='60' font-family='Arial' font-weight='bold' fill='white' text-anchor='middle'>A</text></svg>">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="landing">
+    <nav class="nav">
+        <a href="index.html" class="logo">AirWatch</a>
+        <ul class="nav-links">
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li class="dropdown">
+                <button onclick="toggleMenu(event)" class="btn-primary" id="auth-btn" style="padding: 8px 16px; font-size: 13px;">Guest ▾</button>
+                <div class="dropdown-menu" id="dropdown-menu">
+                    <button onclick="toggleTheme()"><span id="theme-icon">🌙</span><span id="theme-label">Chế độ tối</span></button>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" id="auth-action" onclick="handleAuthAction(); return false;">🔑 Đăng nhập</a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+
+    <header class="hero">
+        <h1>PM10 là gì?</h1>
+        <p class="subtitle">Bụi thô — hạt lơ lửng lớn hơn</p>
+    </header>
+
+    <section class="content-section">
+        <div class="content-row">
+            <div class="content-img">
+                <img src="o_nhiem.jpg" alt="PM10">
+            </div>
+            <div class="content-text">
+                <h3>Định nghĩa</h3>
+                <p>PM10 là vật chất dạng hạt lơ lửng trong không khí với đường kính <strong>10 micromet hoặc nhỏ hơn</strong>, bao gồm khói, bồ hóng, muối, axit và hơi kim loại.</p>
+                <p>Sự khác biệt giữa PM10 và PM2.5 đơn giản ở <strong>kích thước hạt</strong> — PM2.5 siêu nhỏ, còn PM10 lớn hơn và thô hơn.</p>
+            </div>
+        </div>
+
+        <div class="content-row reverse">
+            <div class="content-text">
+                <h3>Tác động sức khỏe</h3>
+                <ul>
+                    <li>Kích ứng mũi, họng và mắt.</li>
+                    <li>Ho, khó thở, giảm chức năng phổi.</li>
+                    <li>Nặng hơn với người mắc hen suyễn, COPD.</li>
+                    <li>Ít nguy hiểm hơn PM2.5 nhưng vẫn ảnh hưởng đường hô hấp trên.</li>
+                </ul>
+            </div>
+            <div class="content-img" style="background: linear-gradient(135deg, #4a3a1a, #FF9800); min-height: 300px; display: flex; align-items: center; justify-content: center;">
+                <div style="font-size: 100px;">🌫️</div>
+            </div>
+        </div>
+
+        <div class="content-text" style="max-width: 800px; margin: 60px auto 40px; text-align: center;">
+            <h3>Nguồn phát sinh PM10</h3>
+            <p>PM10 bao gồm các hạt bụi lơ lửng có kích thước lớn hơn PM2.5, phát sinh từ nhiều quá trình tự nhiên và nhân tạo:</p>
+        </div>
+
+        <div class="pollution-grid">
+            <div class="pollution-item">
+                <svg class="pollution-icon" viewBox="0 0 24 24" fill="none" stroke="#2196F3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 20h16M4 16h16M8 12l4-4 4 4M12 4v4"/>
+                </svg>
+                <span>Bụi đường</span>
+            </div>
+            <div class="pollution-item">
+                <svg class="pollution-icon" viewBox="0 0 24 24" fill="none" stroke="#2196F3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="9"/>
+                    <circle cx="12" cy="12" r="4"/>
+                    <path d="M12 3v3M12 18v3M3 12h3M18 12h3"/>
+                </svg>
+                <span>Lốp xe mài mòn</span>
+            </div>
+            <div class="pollution-item">
+                <svg class="pollution-icon" viewBox="0 0 24 24" fill="none" stroke="#2196F3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 21h18M6 21V8M18 21V8M6 8h12M12 8V4M9 4h6M3 12h3M18 12h3"/>
+                </svg>
+                <span>Công trường xây dựng</span>
+            </div>
+            <div class="pollution-item">
+                <svg class="pollution-icon" viewBox="0 0 24 24" fill="none" stroke="#2196F3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 20l6-6M14 4l6 6M4 4l16 16M8 4l4 4M16 20l-4-4"/>
+                </svg>
+                <span>Khai thác mỏ</span>
+            </div>
+            <div class="pollution-item">
+                <svg class="pollution-icon" viewBox="0 0 24 24" fill="none" stroke="#2196F3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2v20M12 2c-2 3-5 4-8 4M12 2c2 3 5 4 8 4M12 10c-1 2-3 3-5 3M12 10c1 2 3 3 5 3M12 16c-1 2-3 3-5 3M12 16c1 2 3 3 5 3"/>
+                </svg>
+                <span>Nông nghiệp</span>
+            </div>
+            <div class="pollution-item">
+                <svg class="pollution-icon" viewBox="0 0 24 24" fill="none" stroke="#2196F3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 18c2-2 4-2 6 0s4 2 6 0 4-2 6 0M3 12c2-2 4-2 6 0s4 2 6 0 4-2 6 0M3 6c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/>
+                </svg>
+                <span>Bụi đất, cát</span>
+            </div>
+            <div class="pollution-item">
+                <svg class="pollution-icon" viewBox="0 0 24 24" fill="none" stroke="#2196F3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 16h8a4 4 0 0 0 0-8h-1a5 5 0 0 0-9 3"/>
+                    <path d="M3 20h14a3 3 0 0 0 0-6"/>
+                </svg>
+                <span>Tro bay</span>
+            </div>
+            <div class="pollution-item">
+                <svg class="pollution-icon" viewBox="0 0 24 24" fill="none" stroke="#2196F3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M12 9V3M12 21v-6M15 12h6M3 12h6M14.1 9.9l4.2-4.2M5.7 18.3l4.2-4.2M14.1 14.1l4.2 4.2M5.7 5.7l4.2 4.2"/>
+                </svg>
+                <span>Nghiền cơ học</span>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 60px;">
+            <a href="ozone.html" class="btn-primary btn-large">Tiếp: Ozone →</a>
+        </div>
+    </section>
+
+    <footer>
+        <p><strong>AirWatch</strong> — Hệ thống quan trắc không khí LoRa</p>
+        <p>Dự án Khoa học Kỹ thuật 2026</p>
+    </footer>
+
+    <script src="auth-check.js"></script>
+    <script src="auth-ui.js"></script>
+</body>
+</html>

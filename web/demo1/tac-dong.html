@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Tác động sức khỏe — AirWatch</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234CAF50'/><text x='50' y='68' font-size='60' font-family='Arial' font-weight='bold' fill='white' text-anchor='middle'>A</text></svg>">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="landing">
+        <nav class="nav">
+        <a href="index.html" class="logo">AirWatch</a>
+        <ul class="nav-links">
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li class="dropdown">
+                <button onclick="toggleMenu(event)" class="btn-primary" id="auth-btn" style="padding: 8px 16px; font-size: 13px;">Guest ▾</button>
+                <div class="dropdown-menu" id="dropdown-menu">
+                    <button onclick="toggleTheme()"><span id="theme-icon">🌙</span><span id="theme-label">Chế độ tối</span></button>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" id="auth-action" onclick="handleAuthAction(); return false;">🔑 Đăng nhập</a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+    <header class="hero">
+        <h1>Tác động sức khỏe</h1>
+        <p class="subtitle">Ô nhiễm không khí — mối nguy hàng đầu toàn cầu</p>
+    </header>
+
+    <section class="content-section">
+        <div class="content-text" style="text-align: center; margin-bottom: 40px;">
+            <h3 style="font-size: 32px;">Nguyên nhân tử vong hàng đầu</h3>
+            <p>Trong 62 triệu người tử vong mỗi năm (2021), ô nhiễm không khí là yếu tố nguy cơ đứng thứ 2 toàn cầu.</p>
+        </div>
+
+        <table class="spec-table" style="max-width: 700px; margin: 0 auto 80px;">
+            <thead>
+                <tr><th>#</th><th>Yếu tố rủi ro</th><th>Tử vong</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>1</td><td>Huyết áp cao</td><td>10.9M</td></tr>
+                <tr style="background: rgba(244,67,54,0.1);"><td>2</td><td><strong>Ô nhiễm không khí (ngoài trời & trong nhà)</strong></td><td><strong>8.1M</strong></td></tr>
+                <tr><td>3</td><td>Hút thuốc</td><td>6.2M</td></tr>
+                <tr><td>4</td><td>Đường huyết cao</td><td>5.3M</td></tr>
+                <tr><td>5</td><td>Ô nhiễm hạt vật chất ngoài trời</td><td>4.7M</td></tr>
+                <tr><td>6</td><td>Béo phì</td><td>3.7M</td></tr>
+                <tr><td>7</td><td>Cholesterol cao</td><td>3.6M</td></tr>
+                <tr><td>8</td><td>Ô nhiễm không khí trong nhà</td><td>3.1M</td></tr>
+                <tr><td>9</td><td>Chế độ ăn nhiều natri</td><td>1.9M</td></tr>
+                <tr><td>10</td><td>Sử dụng rượu</td><td>1.8M</td></tr>
+            </tbody>
+        </table>
+
+        <div class="content-text" style="text-align: center; margin-bottom: 40px;">
+            <h3 style="font-size: 32px;">Ảnh hưởng đến trẻ em</h3>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <div class="icon">🫁</div>
+                <h3>Vấn đề hô hấp</h3>
+                <p>Tăng các trường hợp hen suyễn và viêm phế quản.</p>
+            </div>
+            <div class="feature">
+                <div class="icon">💨</div>
+                <h3>Giảm chức năng phổi</h3>
+                <p>Tiếp xúc lâu dài có thể làm suy yếu sự phát triển của phổi.</p>
+            </div>
+            <div class="feature">
+                <div class="icon">🧠</div>
+                <h3>Phát triển nhận thức</h3>
+                <p>Tác động tiềm tàng đến sự phát triển não bộ và thành tích học tập.</p>
+            </div>
+        </div>
+
+        <div class="content-text" style="text-align: center; margin: 80px auto 40px; max-width: 800px;">
+            <h3 style="font-size: 32px;">Tác động theo từng chất ô nhiễm</h3>
+        </div>
+
+        <table class="spec-table" style="max-width: 900px; margin: 0 auto;">
+            <thead>
+                <tr>
+                    <th>Ozone mặt đất</th>
+                    <th colspan="2">Bụi mịn (PM) và khói cháy rừng</th>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th>Ngắn hạn</th>
+                    <th>Dài hạn</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <ul style="text-align: left; padding-left: 20px;">
+                            <li>Giảm chức năng phổi</li>
+                            <li>Bệnh hen suyễn trầm trọng hơn</li>
+                            <li>Kích ứng cổ họng và ho</li>
+                            <li>Đau ngực và khó thở</li>
+                            <li>Viêm mô phổi</li>
+                            <li>Khả năng mắc bệnh nhiễm trùng đường hô hấp cao hơn</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul style="text-align: left; padding-left: 20px;">
+                            <li>Nhịp tim không đều</li>
+                            <li>Đau ngực</li>
+                            <li>Ho</li>
+                            <li>Kích ứng mắt, mũi và họng</li>
+                            <li>Bệnh hen suyễn trầm trọng hơn</li>
+                            <li>Giảm chức năng phổi</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul style="text-align: left; padding-left: 20px;">
+                            <li>Tổn thương mô phổi</li>
+                            <li>Bệnh ung thư</li>
+                            <li>Phát triển các bệnh đường hô hấp như hen suyễn, viêm phế quản và khí phế thũng</li>
+                            <li>Cái chết sớm</li>
+                        </ul>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+[{
+	"resource": "/home/phuyy/Downloads/Sience-and-technology/web/demo1/pm25.html",
+	"owner": "_generated_diagnostic_collection_name_#4",
+	"code": "css-colonexpected",
+	"severity": 8,
+	"message": "colon expected",
+	"source": "css",
+	"startLineNumber": 120,
+	"startColumn": 24,
+	"endLineNumber": 120,
+	"endColumn": 29,
+	"modelVersionId": 6,
+	"origin": "extHost2"
+},{
+	"resource": "/home/phuyy/Downloads/Sience-and-technology/web/demo1/pm25.html",
+	"owner": "_generated_diagnostic_collection_name_#4",
+	"code": "css-semicolonexpected",
+	"severity": 8,
+	"message": "semi-colon expected",
+	"source": "css",
+	"startLineNumber": 138,
+	"startColumn": 103,
+	"endLineNumber": 138,
+	"endColumn": 106,
+	"modelVersionId": 6,
+	"origin": "extHost2"
+},{
+	"resource": "/home/phuyy/Downloads/Sience-and-technology/web/demo1/pm25.html",
+	"owner": "_generated_diagnostic_collection_name_#4",
+	"code": "css-lcurlyexpected",
+	"severity": 8,
+	"message": "{ expected",
+	"source": "css",
+	"startLineNumber": 138,
+	"startColumn": 122,
+	"endLineNumber": 138,
+	"endColumn": 123,
+	"modelVersionId": 6,
+	"origin": "extHost2"
+},{
+	"resource": "/home/phuyy/Downloads/Sience-and-technology/web/demo1/pm25.html",
+	"owner": "_generated_diagnostic_collection_name_#4",
+	"code": "css-ruleorselectorexpected",
+	"severity": 8,
+	"message": "at-rule or selector expected",
+	"source": "css",
+	"startLineNumber": 138,
+	"startColumn": 129,
+	"endLineNumber": 138,
+	"endColumn": 130,
+	"modelVersionId": 6,
+	"origin": "extHost2"
+}]
+        <div style="text-align: center; margin-top: 60px;">
+            <a href="nguon.html" class="btn-primary btn-large">Tiếp: Nguồn ô nhiễm →</a>
+        </div>
+    </section>
+
+    <footer>
+        <p><strong>AirWatch</strong> — Hệ thống quan trắc không khí LoRa</p>
+        <p>Dự án Khoa học Kỹ thuật 2026</p>
+    </footer>
+
+    <script src="auth-check.js"></script>
+    <script src="auth-ui.js"></script>
+</body>
+</html>
