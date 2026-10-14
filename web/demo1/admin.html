@@ -99,10 +99,10 @@
         function initMap() {
             map = L.map('map').setView([10.346854, 105.461074], 13);
 
-            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                attribution: '© Esri',
-                maxZoom: 19
-            }).addTo(map);
+           L.tileLayer('https://maps.vietmap.vn/maps/tiles/st/{z}/{x}/{y}.png?apikey=75950d796c1f4a611133660d2ec48258174fc8279da00348', {
+    attribution: '© VietMap',
+    maxZoom: 19
+}).addTo(map);
 
             markerLayer = L.layerGroup().addTo(map);
 

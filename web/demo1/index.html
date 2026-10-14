@@ -5,6 +5,7 @@
     <title>AirWatch — Hệ thống quan trắc không khí</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234CAF50'/><text x='50' y='68' font-size='60' font-family='Arial' font-weight='bold' fill='white' text-anchor='middle'>A</text></svg>">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 </head>
 <body class="landing">
     <nav class="nav">
@@ -29,7 +30,6 @@
         <p class="subtitle">
             Hệ thống quan trắc không khí ứng dụng công nghệ LoRa chi phí thấp, tự chủ năng lượng, phù hợp triển khai mật độ cao tại Việt Nam.
         </p>
-        
     </header>
 
     <section id="van-de" class="content-section">
@@ -61,21 +61,53 @@
         </div>
     </section>
 
-    <section class="content-section">
-        <div class="content-row">
-            <div class="content-img">
-                <img src="tqt.jpg" alt="Trạm quan trắc">
+    <section id="mang-luoi" class="content-section">
+        <div class="content-text" style="text-align: center; max-width: 800px; margin: 0 auto 40px;">
+            <h3 style="font-size: 32px;">Trạm quan trắc còn quá thưa</h3>
+            <p>Cả nước chỉ có <strong>92 trạm quan trắc không khí tự động</strong>, tập trung chủ yếu ở các thành phố lớn. Các tỉnh lẻ, vùng nông thôn gần như không có dữ liệu.</p>
+        </div>
+
+        <div class="features" style="margin-bottom: 50px;">
+            <div class="feature">
+                <div class="icon">📍</div>
+                <h3>Độ phủ thấp</h3>
+                <p>Người dân không biết chất lượng không khí nơi mình sống.</p>
             </div>
-            <div class="content-text">
-                <h3>Trạm quan trắc còn quá thưa</h3>
-                <p>Cả nước chỉ có vài chục trạm quan trắc không khí, tập trung chủ yếu ở các thành phố lớn. Các tỉnh lẻ, vùng nông thôn gần như không có dữ liệu.</p>
-                <ul>
-                    <li><strong>Độ phủ thấp:</strong> người dân không biết chất lượng không khí nơi mình sống.</li>
-                    <li><strong>Dữ liệu chậm:</strong> không cảnh báo kịp thời khi ô nhiễm tăng đột biến.</li>
-                    <li><strong>Phụ thuộc điện lưới:</strong> khó triển khai ở vùng sâu, vùng xa.</li>
-                    <li><strong>Thiếu minh bạch:</strong> nhiều vụ việc làm sai lệch kết quả quan trắc đã bị phát hiện.</li>
-                </ul>
+            <div class="feature">
+                <div class="icon">⏱️</div>
+                <h3>Dữ liệu chậm</h3>
+                <p>Không cảnh báo kịp thời khi ô nhiễm tăng đột biến.</p>
             </div>
+            <div class="feature">
+                <div class="icon">🔌</div>
+                <h3>Phụ thuộc điện lưới</h3>
+                <p>Khó triển khai ở vùng sâu, vùng xa.</p>
+            </div>
+            <div class="feature">
+                <div class="icon">⚠️</div>
+                <h3>Thiếu minh bạch</h3>
+                <p>Nhiều vụ việc làm sai lệch kết quả quan trắc đã bị phát hiện.</p>
+            </div>
+        </div>
+
+        <div class="content-text" style="text-align: center; margin-bottom: 24px;">
+            <h3 style="font-size: 22px;">Bản đồ phân bố các trạm đã xác minh</h3>
+            <p style="color: var(--text-muted); font-size: 15px;">Các trạm tập trung chủ yếu ở đồng bằng và đô thị lớn, thưa thớt ở vùng núi và nông thôn.</p>
+        </div>
+
+        <div id="stations-map" style="height: 600px; border-radius: 12px; border: 1px solid var(--border);"></div>
+
+        <div style="display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; margin-top: 20px; font-size: 13px;">
+            <div><span style="display:inline-block; width:12px; height:12px; border-radius:50%; background:#4CAF50; margin-right:6px; vertical-align:middle;"></span>Trạm Trung ương</div>
+            <div><span style="display:inline-block; width:12px; height:12px; border-radius:50%; background:#FF9800; margin-right:6px; vertical-align:middle;"></span>Trạm cảm biến</div>
+            <div><span style="display:inline-block; width:12px; height:12px; border-radius:50%; background:#f44336; margin-right:6px; vertical-align:middle;"></span>Trạm địa phương</div>
+            <div><span style="display:inline-block; width:12px; height:12px; border-radius:50%; background:#2196F3; margin-right:6px; vertical-align:middle;"></span>Trạm khí tượng lồng ghép</div>
+        </div>
+
+        <div class="content-text" style="text-align: center; margin-top: 24px;">
+            <p style="color: var(--text-muted); font-size: 13px; font-style: italic;">
+                Nguồn: Trung tâm Quan trắc môi trường — Cục Môi trường
+            </p>
         </div>
     </section>
 
@@ -384,7 +416,7 @@
             <div class="login-logo">AirWatch</div>
             <h2>Đăng nhập Admin</h2>
             <form id="login-form">
-                           <label>
+                <label>
                     <span>Tài khoản</span>
                     <input type="text" id="login-user" autocomplete="username" required>
                 </label>
@@ -398,6 +430,7 @@
         </div>
     </div>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="auth-check.js"></script>
     <script src="auth-ui.js"></script>
 
@@ -413,7 +446,7 @@
             rootMargin: '0px 0px -80px 0px'
         });
 
-        document.querySelectorAll('.content-row, .hero h1, .hero .subtitle, .hero-actions, .spec-header, .cta-section h2, .knowledge-card, .knowledge-header').forEach((el, i) => {
+        document.querySelectorAll('.content-row, .hero h1, .hero .subtitle, .spec-header, .cta-section h2, .knowledge-card, .knowledge-header').forEach((el, i) => {
             el.classList.add('reveal');
             if (el.classList.contains('knowledge-card')) {
                 el.style.transitionDelay = (i % 3) * 0.1 + 's';
@@ -426,6 +459,85 @@
             el.style.transitionDelay = (i % 3) * 0.1 + 's';
             observer.observe(el);
         });
+    </script>
+
+    <script>
+    (function() {
+        const KEY = '75950d796c1f4a611133660d2ec48258174fc8279da00348';
+
+        const stations = [
+            { lat: 17.8642075, lng: 106.3537145, name: 'Hòn La – Quảng Bình', type: 'tw' },
+            { lat: 18.020274, lng: 106.454858, name: 'Kỳ Phương – Hà Tĩnh', type: 'tw' },
+            { lat: 21.049562, lng: 105.882167, name: '556 Nguyễn Văn Cừ – Hà Nội', type: 'tw' },
+            { lat: 21.015306, lng: 105.799889, name: '17 Trung Yên 3 – Hà Nội', type: 'tw' },
+            { lat: 21.051194, lng: 105.781833, name: '36A Phạm Văn Đồng – Hà Nội', type: 'tw' },
+            { lat: 18.0965823, lng: 106.3220648, name: 'Kỳ Hà – Hà Tĩnh (cảm biến)', type: 'cb' },
+            { lat: 18.0181014, lng: 106.3633493, name: 'Kỳ Long – Hà Tĩnh (cảm biến)', type: 'cb' },
+            { lat: 18.0397408, lng: 106.2716339, name: 'Kỳ Trinh – Hà Tĩnh (cảm biến)', type: 'cb' },
+            { lat: 18.0057243, lng: 106.3762301, name: 'Kỳ Liên – Hà Tĩnh (cảm biến)', type: 'cb' },
+            { lat: 10.046444, lng: 105.778639, name: 'Ngã 4 CMT8 – Hùng Vương, Cần Thơ', type: 'dp' },
+            { lat: 10.014278, lng: 105.081639, name: 'Ngã ba đi Hà Tiên – Kiên Giang', type: 'dp' },
+            { lat: 10.157806, lng: 104.904250, name: 'Bãi khai thác đá Hòn Sóc – Kiên Giang', type: 'dp' },
+            { lat: 10.272583, lng: 104.623500, name: 'Xi măng Vicem Hà Tiên – Kiên Giang', type: 'dp' },
+            { lat: 11.021999, lng: 106.394917, name: 'KCN Trảng Bàng – Tây Ninh', type: 'dp' },
+            { lat: 21.3270, lng: 103.9141, name: 'Trạm Sơn La', type: 'kt' },
+            { lat: 21.0194, lng: 105.8036, name: 'Trạm Láng – Hà Nội', type: 'kt' },
+            { lat: 20.2539, lng: 105.9745, name: 'Trạm Cúc Phương – Ninh Bình', type: 'kt' },
+            { lat: 21.0345, lng: 105.8536, name: 'Trạm Thủy văn môi trường Hà Nội', type: 'kt' },
+            { lat: 20.8114, lng: 106.6297, name: 'Trạm Phù Liễn – Hải Phòng', type: 'kt' },
+            { lat: 18.6796, lng: 105.6813, name: 'Trạm Vinh – Nghệ An', type: 'kt' },
+            { lat: 16.0474, lng: 108.2193, name: 'Trạm Đà Nẵng', type: 'kt' },
+            { lat: 13.9833, lng: 108.0000, name: 'Trạm Pleiku – Gia Lai', type: 'kt' },
+            { lat: 10.6897, lng: 106.7045, name: 'Trạm Nhà Bè – TP.HCM', type: 'kt' },
+            { lat: 10.0300, lng: 105.7700, name: 'Trạm Khí tượng Cần Thơ', type: 'kt' }
+        ];
+
+        const colors = { tw: '#4CAF50', cb: '#FF9800', dp: '#f44336', kt: '#2196F3' };
+        const labels = {
+            tw: 'Trạm Trung ương',
+            cb: 'Trạm cảm biến nghiên cứu',
+            dp: 'Trạm địa phương',
+            kt: 'Trạm khí tượng lồng ghép'
+        };
+
+        function initStationsMap() {
+            const el = document.getElementById('stations-map');
+            if (!el || typeof L === 'undefined') return;
+
+            const map = L.map('stations-map').setView([16.0, 106.5], 5);
+
+            L.tileLayer('https://maps.vietmap.vn/maps/tiles/st/{z}/{x}/{y}.png?apikey=' + KEY, {
+                attribution: '© VietMap',
+                maxZoom: 19
+            }).addTo(map);
+
+            stations.forEach(s => {
+                const color = colors[s.type];
+                const radius = s.type === 'tw' ? 9 : 7;
+
+                const marker = L.circleMarker([s.lat, s.lng], {
+                    radius: radius,
+                    fillColor: color,
+                    color: '#fff',
+                    weight: 1.5,
+                    opacity: 1,
+                    fillOpacity: 0.9
+                }).addTo(map);
+
+                marker.bindPopup(
+                    '<strong>' + s.name + '</strong><br>' +
+                    '<small style="color:' + color + ';">' + labels[s.type] + '</small><br>' +
+                    '<small>' + s.lat.toFixed(4) + ', ' + s.lng.toFixed(4) + '</small>'
+                );
+            });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initStationsMap);
+        } else {
+            initStationsMap();
+        }
+    })();
     </script>
 </body>
 </html>
