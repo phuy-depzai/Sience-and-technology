@@ -10,12 +10,9 @@
     <nav class="nav">
         <a href="index.html" class="logo">AirWatch</a>
         <ul class="nav-links">
-            <li><a href="#van-de">Vấn đề</a></li>
-            <li><a href="#giai-phap">Giải pháp</a></li>
-            <li><a href="#thong-so">Thông số</a></li>
-            <li><a href="#kien-thuc">Kiến thức</a></li>
-            <li><a href="#tac-dong">Tác động</a></li>
             <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="map.html">Bản đồ</a></li>
+            <li class="admin-only" style="display:none;"><a href="admin.html">Quản lý</a></li>
             <li class="dropdown">
                 <button onclick="toggleMenu(event)" class="btn-primary" id="auth-btn" style="padding: 8px 16px; font-size: 13px;">Guest ▾</button>
                 <div class="dropdown-menu" id="dropdown-menu">
@@ -30,12 +27,9 @@
     <header class="hero">
         <h1>Theo dõi chất lượng không khí <br><span class="accent">mọi lúc, mọi nơi</span></h1>
         <p class="subtitle">
-            Hệ thống quan trắc không khí ứng dụng công nghệ LoRa —
-            chi phí thấp, tự chủ năng lượng, phù hợp triển khai mật độ cao tại Việt Nam.
+            Hệ thống quan trắc không khí ứng dụng công nghệ LoRa chi phí thấp, tự chủ năng lượng, phù hợp triển khai mật độ cao tại Việt Nam.
         </p>
-        <div class="hero-actions">
-            <a href="dashboard.html" class="btn-primary btn-large">Xem Dashboard</a>
-        </div>
+        
     </header>
 
     <section id="van-de" class="content-section">
@@ -202,31 +196,101 @@
         </div>
     </section>
 
+    <section id="tac-dong" class="content-section">
         <div class="content-text" style="text-align: center; margin-bottom: 40px;">
             <h3 style="font-size: 28px;">Nguyên nhân tử vong hàng đầu</h3>
             <p>Trong 62 triệu người tử vong mỗi năm (2021), ô nhiễm không khí là yếu tố nguy cơ đứng thứ 2 toàn cầu.</p>
         </div>
 
-        <table class="spec-table" style="max-width: 700px; margin: 0 auto 20px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 1100px; margin: 0 auto 20px;">
+
+    <!-- Bảng Thế giới -->
+    <div>
+        <h4 style="text-align: center; color: var(--accent); margin-bottom: 16px; font-size: 18px;">Thế giới (2021)</h4>
+        <table class="spec-table">
             <thead>
-                <tr><th>#</th><th>Yếu tố rủi ro</th><th>Tử vong</th></tr>
+                <tr>
+                    <th>#</th>
+                    <th>Yếu tố rủi ro</th>
+                    <th style="text-align:right;">Tử vong</th>
+                </tr>
             </thead>
             <tbody>
-                <tr><td>1</td><td>Huyết áp cao</td><td>10.9M</td></tr>
-                <tr style="background: rgba(244,67,54,0.1);"><td>2</td><td><strong>Ô nhiễm không khí (ngoài trời & trong nhà)</strong></td><td><strong>8.1M</strong></td></tr>
-                <tr><td>3</td><td>Hút thuốc</td><td>6.2M</td></tr>
-                <tr><td>4</td><td>Đường huyết cao</td><td>5.3M</td></tr>
-                <tr style="background: rgba(244,67,54,0.1);"><td>5</td><td><strong>Ô nhiễm hạt vật chất ngoài trời</strong></td><td><strong>4.7M</strong></td></tr>
-                <tr><td>6</td><td>Béo phì</td><td>3.7M</td></tr>
-                <tr><td>7</td><td>Cholesterol cao</td><td>3.6M</td></tr>
-                <tr style="background: rgba(244,67,54,0.1);"><td>8</td><td><strong>Ô nhiễm không khí trong nhà</strong></td><td><strong>3.1M</strong></td></tr>
-                <tr><td>9</td><td>Chế độ ăn nhiều natri</td><td>1.9M</td></tr>
-                <tr><td>10</td><td>Sử dụng rượu</td><td>1.8M</td></tr>
+                <tr><td>1</td><td>Huyết áp cao</td><td style="text-align:right;">11.0M</td></tr>
+                <tr style="background: rgba(244,67,54,0.1);"><td>2</td><td><strong>Ô nhiễm không khí (ngoài trời & trong nhà)</strong></td><td style="text-align:right;"><strong>7.90M</strong></td></tr>
+                <tr><td>3</td><td>Hút thuốc</td><td style="text-align:right;">5.81M</td></tr>
+                <tr><td>4</td><td>Đường huyết cao</td><td style="text-align:right;">5.34M</td></tr>
+                <tr style="background: rgba(244,67,54,0.1);"><td>5</td><td><strong>Ô nhiễm hạt vật chất ngoài trời</strong></td><td style="text-align:right;"><strong>4.92M</strong></td></tr>
+                <tr><td>6</td><td>Béo phì</td><td style="text-align:right;">3.68M</td></tr>
+                <tr><td>7</td><td>Cholesterol cao</td><td style="text-align:right;">3.62M</td></tr>
+                <tr style="background: rgba(244,67,54,0.1);"><td>8</td><td><strong>Ô nhiễm không khí trong nhà</strong></td><td style="text-align:right;"><strong>2.76M</strong></td></tr>
+                <tr><td>9</td><td>Chế độ ăn ít trái cây</td><td style="text-align:right;">1.76M</td></tr>
+                <tr><td>10</td><td>Chế độ ăn nhiều natri</td><td style="text-align:right;">1.67M</td></tr>
+                <tr><td>11</td><td>Khói thuốc lá gián tiếp</td><td style="text-align:right;">1.66M</td></tr>
+                <tr><td>12</td><td>Trẻ sơ sinh nhẹ cân</td><td style="text-align:right;">1.38M</td></tr>
+                <tr><td>13</td><td>Sử dụng rượu</td><td style="text-align:right;">1.29M</td></tr>
+                <tr><td>14</td><td>Chế độ ăn ít ngũ cốc nguyên hạt</td><td style="text-align:right;">1.19M</td></tr>
+                <tr><td>15</td><td>Quan hệ tình dục không an toàn</td><td style="text-align:right;">1.07M</td></tr>
+                <tr><td>16</td><td>Chế độ ăn ít rau</td><td style="text-align:right;">933K</td></tr>
+                <tr><td>17</td><td>Chế độ ăn ít các loại hạt</td><td style="text-align:right;">884K</td></tr>
+                <tr><td>18</td><td>Nguồn nước không an toàn</td><td style="text-align:right;">755K</td></tr>
+                <tr><td>19</td><td>Ít vận động thể chất</td><td style="text-align:right;">670K</td></tr>
+                <tr><td>20</td><td>Suy dinh dưỡng ở trẻ em</td><td style="text-align:right;">585K</td></tr>
+                <tr><td>21</td><td>Vệ sinh không an toàn</td><td style="text-align:right;">534K</td></tr>
+                <tr><td>22</td><td>Sử dụng ma túy</td><td style="text-align:right;">492K</td></tr>
+                <tr><td>23</td><td>Mật độ khoáng xương thấp</td><td style="text-align:right;">483K</td></tr>
+                <tr><td>24</td><td>Không có phương tiện rửa tay</td><td style="text-align:right;">416K</td></tr>
+                <tr><td>25</td><td>Trẻ em thấp còi</td><td style="text-align:right;">373K</td></tr>
             </tbody>
         </table>
-        <p style="text-align: center; color: var(--text-muted); font-size: 13px; margin-bottom: 60px; font-style: italic;">
-            Nguồn: <a href="https://ourworldindata.org/grapher/number-of-deaths-by-risk-factor" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: underline;">IHME, Global Burden of Disease (2024)</a>
-        </p>
+    </div>
+
+    <!-- Bảng Việt Nam -->
+    <div>
+        <h4 style="text-align: center; color: var(--accent); margin-bottom: 16px; font-size: 18px;">Việt Nam (2023)</h4>
+        <table class="spec-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Yếu tố rủi ro</th>
+                    <th style="text-align:right;">Tử vong</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>1</td><td>Huyết áp cao</td><td style="text-align:right;">145.000</td></tr>
+                <tr style="background: rgba(244,67,54,0.1);"><td>2</td><td><strong>Ô nhiễm không khí (ngoài trời & trong nhà)</strong></td><td style="text-align:right;"><strong>94.800</strong></td></tr>
+                <tr><td>3</td><td>Hút thuốc</td><td style="text-align:right;">84.600</td></tr>
+                <tr style="background: rgba(244,67,54,0.1);"><td>4</td><td><strong>Ô nhiễm hạt vật chất ngoài trời</strong></td><td style="text-align:right;"><strong>57.600</strong></td></tr>
+                <tr><td>5</td><td>Đường huyết cao</td><td style="text-align:right;">48.400</td></tr>
+                <tr style="background: rgba(244,67,54,0.1);"><td>6</td><td><strong>Ô nhiễm không khí trong nhà</strong></td><td style="text-align:right;"><strong>36.100</strong></td></tr>
+                <tr><td>7</td><td>Cholesterol cao</td><td style="text-align:right;">34.300</td></tr>
+                <tr><td>8</td><td>Chế độ ăn nhiều natri</td><td style="text-align:right;">27.900</td></tr>
+                <tr><td>9</td><td>Sử dụng rượu</td><td style="text-align:right;">26.800</td></tr>
+                <tr><td>10</td><td>Khói thuốc lá gián tiếp</td><td style="text-align:right;">25.500</td></tr>
+                <tr><td>11</td><td>Chế độ ăn ít trái cây</td><td style="text-align:right;">20.300</td></tr>
+                <tr><td>12</td><td>Béo phì</td><td style="text-align:right;">19.900</td></tr>
+                <tr><td>13</td><td>Chế độ ăn ít ngũ cốc nguyên hạt</td><td style="text-align:right;">18.400</td></tr>
+                <tr><td>14</td><td>Sử dụng ma túy</td><td style="text-align:right;">11.200</td></tr>
+                <tr><td>15</td><td>Chế độ ăn ít rau</td><td style="text-align:right;">10.100</td></tr>
+                <tr><td>16</td><td>Quan hệ tình dục không an toàn</td><td style="text-align:right;">10.100</td></tr>
+                <tr><td>17</td><td>Mật độ khoáng xương thấp</td><td style="text-align:right;">9.840</td></tr>
+                <tr><td>18</td><td>Chế độ ăn ít các loại hạt</td><td style="text-align:right;">5.610</td></tr>
+                <tr><td>19</td><td>Ít vận động thể chất</td><td style="text-align:right;">4.430</td></tr>
+                <tr><td>20</td><td>Trẻ sơ sinh nhẹ cân</td><td style="text-align:right;">4.040</td></tr>
+                <tr><td>21</td><td>Nguồn nước không an toàn</td><td style="text-align:right;">1.200</td></tr>
+                <tr><td>22</td><td>Không có phương tiện rửa tay</td><td style="text-align:right;">958</td></tr>
+                <tr><td>23</td><td>Vệ sinh không an toàn</td><td style="text-align:right;">705</td></tr>
+                <tr><td>24</td><td>Suy dinh dưỡng ở trẻ em</td><td style="text-align:right;">664</td></tr>
+                <tr><td>25</td><td>Trẻ em thấp còi</td><td style="text-align:right;">514</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<p style="text-align: center; color: var(--text-muted); font-size: 13px; margin-bottom: 60px; font-style: italic;">
+    Nguồn: <a href="https://ourworldindata.org/grapher/number-of-deaths-by-risk-factor" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: underline;">IHME, Global Burden of Disease</a>
+</p>
 
         <div class="content-text" style="text-align: center; margin-bottom: 40px;">
             <h3 style="font-size: 28px;">Ảnh hưởng đến trẻ em</h3>
@@ -257,7 +321,7 @@
             <h3 style="font-size: 28px;">Tác động theo từng chất ô nhiễm</h3>
         </div>
 
-                <table style="width:100%; max-width:950px; margin:0 auto; border-collapse:separate; border-spacing:0; border:1px solid #2a3040; border-radius:12px; overflow:hidden; background:var(--bg-card); font-size:15px;">
+        <table style="width:100%; max-width:950px; margin:0 auto; border-collapse:separate; border-spacing:0; border:1px solid #2a3040; border-radius:12px; overflow:hidden; background:var(--bg-card); font-size:15px;">
             <thead>
                 <tr>
                     <th style="padding:16px 20px; text-align:center; font-weight:600; font-size:15px; background:#3b4a5e; color:#fff; border-right:1px solid rgba(255,255,255,0.15); border-bottom:1px solid rgba(255,255,255,0.15); letter-spacing:0.3px;">Ozone ở mặt đất</th>
@@ -320,7 +384,7 @@
             <div class="login-logo">AirWatch</div>
             <h2>Đăng nhập Admin</h2>
             <form id="login-form">
-                <label>
+                           <label>
                     <span>Tài khoản</span>
                     <input type="text" id="login-user" autocomplete="username" required>
                 </label>

@@ -2,12 +2,14 @@
     await checkAuth();
     updateAuthUI();
     applyTheme();
+    updateAdminOnly();
 })();
 
 function updateAuthUI() {
     const btn = document.getElementById('auth-btn');
     const action = document.getElementById('auth-action');
     if (!btn || !action) return;
+
     if (isAdmin()) {
         btn.textContent = 'Admin ▾';
         action.textContent = '🚪 Đăng xuất';
@@ -15,6 +17,12 @@ function updateAuthUI() {
         btn.textContent = 'Guest ▾';
         action.textContent = '🔑 Đăng nhập';
     }
+}
+
+function updateAdminOnly() {
+    document.querySelectorAll('.admin-only').forEach(el => {
+        el.style.display = isAdmin() ? '' : 'none';
+    });
 }
 
 function toggleMenu(e) {
@@ -66,6 +74,7 @@ function updateThemeLabel() {
     const icon = document.getElementById('theme-icon');
     const label = document.getElementById('theme-label');
     if (!icon || !label) return;
+
     if (document.body.classList.contains('light')) {
         icon.textContent = '☀️';
         label.textContent = 'Chế độ sáng';
@@ -75,7 +84,7 @@ function updateThemeLabel() {
     }
 }
 
-// Login form (chỉ index.html có)
+// Login form (chỉ index.html)
 const loginForm = document.getElementById('login-form');
 if (loginForm) {
     loginForm.addEventListener('submit', async (e) => {
@@ -83,16 +92,18 @@ if (loginForm) {
         const user = document.getElementById('login-user').value.trim();
         const pass = document.getElementById('login-pass').value;
         const errEl = document.getElementById('login-error');
-        errEl.textContent = '';
+        if (errEl) errEl.textContent = '';
+
         const ok = await login(user, pass);
         if (ok) {
             closeLogin();
             await checkAuth();
             updateAuthUI();
+            updateAdminOnly();
             document.getElementById('login-user').value = '';
             document.getElementById('login-pass').value = '';
         } else {
-            errEl.textContent = 'Sai tài khoản hoặc mật khẩu';
+            if (errEl) errEl.textContent = 'Sai tài khoản hoặc mật khẩu';
         }
     });
 }

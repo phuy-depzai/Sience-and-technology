@@ -3,13 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <title>Dashboard — Quan trắc không khí</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234CAF50'/><text x='50' y='68' font-size='60' font-family='Arial' font-weight='bold' fill='white' text-anchor='middle'>A</text></svg>">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 </head>
 <body>
-        <nav class="nav">
+    <nav class="nav">
         <a href="index.html" class="logo">AirWatch</a>
         <ul class="nav-links">
-            <li><a href="dashboard.html">Dashboard</a></li>
+            
+            <li><a href="index.html">Trang chủ</a></li>
+            <li><a href="map.html">Bản đồ</a></li>
+            <li class="admin-only" style="display:none;"><a href="admin.html">Quản lý</a></li>
             <li class="dropdown">
                 <button onclick="toggleMenu(event)" class="btn-primary" id="auth-btn" style="padding: 8px 16px; font-size: 13px;">Guest ▾</button>
                 <div class="dropdown-menu" id="dropdown-menu">
@@ -20,6 +25,7 @@
             </li>
         </ul>
     </nav>
+
     <header>
         <h1>
             Dashboard
@@ -61,6 +67,7 @@
         <canvas id="chart-curr"></canvas>
     </section>
 
+
     <section class="chart-container admin-only" style="display:none;">
         <h2 class="chart-title">Dữ liệu hệ thống (Admin)</h2>
         <div class="grid">
@@ -84,6 +91,7 @@
     </footer>
 
     <script src="chart.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="auth-check.js"></script>
     <script>
         function toggleMenu(e) {

@@ -173,7 +173,6 @@ async function updateCharts() {
 
     const labels = data.map(x => x.ts.split(' ')[1] || x.ts);
 
-    // Chart môi trường — ai cũng xem
     if (chartEnv) chartEnv.destroy();
     chartEnv = new Chart(document.getElementById('chart-env'), {
         type: 'line',
@@ -224,7 +223,6 @@ async function updateCharts() {
         }
     });
 
-    // Chart thiết bị — chỉ admin
     if (!isAdmin()) return;
 
     if (chartVolt) chartVolt.destroy();
@@ -272,32 +270,38 @@ async function updateCharts() {
     });
 }
 
-// WebSocket realtime
+// ===== WEBSOCKET =====
 let ws = null;
+let wsPingInterval = null;
 
 function connectWebSocket() {
     ws = new WebSocket('ws://192.168.1.54:1880/ws/data');
 
     ws.onopen = () => {
         console.log('[WS] connected');
+        wsPingInterval = setInterval(() => {
+            if (ws.readyState === WebSocket.OPEN) {
+                ws.send('ping');
+            }
+        }, 30000);
     };
 
     ws.onmessage = (e) => {
+        if (e.data === 'pong') return;
         try {
             const d = JSON.parse(e.data);
-            updateFromWS(d);
-        } catch(err) {
-            console.error('[WS] parse error:', err);
-        }
+            if (d.t !== undefined) updateFromWS(d);
+        } catch(err) {}
     };
 
     ws.onclose = () => {
         console.log('[WS] disconnected, retry in 3s');
+        clearInterval(wsPingInterval);
         setTimeout(connectWebSocket, 3000);
     };
 
-    ws.onerror = (err) => {
-        console.error('[WS] error:', err);
+    ws.onerror = () => {
+        console.error('[WS] error');
     };
 }
 
@@ -357,6 +361,7 @@ function addPointToCharts(d) {
     }
 }
 
+// ===== INIT =====
 updateLatest();
 updateCharts();
 

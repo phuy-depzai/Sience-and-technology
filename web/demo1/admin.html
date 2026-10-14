@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý node — AirWatch</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234CAF50'/><text x='50' y='68' font-size='60' font-family='Arial' font-weight='bold' fill='white' text-anchor='middle'>A</text></svg>">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <style>
+        .admin-wrapper { max-width: 1200px; margin: 0 auto; padding: 40px; }
+        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        @media (max-width: 900px) { .admin-grid { grid-template-columns: 1fr; } }
+        #map { height: 500px; border-radius: 12px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 6px; }
+        .form-group input { width: 100%; padding: 10px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 15px; }
+        .form-group input:focus { border-color: var(--accent); outline: none; }
+        .btn-row { display: flex; gap: 12px; margin-top: 20px; }
+        .node-list { margin-top: 30px; }
+        .node-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; }
+        .node-item .info { font-size: 14px; }
+        .node-item .id { color: var(--accent); font-weight: 600; }
+        .node-item .coords { color: var(--text-muted); font-size: 12px; }
+        .btn-del { padding: 6px 14px; background: #f44336; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; }
+        .btn-del:hover { background: #d32f2f; }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <a href="index.html" class="logo">AirWatch</a>
+        <ul class="nav-links">
+            <li><a href="index.html">Trang chủ</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="map.html">Bản đồ</a></li>
+            <li><a href="admin.html" style="color: var(--accent);">Quản lý</a></li>
+        </ul>
+    </nav>
+
+    <div class="admin-wrapper">
+        <h1 style="color: var(--accent); margin-bottom: 24px;">Quản lý node</h1>
+
+        <div class="admin-grid">
+            <div>
+                <h3 style="margin-bottom: 16px; color: var(--accent);">Thêm node mới</h3>
+
+                <div class="form-group">
+                    <label>ID node (VD: 02)</label>
+                    <input type="text" id="node-id" placeholder="02">
+                </div>
+                <div class="form-group">
+                    <label>Tên node</label>
+                    <input type="text" id="node-name" placeholder="Trạm Cần Thơ">
+                </div>
+                <div class="form-group">
+                    <label>Vĩ độ (lat)</label>
+                    <input type="text" id="node-lat" placeholder="10.346854">
+                </div>
+                <div class="form-group">
+                    <label>Kinh độ (lng)</label>
+                    <input type="text" id="node-lng" placeholder="105.461074">
+                </div>
+
+                <p style="font-size: 13px; color: var(--text-muted); margin: 12px 0;">
+                    Hoặc click vào bản đồ để tự lấy tọa độ
+                </p>
+
+                <div class="btn-row">
+                    <button class="btn-primary" onclick="addNode()">Thêm node</button>
+                    <button class="btn-secondary" onclick="clearForm()">Xóa form</button>
+                </div>
+
+                <div id="msg" style="margin-top: 16px; font-size: 14px;"></div>
+            </div>
+
+            <div>
+                <div id="map"></div>
+            </div>
+        </div>
+
+        <div class="node-list">
+            <h3 style="margin-bottom: 16px; color: var(--accent);">Danh sách node</h3>
+            <div id="nodes-container">Đang tải...</div>
+        </div>
+    </div>
+
+    <footer>
+        <p><strong>AirWatch</strong> — Hệ thống quan trắc không khí LoRa</p>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        const API = 'http://192.168.1.54:1880';
+        let map = null;
+        let markerLayer = null;
+        let tempMarker = null;
+        let allNodes = [];
+
+        // Init map
+        function initMap() {
+            map = L.map('map').setView([10.346854, 105.461074], 13);
+
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: '© Esri',
+                maxZoom: 19
+            }).addTo(map);
+
+            markerLayer = L.layerGroup().addTo(map);
+
+            // Click map → lấy tọa độ
+            map.on('click', (e) => {
+                const lat = e.latlng.lat;
+                const lng = e.latlng.lng;
+
+                document.getElementById('node-lat').value = lat.toFixed(6);
+                document.getElementById('node-lng').value = lng.toFixed(6);
+
+                if (tempMarker) map.removeLayer(tempMarker);
+                tempMarker = L.marker([lat, lng], { opacity: 0.7 }).addTo(map);
+                tempMarker.bindPopup('Vị trí mới').openPopup();
+            });
+
+            loadNodes();
+        }
+
+        // Load nodes từ API
+        async function loadNodes() {
+            try {
+                const r = await fetch(API + '/api/nodes');
+                allNodes = await r.json();
+
+                markerLayer.clearLayers();
+                const bounds = [];
+
+                allNodes.forEach(n => {
+                    if (!n.lat || !n.lng) return;
+                    const m = L.marker([n.lat, n.lng]).addTo(markerLayer);
+                    m.bindPopup('<strong>' + n.name + '</strong><br>ID: ' + n.id);
+                    bounds.push([n.lat, n.lng]);
+                });
+
+                if (bounds.length === 1) map.setView(bounds[0], 13);
+                else if (bounds.length > 1) map.fitBounds(bounds, { padding: [40, 40] });
+
+                renderNodeList();
+            } catch(e) {
+                console.error(e);
+                document.getElementById('nodes-container').textContent = 'Lỗi tải danh sách';
+            }
+        }
+
+        // Hiện danh sách node
+        function renderNodeList() {
+            const c = document.getElementById('nodes-container');
+            if (!allNodes.length) {
+                c.innerHTML = '<p style="color: var(--text-muted);">Chưa có node nào</p>';
+                return;
+            }
+            c.innerHTML = allNodes.map(n =>
+                '<div class="node-item">' +
+                    '<div class="info">' +
+                        '<span class="id">' + n.id + '</span> · ' + n.name +
+                        '<div class="coords">' + n.lat.toFixed(4) + ', ' + n.lng.toFixed(4) + '</div>' +
+                    '</div>' +
+                    '<button class="btn-del" onclick="delNode(\'' + n.id + '\')">Xóa</button>' +
+                '</div>'
+            ).join('');
+        }
+
+        // Thêm node
+        async function addNode() {
+            const id = document.getElementById('node-id').value.trim();
+            const name = document.getElementById('node-name').value.trim();
+            const lat = parseFloat(document.getElementById('node-lat').value);
+            const lng = parseFloat(document.getElementById('node-lng').value);
+            const msgEl = document.getElementById('msg');
+
+            if (!id || !name || isNaN(lat) || isNaN(lng)) {
+                msgEl.style.color = '#f44336';
+                msgEl.textContent = 'Vui lòng nhập đủ thông tin';
+                return;
+            }
+
+            try {
+                const r = await fetch(API + '/api/nodes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, name, lat, lng })
+                });
+                const data = await r.json();
+
+                if (data.ok) {
+                    msgEl.style.color = '#4CAF50';
+                    msgEl.textContent = 'Đã thêm node ' + id;
+                    clearForm();
+                    if (tempMarker) { map.removeLayer(tempMarker); tempMarker = null; }
+                    await loadNodes();
+                } else {
+                    msgEl.style.color = '#f44336';
+                    msgEl.textContent = data.error || 'Lỗi';
+                }
+            } catch(e) {
+                msgEl.style.color = '#f44336';
+                msgEl.textContent = 'Không kết nối được server';
+            }
+        }
+
+        // Xóa node
+        async function delNode(id) {
+            if (!confirm('Xóa node ' + id + '?')) return;
+
+            try {
+                const r = await fetch(API + '/api/nodes/' + id, { method: 'DELETE' });
+                const data = await r.json();
+                if (data.ok) {
+                    await loadNodes();
+                } else {
+                    alert('Lỗi: ' + (data.error || 'không xóa được'));
+                }
+            } catch(e) {
+                alert('Không kết nối được server');
+            }
+        }
+
+        function clearForm() {
+            document.getElementById('node-id').value = '';
+            document.getElementById('node-name').value = '';
+            document.getElementById('node-lat').value = '';
+            document.getElementById('node-lng').value = '';
+        }
+
+        document.addEventListener('DOMContentLoaded', initMap);
+    </script>
+</body>
+</html>

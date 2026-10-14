@@ -864,3 +864,35 @@ footer {
         font-size: 13px;
     }
 }
+@media (max-width: 900px) {
+    .content-section > div[style*="grid-template-columns: 1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+    }
+}
+/* ===== LEAFLET FIX ===== */
+.leaflet-container {
+    background: #ddd !important;
+    font-family: inherit;
+    z-index: 1;
+}
+
+.leaflet-tile {
+    width: 256px !important;
+    height: 256px !important;
+}
+
+.leaflet-pane,
+.leaflet-tile-pane,
+.leaflet-overlay-pane,
+.leaflet-shadow-pane,
+.leaflet-marker-pane,
+.leaflet-popup-pane {
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+#map {
+    height: 400px;
+    width: 100%;
+}

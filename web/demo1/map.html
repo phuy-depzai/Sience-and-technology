@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Bản đồ trạm đo — AirWatch</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234CAF50'/><text x='50' y='68' font-size='60' font-family='Arial' font-weight='bold' fill='white' text-anchor='middle'>A</text></svg>">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <style>
+        #map {
+            height: calc(100vh - 200px);
+            min-height: 500px;
+            width: 100%;
+            border-radius: 12px;
+        }
+        .map-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 40px 40px;
+        }
+        .map-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .map-header h1 {
+            font-size: 32px;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+        .map-header p {
+            color: var(--text-muted);
+            font-size: 15px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <a href="index.html" class="logo">AirWatch</a>
+        <ul class="nav-links">
+            <li><a href="index.html">Trang chủ</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li class="dropdown">
+                <button onclick="toggleMenu(event)" class="btn-primary" id="auth-btn" style="padding: 8px 16px; font-size: 13px;">Guest ▾</button>
+                <div class="dropdown-menu" id="dropdown-menu">
+                    <button onclick="toggleTheme()"><span id="theme-icon">🌙</span><span id="theme-label">Chế độ tối</span></button>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" id="auth-action" onclick="handleAuthAction(); return false;">🔑 Đăng nhập</a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="map-wrapper">
+        <div class="map-header">
+            <h1>Bản đồ trạm đo</h1>
+            <p>Vị trí các trạm quan trắc trong mạng lưới AirWatch</p>
+        </div>
+
+        <div id="map"></div>
+    </div>
+
+    <footer>
+        <p><strong>AirWatch</strong> — Hệ thống quan trắc không khí LoRa</p>
+        <p>Dự án Khoa học Kỹ thuật 2026</p>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="auth-check.js"></script>
+    <script>
+        function toggleMenu(e) {
+            e.stopPropagation();
+            document.getElementById('dropdown-menu').classList.toggle('open');
+        }
+        document.addEventListener('click', () => {
+            const m = document.getElementById('dropdown-menu');
+            if (m) m.classList.remove('open');
+        });
+        function handleAuthAction() {
+            if (isAdmin()) {
+                logout();
+            } else {
+                window.location.href = 'index.html';
+            }
+        }
+        function toggleTheme() {
+            const isLight = document.body.classList.toggle('light');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            updateThemeLabel();
+        }
+        function applyTheme() {
+            const saved = localStorage.getItem('theme') || 'dark';
+            if (saved === 'light') document.body.classList.add('light');
+            else document.body.classList.remove('light');
+            updateThemeLabel();
+        }
+        function updateThemeLabel() {
+            const icon = document.getElementById('theme-icon');
+            const label = document.getElementById('theme-label');
+            if (!icon || !label) return;
+            if (document.body.classList.contains('light')) {
+                icon.textContent = '☀️';
+                label.textContent = 'Chế độ sáng';
+            } else {
+                icon.textContent = '🌙';
+                label.textContent = 'Chế độ tối';
+            }
+        }
+
+        // ==== MAP ====
+        const API = 'http://192.168.1.54:1880';
+
+        (async () => {
+            await checkAuth();
+            const btn = document.getElementById('auth-btn');
+            const action = document.getElementById('auth-action');
+            if (isAdmin()) {
+                if (btn) btn.textContent = 'Admin ▾';
+                if (action) action.textContent = '🚪 Đăng xuất';
+            } else {
+                if (btn) btn.textContent = 'Guest ▾';
+                if (action) action.textContent = '🔑 Đăng nhập';
+            }
+            applyTheme();
+            initMap();
+        })();
+
+        let map = null;
+        let markerLayer = null;
+
+        async function initMap() {
+            const mapEl = document.getElementById('map');
+            if (!mapEl) return;
+
+            map = L.map('map').setView([10.346854, 105.461074], 13);
+
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: '© Esri',
+                maxZoom: 19
+            }).addTo(map);
+
+            markerLayer = L.layerGroup().addTo(map);
+
+            await loadNodes();
+        }
+
+        async function loadNodes() {
+            if (!map || !markerLayer) return;
+            try {
+                const r = await fetch(API + '/api/nodes');
+                const nodes = await r.json();
+                markerLayer.clearLayers();
+                if (!nodes.length) return;
+
+                const bounds = [];
+                nodes.forEach(n => {
+                    if (!n.lat || !n.lng) return;
+                    const marker = L.marker([n.lat, n.lng]).addTo(markerLayer);
+                    marker.bindPopup(
+                        '<strong>' + n.name + '</strong><br>' +
+                        'ID: ' + n.id + '<br>' +
+                        'Tọa độ: ' + n.lat.toFixed(4) + ', ' + n.lng.toFixed(4)
+                    );
+                    bounds.push([n.lat, n.lng]);
+                });
+
+                if (bounds.length === 1) {
+                    map.setView(bounds[0], 13);
+                } else if (bounds.length > 1) {
+                    map.fitBounds(bounds, { padding: [40, 40] });
+                }
+            } catch(e) {
+                console.error('Load nodes fail:', e);
+            }
+        }
+    </script>
+</body>
+</html>
