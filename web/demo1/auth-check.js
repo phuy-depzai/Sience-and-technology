@@ -1,4 +1,4 @@
-const API_AUTH = 'http://192.168.1.54:1880';
+const API_AUTH = 'https://airwatch.io.vn';
 let currentRole = 'guest';
 
 function getToken() {

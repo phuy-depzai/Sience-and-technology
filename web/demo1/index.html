@@ -2,13 +2,14 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>AirWatch — Hệ thống quan trắc không khí</title>
+    <title>AirWatch </title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234CAF50'/><text x='50' y='68' font-size='60' font-family='Arial' font-weight='bold' fill='white' text-anchor='middle'>A</text></svg>">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 </head>
 <body class="landing">
-    <nav class="nav">
+        <nav class="nav">
+            <button id="scrollTopBtn" title="Lên đầu trang">↑</button>
         <a href="index.html" class="logo">AirWatch</a>
         <ul class="nav-links">
             <li><a href="dashboard.html">Dashboard</a></li>
@@ -24,43 +25,75 @@
             </li>
         </ul>
     </nav>
-
-    <header class="hero">
-        <h1>Theo dõi chất lượng không khí <br><span class="accent">mọi lúc, mọi nơi</span></h1>
+       <header class="hero">
+        <div class="aqi-bg-glow"></div>
+        <h1>Air<span class="accent">Watch</span></h1>
+        <h2 style="font-size: 32px; margin-bottom: 20px; color: var(--text);">
+            Theo dõi chất lượng không khí <br><span class="accent">mọi lúc, mọi nơi</span>
+        </h2>
         <p class="subtitle">
             Hệ thống quan trắc không khí ứng dụng công nghệ LoRa chi phí thấp, tự chủ năng lượng, phù hợp triển khai mật độ cao tại Việt Nam.
         </p>
+        <div class="hero-actions" style="flex-direction: column; align-items: center;">
+    <div class="live-aqi-card">
+        <span style="font-size: 14px; color: #8899a6; text-transform: uppercase; letter-spacing: 1px;">Chất lượng không khí hiện tại</span>
+        <div style="font-size: 64px; font-weight: 800; color: #4CAF50; line-height: 1.1; margin: 8px 0;" id="hero-aqi">--</div>
+        <span style="background: #4CAF50; color: white; padding: 4px 16px; border-radius: 20px; font-size: 14px; font-weight: 600;" id="hero-aqi-text">Đang tải...</span>
+    </div>
+    <div style="display: flex; gap: 16px; margin-top: 24px;">
+        <a href="dashboard.html" class="btn-primary btn-large">Xem Dashboard</a>
+        <a href="#van-de" class="btn-secondary">Tìm hiểu thêm</a>
+    </div>
+</div>
     </header>
-
+    <!-- PHẦN VẤN ĐỀ -->
     <section id="van-de" class="content-section">
         <div class="content-row">
             <div class="content-img">
                 <img src="o_nhiem.jpg" alt="Ô nhiễm không khí">
             </div>
             <div class="content-text">
-                <h3>Ô nhiễm không khí — mối nguy thầm lặng</h3>
-                <p>Việt Nam nằm trong nhóm quốc gia có chất lượng không khí kém nhất thế giới. Tại các đô thị lớn, nồng độ bụi mịn PM2.5 thường xuyên vượt ngưỡng an toàn của WHO nhiều lần, ảnh hưởng trực tiếp đến sức khỏe cộng đồng.</p>
-                <p>Hậu quả ngày càng nghiêm trọng khi tốc độ đô thị hóa và công nghiệp hóa gia tăng.</p>
+                <h3>Ô nhiễm không khí mối nguy thầm lặng</h3>
+                <p>Ô nhiễm không khí gây ra cái chết của <strong><span class="counter" data-target="7">0</span> triệu người</strong> toàn cầu mỗi năm, trong đó có <strong><span class="counter" data-target="1.7" data-decimals="1">0</span> triệu</strong> trẻ em dưới 5 tuổi. Tại Việt Nam, ô nhiễm không khí gây thiệt hại kinh tế lên tới <strong><span class="counter" data-target="12.45" data-decimals="2">0</span> tỉ đô la</strong> (năm 2013). Riêng TP.HCM thất thoát 117 đến 183 triệu đô la.</p>
+                <p>Nguy hiểm nhất là <strong>bụi siêu mịn PM2.5</strong> (nhỏ hơn sợi tóc 40 đến 100 lần). Chúng chui sâu vào phổi, thậm chí vào máu, gây ung thư phổi, đột quỵ, rối loạn nhịp tim. Khẩu trang thông thường không thể ngăn cản được.</p>
+                <p style="margin-top: 16px; font-size: 13px; font-style: italic; color: var(--text-muted);">
+                    Nguồn: 
+                    <a href="https://thanhnien.vn/giat-minh-nhung-buc-anh-bat-net-khong-khi-phoi-mau-o-nhiem-tai-viet-nam-185842697.htm" 
+                       target="_blank" rel="noopener noreferrer"
+                       style="color: var(--accent); text-decoration: underline;">
+                        Báo Thanh Niên
+                    </a>
+                </p>
             </div>
         </div>
 
-        <div class="content-row reverse">
-            <div class="content-img">
-                <img src="suc_khoe.jpg" alt="Ảnh hưởng sức khỏe">
+        <div class="content-row reverse" style="align-items: center;">
+            <div style="flex: 1; display: flex; justify-content: center; align-items: center;">
+                <img src="suc_khoe.jpg" alt="Ảnh hưởng sức khỏe" style="width: 80%; max-width: 350px; height: auto; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
             </div>
-            <div class="content-text">
+            <div class="content-text" style="flex: 1;">
                 <h3>Ảnh hưởng trực tiếp đến sức khỏe</h3>
-                <p>Ô nhiễm không khí gây ra nhiều vấn đề sức khỏe nghiêm trọng:</p>
+                <p>Ô nhiễm không khí không chỉ là vấn đề môi trường mà còn là mối đe dọa trực tiếp đến tính mạng:</p>
                 <ul>
-                    <li>Hàng chục nghìn ca tử vong mỗi năm liên quan đến ô nhiễm không khí.</li>
-                    <li>Trẻ em và người già là đối tượng chịu ảnh hưởng nặng nhất.</li>
-                    <li>Gia tăng các bệnh hô hấp, tim mạch, ung thư phổi.</li>
-                    <li>Chi phí y tế và tổn thất kinh tế ngày càng tăng.</li>
+                    <li>Ước tính mỗi năm có <strong><span class="counter" data-target="60000">0</span> người tử vong</strong> tại Việt Nam do các bệnh liên quan đến ô nhiễm không khí (theo WHO).</li>
+                    <li>Tại TP.HCM, nghiên cứu năm 2017 ghi nhận <strong><span class="counter" data-target="1397">0</span> ca tử vong</strong> do ô nhiễm không khí, chiếm 13,46% tổng số ca tử vong.</li>
+                    <li>Bụi mịn PM2.5 là tác nhân nguy hiểm nhất, chiếm tới <strong><span class="counter" data-target="81.32" data-decimals="2">0</span>%</strong> số ca tử vong do ô nhiễm không khí.</li>
+                    <li>Tỉ lệ trẻ em mắc bệnh hen suyễn tại TP.HCM lên tới <strong><span class="counter" data-target="29">0</span>%</strong>, cao gấp gần 6 lần so với các tỉnh thành khác (như Cần Thơ, Lâm Đồng chỉ 5%).</li>
+                    <li>Số bệnh nhân nhập viện do các bệnh hô hấp và tim mạch tăng khoảng <strong><span class="counter" data-target="20">0</span>%</strong> vào những ngày ô nhiễm không khí ở mức cao.</li>
                 </ul>
+                <p style="margin-top: 16px; font-size: 13px; font-style: italic; color: var(--text-muted);">
+                    Nguồn: 
+                    <a href="https://tuoitre.vn/khong-khi-o-nhiem-so-dau-cung-ra-benh-2024040517045209.htm" 
+                       target="_blank" rel="noopener noreferrer"
+                       style="color: var(--accent); text-decoration: underline;">
+                        Báo Tuổi Trẻ
+                    </a>
+                </p>
             </div>
         </div>
     </section>
 
+    <!-- PHẦN MẠNG LƯỚI -->
     <section id="mang-luoi" class="content-section">
         <div class="content-text" style="text-align: center; max-width: 800px; margin: 0 auto 40px;">
             <h3 style="font-size: 32px;">Trạm quan trắc còn quá thưa</h3>
@@ -86,7 +119,13 @@
             <div class="feature">
                 <div class="icon">⚠️</div>
                 <h3>Thiếu minh bạch</h3>
-                <p>Nhiều vụ việc làm sai lệch kết quả quan trắc đã bị phát hiện.</p>
+                <p>
+                    <a href="https://thanhnien.vn/cong-an-tphcm-bat-21-bi-can-lam-sai-lech-ket-qua-quan-trac-moi-truong-185261010191139411.htm" 
+                       target="_blank" rel="noopener noreferrer" 
+                       style="color: var(--accent); text-decoration: underline;">
+                        Nhiều vụ việc làm sai lệch kết quả quan trắc đã bị phát hiện
+                    </a>.
+                </p>
             </div>
         </div>
 
@@ -235,94 +274,92 @@
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 1100px; margin: 0 auto 20px;">
+            <!-- Bảng Thế giới -->
+            <div>
+                <h4 style="text-align: center; color: var(--accent); margin-bottom: 16px; font-size: 18px;">Thế giới (2021)</h4>
+                <table class="spec-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Yếu tố rủi ro</th>
+                            <th style="text-align:right;">Tử vong</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>1</td><td>Huyết áp cao</td><td style="text-align:right;"><span class="counter" data-target="11.0" data-decimals="1" data-suffix="M">0</span></td></tr>
+                        <tr style="background: rgba(244,67,54,0.1);"><td>2</td><td><strong>Ô nhiễm không khí (ngoài trời & trong nhà)</strong></td><td style="text-align:right;"><strong><span class="counter" data-target="7.90" data-decimals="2" data-suffix="M">0</span></strong></td></tr>
+                        <tr><td>3</td><td>Hút thuốc</td><td style="text-align:right;"><span class="counter" data-target="5.81" data-decimals="2" data-suffix="M">0</span></td></tr>
+                        <tr><td>4</td><td>Đường huyết cao</td><td style="text-align:right;"><span class="counter" data-target="5.34" data-decimals="2" data-suffix="M">0</span></td></tr>
+                        <tr style="background: rgba(244,67,54,0.1);"><td>5</td><td><strong>Ô nhiễm hạt vật chất ngoài trời</strong></td><td style="text-align:right;"><strong><span class="counter" data-target="4.92" data-decimals="2" data-suffix="M">0</span></strong></td></tr>
+                        <tr><td>6</td><td>Béo phì</td><td style="text-align:right;"><span class="counter" data-target="3.68" data-decimals="2" data-suffix="M">0</span></td></tr>
+                        <tr><td>7</td><td>Cholesterol cao</td><td style="text-align:right;"><span class="counter" data-target="3.62" data-decimals="2" data-suffix="M">0</span></td></tr>
+                        <tr style="background: rgba(244,67,54,0.1);"><td>8</td><td><strong>Ô nhiễm không khí trong nhà</strong></td><td style="text-align:right;"><strong><span class="counter" data-target="2.76" data-decimals="2" data-suffix="M">0</span></strong></td></tr>
+                        <tr><td>9</td><td>Chế độ ăn ít trái cây</td><td style="text-align:right;"><span class="counter" data-target="1.76" data-decimals="2" data-suffix="M">0</span></td></tr>
+                        <tr><td>10</td><td>Chế độ ăn nhiều natri</td><td style="text-align:right;"><span class="counter" data-target="1.67" data-decimals="2" data-suffix="M">0</span></td></tr>
+                        <tr><td>11</td><td>Khói thuốc lá gián tiếp</td><td style="text-align:right;"><span class="counter" data-target="1.66" data-decimals="2" data-suffix="M">0</span></td></tr>
+                        <tr><td>12</td><td>Trẻ sơ sinh nhẹ cân</td><td style="text-align:right;"><span class="counter" data-target="1.38" data-decimals="2" data-suffix="M">0</span></td></tr>
+                        <tr><td>13</td><td>Sử dụng rượu</td><td style="text-align:right;"><span class="counter" data-target="1.29" data-decimals="2" data-suffix="M">0</span></td></tr>
+                        <tr><td>14</td><td>Chế độ ăn ít ngũ cốc nguyên hạt</td><td style="text-align:right;"><span class="counter" data-target="1.19" data-decimals="2" data-suffix="M">0</span></td></tr>
+                        <tr><td>15</td><td>Quan hệ tình dục không an toàn</td><td style="text-align:right;"><span class="counter" data-target="1.07" data-decimals="2" data-suffix="M">0</span></td></tr>
+                        <tr><td>16</td><td>Chế độ ăn ít rau</td><td style="text-align:right;"><span class="counter" data-target="933" data-suffix="K">0</span></td></tr>
+                        <tr><td>17</td><td>Chế độ ăn ít các loại hạt</td><td style="text-align:right;"><span class="counter" data-target="884" data-suffix="K">0</span></td></tr>
+                        <tr><td>18</td><td>Nguồn nước không an toàn</td><td style="text-align:right;"><span class="counter" data-target="755" data-suffix="K">0</span></td></tr>
+                        <tr><td>19</td><td>Ít vận động thể chất</td><td style="text-align:right;"><span class="counter" data-target="670" data-suffix="K">0</span></td></tr>
+                        <tr><td>20</td><td>Suy dinh dưỡng ở trẻ em</td><td style="text-align:right;"><span class="counter" data-target="585" data-suffix="K">0</span></td></tr>
+                        <tr><td>21</td><td>Vệ sinh không an toàn</td><td style="text-align:right;"><span class="counter" data-target="534" data-suffix="K">0</span></td></tr>
+                        <tr><td>22</td><td>Sử dụng ma túy</td><td style="text-align:right;"><span class="counter" data-target="492" data-suffix="K">0</span></td></tr>
+                        <tr><td>23</td><td>Mật độ khoáng xương thấp</td><td style="text-align:right;"><span class="counter" data-target="483" data-suffix="K">0</span></td></tr>
+                        <tr><td>24</td><td>Không có phương tiện rửa tay</td><td style="text-align:right;"><span class="counter" data-target="416" data-suffix="K">0</span></td></tr>
+                        <tr><td>25</td><td>Trẻ em thấp còi</td><td style="text-align:right;"><span class="counter" data-target="373" data-suffix="K">0</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
 
-    <!-- Bảng Thế giới -->
-    <div>
-        <h4 style="text-align: center; color: var(--accent); margin-bottom: 16px; font-size: 18px;">Thế giới (2021)</h4>
-        <table class="spec-table">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Yếu tố rủi ro</th>
-                    <th style="text-align:right;">Tử vong</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>1</td><td>Huyết áp cao</td><td style="text-align:right;">11.0M</td></tr>
-                <tr style="background: rgba(244,67,54,0.1);"><td>2</td><td><strong>Ô nhiễm không khí (ngoài trời & trong nhà)</strong></td><td style="text-align:right;"><strong>7.90M</strong></td></tr>
-                <tr><td>3</td><td>Hút thuốc</td><td style="text-align:right;">5.81M</td></tr>
-                <tr><td>4</td><td>Đường huyết cao</td><td style="text-align:right;">5.34M</td></tr>
-                <tr style="background: rgba(244,67,54,0.1);"><td>5</td><td><strong>Ô nhiễm hạt vật chất ngoài trời</strong></td><td style="text-align:right;"><strong>4.92M</strong></td></tr>
-                <tr><td>6</td><td>Béo phì</td><td style="text-align:right;">3.68M</td></tr>
-                <tr><td>7</td><td>Cholesterol cao</td><td style="text-align:right;">3.62M</td></tr>
-                <tr style="background: rgba(244,67,54,0.1);"><td>8</td><td><strong>Ô nhiễm không khí trong nhà</strong></td><td style="text-align:right;"><strong>2.76M</strong></td></tr>
-                <tr><td>9</td><td>Chế độ ăn ít trái cây</td><td style="text-align:right;">1.76M</td></tr>
-                <tr><td>10</td><td>Chế độ ăn nhiều natri</td><td style="text-align:right;">1.67M</td></tr>
-                <tr><td>11</td><td>Khói thuốc lá gián tiếp</td><td style="text-align:right;">1.66M</td></tr>
-                <tr><td>12</td><td>Trẻ sơ sinh nhẹ cân</td><td style="text-align:right;">1.38M</td></tr>
-                <tr><td>13</td><td>Sử dụng rượu</td><td style="text-align:right;">1.29M</td></tr>
-                <tr><td>14</td><td>Chế độ ăn ít ngũ cốc nguyên hạt</td><td style="text-align:right;">1.19M</td></tr>
-                <tr><td>15</td><td>Quan hệ tình dục không an toàn</td><td style="text-align:right;">1.07M</td></tr>
-                <tr><td>16</td><td>Chế độ ăn ít rau</td><td style="text-align:right;">933K</td></tr>
-                <tr><td>17</td><td>Chế độ ăn ít các loại hạt</td><td style="text-align:right;">884K</td></tr>
-                <tr><td>18</td><td>Nguồn nước không an toàn</td><td style="text-align:right;">755K</td></tr>
-                <tr><td>19</td><td>Ít vận động thể chất</td><td style="text-align:right;">670K</td></tr>
-                <tr><td>20</td><td>Suy dinh dưỡng ở trẻ em</td><td style="text-align:right;">585K</td></tr>
-                <tr><td>21</td><td>Vệ sinh không an toàn</td><td style="text-align:right;">534K</td></tr>
-                <tr><td>22</td><td>Sử dụng ma túy</td><td style="text-align:right;">492K</td></tr>
-                <tr><td>23</td><td>Mật độ khoáng xương thấp</td><td style="text-align:right;">483K</td></tr>
-                <tr><td>24</td><td>Không có phương tiện rửa tay</td><td style="text-align:right;">416K</td></tr>
-                <tr><td>25</td><td>Trẻ em thấp còi</td><td style="text-align:right;">373K</td></tr>
-            </tbody>
-        </table>
-    </div>
+            <!-- Bảng Việt Nam -->
+            <div>
+                <h4 style="text-align: center; color: var(--accent); margin-bottom: 16px; font-size: 18px;">Việt Nam (2023)</h4>
+                <table class="spec-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Yếu tố rủi ro</th>
+                            <th style="text-align:right;">Tử vong</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>1</td><td>Huyết áp cao</td><td style="text-align:right;"><span class="counter" data-target="145000">0</span></td></tr>
+                        <tr style="background: rgba(244,67,54,0.1);"><td>2</td><td><strong>Ô nhiễm không khí (ngoài trời & trong nhà)</strong></td><td style="text-align:right;"><strong><span class="counter" data-target="94800">0</span></strong></td></tr>
+                        <tr><td>3</td><td>Hút thuốc</td><td style="text-align:right;"><span class="counter" data-target="84600">0</span></td></tr>
+                        <tr style="background: rgba(244,67,54,0.1);"><td>4</td><td><strong>Ô nhiễm hạt vật chất ngoài trời</strong></td><td style="text-align:right;"><strong><span class="counter" data-target="57600">0</span></strong></td></tr>
+                        <tr><td>5</td><td>Đường huyết cao</td><td style="text-align:right;"><span class="counter" data-target="48400">0</span></td></tr>
+                        <tr style="background: rgba(244,67,54,0.1);"><td>6</td><td><strong>Ô nhiễm không khí trong nhà</strong></td><td style="text-align:right;"><strong><span class="counter" data-target="36100">0</span></strong></td></tr>
+                        <tr><td>7</td><td>Cholesterol cao</td><td style="text-align:right;"><span class="counter" data-target="34300">0</span></td></tr>
+                        <tr><td>8</td><td>Chế độ ăn nhiều natri</td><td style="text-align:right;"><span class="counter" data-target="27900">0</span></td></tr>
+                        <tr><td>9</td><td>Sử dụng rượu</td><td style="text-align:right;"><span class="counter" data-target="26800">0</span></td></tr>
+                        <tr><td>10</td><td>Khói thuốc lá gián tiếp</td><td style="text-align:right;"><span class="counter" data-target="25500">0</span></td></tr>
+                        <tr><td>11</td><td>Chế độ ăn ít trái cây</td><td style="text-align:right;"><span class="counter" data-target="20300">0</span></td></tr>
+                        <tr><td>12</td><td>Béo phì</td><td style="text-align:right;"><span class="counter" data-target="19900">0</span></td></tr>
+                        <tr><td>13</td><td>Chế độ ăn ít ngũ cốc nguyên hạt</td><td style="text-align:right;"><span class="counter" data-target="18400">0</span></td></tr>
+                        <tr><td>14</td><td>Sử dụng ma túy</td><td style="text-align:right;"><span class="counter" data-target="11200">0</span></td></tr>
+                        <tr><td>15</td><td>Chế độ ăn ít rau</td><td style="text-align:right;"><span class="counter" data-target="10100">0</span></td></tr>
+                        <tr><td>16</td><td>Quan hệ tình dục không an toàn</td><td style="text-align:right;"><span class="counter" data-target="10100">0</span></td></tr>
+                        <tr><td>17</td><td>Mật độ khoáng xương thấp</td><td style="text-align:right;"><span class="counter" data-target="9840">0</span></td></tr>
+                        <tr><td>18</td><td>Chế độ ăn ít các loại hạt</td><td style="text-align:right;"><span class="counter" data-target="5610">0</span></td></tr>
+                        <tr><td>19</td><td>Ít vận động thể chất</td><td style="text-align:right;"><span class="counter" data-target="4430">0</span></td></tr>
+                        <tr><td>20</td><td>Trẻ sơ sinh nhẹ cân</td><td style="text-align:right;"><span class="counter" data-target="4040">0</span></td></tr>
+                        <tr><td>21</td><td>Nguồn nước không an toàn</td><td style="text-align:right;"><span class="counter" data-target="1200">0</span></td></tr>
+                        <tr><td>22</td><td>Không có phương tiện rửa tay</td><td style="text-align:right;"><span class="counter" data-target="958">0</span></td></tr>
+                        <tr><td>23</td><td>Vệ sinh không an toàn</td><td style="text-align:right;"><span class="counter" data-target="705">0</span></td></tr>
+                        <tr><td>24</td><td>Suy dinh dưỡng ở trẻ em</td><td style="text-align:right;"><span class="counter" data-target="664">0</span></td></tr>
+                        <tr><td>25</td><td>Trẻ em thấp còi</td><td style="text-align:right;"><span class="counter" data-target="514">0</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-    <!-- Bảng Việt Nam -->
-    <div>
-        <h4 style="text-align: center; color: var(--accent); margin-bottom: 16px; font-size: 18px;">Việt Nam (2023)</h4>
-        <table class="spec-table">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Yếu tố rủi ro</th>
-                    <th style="text-align:right;">Tử vong</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>1</td><td>Huyết áp cao</td><td style="text-align:right;">145.000</td></tr>
-                <tr style="background: rgba(244,67,54,0.1);"><td>2</td><td><strong>Ô nhiễm không khí (ngoài trời & trong nhà)</strong></td><td style="text-align:right;"><strong>94.800</strong></td></tr>
-                <tr><td>3</td><td>Hút thuốc</td><td style="text-align:right;">84.600</td></tr>
-                <tr style="background: rgba(244,67,54,0.1);"><td>4</td><td><strong>Ô nhiễm hạt vật chất ngoài trời</strong></td><td style="text-align:right;"><strong>57.600</strong></td></tr>
-                <tr><td>5</td><td>Đường huyết cao</td><td style="text-align:right;">48.400</td></tr>
-                <tr style="background: rgba(244,67,54,0.1);"><td>6</td><td><strong>Ô nhiễm không khí trong nhà</strong></td><td style="text-align:right;"><strong>36.100</strong></td></tr>
-                <tr><td>7</td><td>Cholesterol cao</td><td style="text-align:right;">34.300</td></tr>
-                <tr><td>8</td><td>Chế độ ăn nhiều natri</td><td style="text-align:right;">27.900</td></tr>
-                <tr><td>9</td><td>Sử dụng rượu</td><td style="text-align:right;">26.800</td></tr>
-                <tr><td>10</td><td>Khói thuốc lá gián tiếp</td><td style="text-align:right;">25.500</td></tr>
-                <tr><td>11</td><td>Chế độ ăn ít trái cây</td><td style="text-align:right;">20.300</td></tr>
-                <tr><td>12</td><td>Béo phì</td><td style="text-align:right;">19.900</td></tr>
-                <tr><td>13</td><td>Chế độ ăn ít ngũ cốc nguyên hạt</td><td style="text-align:right;">18.400</td></tr>
-                <tr><td>14</td><td>Sử dụng ma túy</td><td style="text-align:right;">11.200</td></tr>
-                <tr><td>15</td><td>Chế độ ăn ít rau</td><td style="text-align:right;">10.100</td></tr>
-                <tr><td>16</td><td>Quan hệ tình dục không an toàn</td><td style="text-align:right;">10.100</td></tr>
-                <tr><td>17</td><td>Mật độ khoáng xương thấp</td><td style="text-align:right;">9.840</td></tr>
-                <tr><td>18</td><td>Chế độ ăn ít các loại hạt</td><td style="text-align:right;">5.610</td></tr>
-                <tr><td>19</td><td>Ít vận động thể chất</td><td style="text-align:right;">4.430</td></tr>
-                <tr><td>20</td><td>Trẻ sơ sinh nhẹ cân</td><td style="text-align:right;">4.040</td></tr>
-                <tr><td>21</td><td>Nguồn nước không an toàn</td><td style="text-align:right;">1.200</td></tr>
-                <tr><td>22</td><td>Không có phương tiện rửa tay</td><td style="text-align:right;">958</td></tr>
-                <tr><td>23</td><td>Vệ sinh không an toàn</td><td style="text-align:right;">705</td></tr>
-                <tr><td>24</td><td>Suy dinh dưỡng ở trẻ em</td><td style="text-align:right;">664</td></tr>
-                <tr><td>25</td><td>Trẻ em thấp còi</td><td style="text-align:right;">514</td></tr>
-            </tbody>
-        </table>
-    </div>
-
-</div>
-
-<p style="text-align: center; color: var(--text-muted); font-size: 13px; margin-bottom: 60px; font-style: italic;">
-    Nguồn: <a href="https://ourworldindata.org/grapher/number-of-deaths-by-risk-factor" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: underline;">IHME, Global Burden of Disease</a>
-</p>
+        <p style="text-align: center; color: var(--text-muted); font-size: 13px; margin-bottom: 60px; font-style: italic;">
+            Nguồn: <a href="https://ourworldindata.org/grapher/number-of-deaths-by-risk-factor" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: underline;">IHME, Global Burden of Disease</a>
+        </p>
 
         <div class="content-text" style="text-align: center; margin-bottom: 40px;">
             <h3 style="font-size: 28px;">Ảnh hưởng đến trẻ em</h3>
@@ -353,51 +390,58 @@
             <h3 style="font-size: 28px;">Tác động theo từng chất ô nhiễm</h3>
         </div>
 
-        <table style="width:100%; max-width:950px; margin:0 auto; border-collapse:separate; border-spacing:0; border:1px solid #2a3040; border-radius:12px; overflow:hidden; background:var(--bg-card); font-size:15px;">
-            <thead>
-                <tr>
-                    <th style="padding:16px 20px; text-align:center; font-weight:600; font-size:15px; background:#3b4a5e; color:#fff; border-right:1px solid rgba(255,255,255,0.15); border-bottom:1px solid rgba(255,255,255,0.15); letter-spacing:0.3px;">Ozone ở mặt đất</th>
-                    <th colspan="2" style="padding:16px 20px; text-align:center; font-weight:600; font-size:15px; background:#3b4a5e; color:#fff; border-bottom:1px solid rgba(255,255,255,0.15); letter-spacing:0.3px;">Bụi mịn (PM) và khói cháy rừng</th>
-                </tr>
-                <tr>
-                    <th style="padding:14px 20px; background:#4a5a70; color:#fff; border-right:1px solid rgba(255,255,255,0.15); border-bottom:1px solid rgba(255,255,255,0.15);"></th>
-                    <th style="padding:14px 20px; text-align:center; font-weight:500; font-size:14px; background:#4a5a70; color:#fff; border-right:1px solid rgba(255,255,255,0.15); border-bottom:1px solid rgba(255,255,255,0.15);">Ngắn hạn</th>
-                    <th style="padding:14px 20px; text-align:center; font-weight:500; font-size:14px; background:#4a5a70; color:#fff; border-bottom:1px solid rgba(255,255,255,0.15);">Dài hạn</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td style="padding:24px 20px; vertical-align:top; border-right:1px solid #2a3040;">
-                        <ul style="list-style:none; padding:0; margin:0;">
-                            <li style="position:relative; padding:6px 0 6px 18px; color:var(--text); font-size:14px; line-height:1.55;">• Giảm chức năng phổi</li>
-                            <li style="position:relative; padding:6px 0 6px 18px; color:var(--text); font-size:14px; line-height:1.55;">• Bệnh hen suyễn trầm trọng hơn</li>
-                            <li style="position:relative; padding:6px 0 6px 18px; color:var(--text); font-size:14px; line-height:1.55;">• Kích ứng cổ họng và ho</li>
-                            <li style="position:relative; padding:6px 0 6px 18px; color:var(--text); font-size:14px; line-height:1.55;">• Đau ngực và khó thở</li>
-                            <li style="position:relative; padding:6px 0 6px 18px; color:var(--text); font-size:14px; line-height:1.55;">• Viêm mô phổi</li>
-                            <li style="position:relative; padding:6px 0 6px 18px; color:var(--text); font-size:14px; line-height:1.55;">• Khả năng mắc bệnh nhiễm trùng đường hô hấp cao hơn</li>
-                        </ul>
-                    </td>
-                    <td style="padding:24px 20px; vertical-align:top; border-right:1px solid #2a3040;">
-                        <ul style="list-style:none; padding:0; margin:0;">
-                            <li style="position:relative; padding:6px 0 6px 18px; color:var(--text); font-size:14px; line-height:1.55;">• Nhịp tim không đều</li>
-                            <li style="position:relative; padding:6px 0 6px 18px; color:var(--text); font-size:14px; line-height:1.55;">• Đau ngực</li>
-                            <li style="position:relative; padding:6px 0 6px 18px; color:var(--text); font-size:14px; line-height:1.55;">• Ho</li>
-                            <li style="position:relative; padding:6px 0 6px 18px; color:var(--text); font-size:14px; line-height:1.55;">• Kích ứng mắt, mũi và họng</li>
-                            <li style="position:relative; padding:6px 0 6px 18px; color:var(--text); font-size:14px; line-height:1.55;">• Bệnh hen suyễn trầm trọng hơn</li>
-                            <li style="position:relative; padding:6px 0 6px 18px; color:var(--text); font-size:14px; line-height:1.55;">• Giảm chức năng phổi</li>
-                        </ul>
-                    </td>
-                    <td style="padding:24px 20px; vertical-align:top;">
-                        <ul style="list-style:none; padding:0; margin:0;">
-                            <li style="position:relative; padding:6px 0 6px 18px; color:var(--text); font-size:14px; line-height:1.55;">• Tổn thương mô phổi</li>
-                            <li style="position:relative; padding:6px 0 6px 18px; color:var(--text); font-size:14px; line-height:1.55;">• Bệnh ung thư</li>
-                            <li style="position:relative; padding:6px 0 6px 18px; color:var(--text); font-size:14px; line-height:1.55;">• Phát triển các bệnh về đường hô hấp như hen suyễn, viêm phế quản và khí phế thũng</li>
-                            <li style="position:relative; padding:6px 0 6px 18px; color:var(--text); font-size:14px; line-height:1.55;">• Cái chết sớm</li>
-                        </ul>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+               <div class="content-text" style="text-align: center; margin-bottom: 40px;">
+            <h3 style="font-size: 28px;">Tác động theo từng chất ô nhiễm</h3>
+            <p style="color: var(--text-muted);">Ảnh hưởng cụ thể của từng loại khí độc và bụi mịn đến cơ thể con người.</p>
+        </div>
+
+        <div class="pollutant-grid">
+            <!-- Cột 1: Ozone -->
+            <div class="pollutant-card">
+                <div class="pollutant-header">
+                    <div class="pollutant-icon">☀️</div>
+                    <h4>Ozone mặt đất (O₃)</h4>
+                </div>
+                <ul class="pollutant-list">
+                    <li>Giảm chức năng phổi</li>
+                    <li>Bệnh hen suyễn trầm trọng hơn</li>
+                    <li>Kích ứng cổ họng và ho</li>
+                    <li>Đau ngực và khó thở</li>
+                    <li>Viêm mô phổi</li>
+                    <li>Tăng nguy cơ nhiễm trùng đường hô hấp</li>
+                </ul>
+            </div>
+
+            <!-- Cột 2: PM Ngắn hạn -->
+            <div class="pollutant-card">
+                <div class="pollutant-header">
+                    <div class="pollutant-icon">⏱️</div>
+                    <h4>Bụi mịn (PM) - Ngắn hạn</h4>
+                </div>
+                <ul class="pollutant-list">
+                    <li>Nhịp tim không đều</li>
+                    <li>Đau ngực</li>
+                    <li>Ho</li>
+                    <li>Kích ứng mắt, mũi và họng</li>
+                    <li>Bệnh hen suyễn trầm trọng hơn</li>
+                    <li>Giảm chức năng phổi</li>
+                </ul>
+            </div>
+
+            <!-- Cột 3: PM Dài hạn -->
+            <div class="pollutant-card">
+                <div class="pollutant-header">
+                    <div class="pollutant-icon">⏳</div>
+                    <h4>Bụi mịn (PM) - Dài hạn</h4>
+                </div>
+                <ul class="pollutant-list">
+                    <li>Tổn thương mô phổi</li>
+                    <li>Bệnh ung thư</li>
+                    <li>Phát triển bệnh hen suyễn, viêm phế quản, khí phế thũng</li>
+                    <li>Tử vong sớm</li>
+                </ul>
+            </div>
+        </div>
     </section>
 
     <section class="section cta-section">
@@ -435,6 +479,7 @@
     <script src="auth-ui.js"></script>
 
     <script>
+        // 1. Hiệu ứng Reveal (Cuộn trang)
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -459,9 +504,79 @@
             el.style.transitionDelay = (i % 3) * 0.1 + 's';
             observer.observe(el);
         });
+
+        // 2. Hiệu ứng Đếm Số (Nhanh, mượt, hỗ trợ hậu tố)
+        const counters = document.querySelectorAll('.counter');
+        const observerCounter = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    startCounting(entry.target);
+                    observerCounter.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        const startCounting = (counter) => {
+            const target = parseFloat(counter.getAttribute('data-target'));
+            const decimals = parseInt(counter.getAttribute('data-decimals')) || 0;
+            const suffix = counter.getAttribute('data-suffix') || '';
+            const duration = 1200; // Tốc độ đếm (1.2 giây)
+            const startTime = performance.now();
+
+            const updateCount = (currentTime) => {
+                const elapsedTime = currentTime - startTime;
+                const progress = Math.min(elapsedTime / duration, 1);
+                
+                // Ease out cubic cho mượt
+                const easeOutProgress = 1 - Math.pow(1 - progress, 3);
+                const currentCount = target * easeOutProgress;
+
+                if (decimals > 0) {
+                    counter.innerText = currentCount.toFixed(decimals) + suffix;
+                } else {
+                    counter.innerText = Math.floor(currentCount).toLocaleString('vi-VN') + suffix;
+                }
+
+                if (progress < 1) {
+                    requestAnimationFrame(updateCount);
+                } else {
+                    if (decimals > 0) {
+                        counter.innerText = target.toFixed(decimals) + suffix;
+                    } else {
+                        counter.innerText = target.toLocaleString('vi-VN') + suffix;
+                    }
+                }
+            };
+            requestAnimationFrame(updateCount);
+        };
+
+        counters.forEach(counter => observerCounter.observe(counter));
+
+        // 3. Hiệu ứng 3D Tilt cho TẤT CẢ các Card
+        const tiltCards = document.querySelectorAll('.feature, .spec-card, .knowledge-card, .card');
+        tiltCards.forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                // Góc nghiêng tối đa 8 độ
+                const rotateX = ((y - centerY) / centerY) * -8;
+                const rotateY = ((x - centerX) / centerX) * 8;
+                
+                card.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                card.style.transition = 'box-shadow 0.2s ease';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = `perspective(800px) rotateX(0) rotateY(0) scale3d(1, 1, 1)`;
+                card.style.transition = 'transform 0.3s ease, box-shadow 0.3s ease';
+            });
+        });
     </script>
 
-    <script>
+       <script>
     (function() {
         const KEY = '75950d796c1f4a611133660d2ec48258174fc8279da00348';
 
@@ -511,6 +626,8 @@
                 maxZoom: 19
             }).addTo(map);
 
+            const markers = []; // Mảng lưu các marker để gọi hiệu ứng sau
+
             stations.forEach(s => {
                 const color = colors[s.type];
                 const radius = s.type === 'tw' ? 9 : 7;
@@ -522,7 +639,10 @@
                     weight: 1.5,
                     opacity: 1,
                     fillOpacity: 0.9
+                    // Không thêm class bounce-marker ở đây nữa
                 }).addTo(map);
+
+                markers.push(marker);
 
                 marker.bindPopup(
                     '<strong>' + s.name + '</strong><br>' +
@@ -530,8 +650,30 @@
                     '<small>' + s.lat.toFixed(4) + ', ' + s.lng.toFixed(4) + '</small>'
                 );
             });
+
+            // Tạo bộ theo dõi cuộn trang
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        // Khi cuộn tới bản đồ -> Bắt đầu nảy
+                        markers.forEach(marker => {
+                            const svgEl = marker.getElement();
+                            if (svgEl) {
+                                // Random delay để nảy lần lượt
+                                svgEl.style.animationDelay = (Math.random() * 0.8) + 's';
+                                svgEl.classList.add('bounce-marker');
+                            }
+                        });
+                        // Chỉ chạy 1 lần duy nhất
+                        observer.unobserve(entry.target); 
+                    }
+                });
+            }, { threshold: 0.2 }); // Kích hoạt khi 20% bản đồ hiện ra
+
+            observer.observe(el);
         }
 
+        // GỌI HÀM KHỞI TẠO (ĐÂY LÀ PHẦN BỊ THIẾU)
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', initStationsMap);
         } else {
@@ -539,5 +681,79 @@
         }
     })();
     </script>
+    <script>
+    // 1. Parallax Image (Ảnh chạy chậm hơn chữ khi cuộn)
+    window.addEventListener('scroll', () => {
+        document.querySelectorAll('.content-img img').forEach(img => {
+            const rect = img.getBoundingClientRect();
+            // Chỉ xử lý khi ảnh nằm trong tầm nhìn
+            if (rect.top < window.innerHeight && rect.bottom > 0) {
+                const speed = 0.15; // Tốc độ chạy của ảnh
+                const yPos = (rect.top - window.innerHeight / 2) * speed;
+                img.style.transform = `translateY(${yPos}px) scale(1.1)`; // Scale 1.1 để không bị lộ viền
+            }
+        });
+    });
+
+    // 2. Magnetic Buttons (Nút hút theo chuột)
+    document.querySelectorAll('.btn-primary, .btn-secondary').forEach(btn => {
+        btn.addEventListener('mousemove', (e) => {
+            const rect = btn.getBoundingClientRect();
+            const x = e.clientX - rect.left - rect.width / 2;
+            const y = e.clientY - rect.top - rect.height / 2;
+            // Hút 30% khoảng cách
+            btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px) scale(1.05)`;
+        });
+        btn.addEventListener('mouseleave', () => {
+            btn.style.transform = `translate(0px, 0px) scale(1)`;
+        });
+    });
+</script>
+<script>
+    let lastScrollY = window.scrollY;
+    const nav = document.querySelector('.nav');
+
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > lastScrollY && window.scrollY > 100) {
+            // Cuộn xuống -> Ẩn
+            nav.classList.add('nav-hidden');
+        } else {
+            // Cuộn lên -> Hiện
+            nav.classList.remove('nav-hidden');
+        }
+        lastScrollY = window.scrollY;
+    });
+</script>
+<script>
+    const topBtn = document.getElementById("scrollTopBtn");
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+            topBtn.classList.add("show");
+        } else {
+            topBtn.classList.remove("show");
+        }
+    });
+    topBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+</script>
+<script>
+    fetch('https://airwatch.io.vn/api/data')
+        .then(res => res.json())
+        .then(data => {
+            if(data && data.length > 0) {
+                const last = data[data.length - 1];
+                // Tính AQI đơn giản
+                const aqi = Math.max(last.pm25 * 2, last.pm10); // Ước lượng nhanh
+                const el = document.getElementById('hero-aqi');
+                const textEl = document.getElementById('hero-aqi-text');
+                el.textContent = Math.round(aqi);
+                
+                if (aqi <= 50) { el.style.color = '#4CAF50'; textEl.style.background = '#4CAF50'; textEl.textContent = 'Tốt'; }
+                else if (aqi <= 100) { el.style.color = '#FFEB3B'; textEl.style.background = '#FFEB3B'; textEl.style.color='#000'; textEl.textContent = 'Trung bình'; }
+                else { el.style.color = '#FF9800'; textEl.style.background = '#FF9800'; textEl.textContent = 'Kém'; }
+            }
+        });
+</script>
 </body>
 </html>

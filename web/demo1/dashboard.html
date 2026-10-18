@@ -5,15 +5,12 @@
     <title>Dashboard — Quan trắc không khí</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234CAF50'/><text x='50' y='68' font-size='60' font-family='Arial' font-weight='bold' fill='white' text-anchor='middle'>A</text></svg>">
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 </head>
 <body>
     <nav class="nav">
-        <a href="index.html" class="logo">AirWatch</a>
+        <div class="logo"><a href="index.html">AirWatch</a></div>
         <ul class="nav-links">
-            
             <li><a href="index.html">Trang chủ</a></li>
-            <li><a href="map.html">Bản đồ</a></li>
             <li class="admin-only" style="display:none;"><a href="admin.html">Quản lý</a></li>
             <li class="dropdown">
                 <button onclick="toggleMenu(event)" class="btn-primary" id="auth-btn" style="padding: 8px 16px; font-size: 13px;">Guest ▾</button>
@@ -33,6 +30,38 @@
         </h1>
     </header>
 
+    <!-- DATE SELECTOR -->
+    <section class="date-selector">
+        <label>Xem dữ liệu ngày:</label>
+        <input type="date" id="date-picker">
+        <button onclick="loadByDate()" class="btn-primary" style="padding: 8px 16px;">Xem</button>
+        <button onclick="loadToday()" class="btn-secondary" style="padding: 8px 16px;">Hôm nay</button>
+    </section>
+
+    <!-- AQI BANNER (VÒNG TRÒN SVG) -->
+    <section class="aqi-banner">
+        <div class="aqi-circle-container">
+            <svg class="aqi-circle" width="200" height="200">
+                <circle class="aqi-circle-bg" cx="100" cy="100" r="90" />
+                <circle class="aqi-circle-progress" id="aqi-progress" cx="100" cy="100" r="90" />
+            </svg>
+            <div class="aqi-circle-text">
+                <div class="aqi-value" id="aqi" style="font-size:48px; font-weight:700; color:#4CAF50; line-height:1;">--</div>
+                <div class="aqi-label" style="font-size:14px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-top:4px;">AQI</div>
+            </div>
+        </div>
+        <div class="aqi-status" id="aqi-text" style="display:inline-block; margin-top:16px; padding:4px 16px; border-radius:12px; background:#4CAF50; color:#fff; font-weight:600;">--</div>
+        <div class="aqi-desc" style="font-size:12px; color:var(--text-muted); margin-top:12px;">
+            Nguồn công thức: 
+            <a href="https://cem.gov.vn/storage/news_file_attach/QD%201459%20TCMT%20ngay%2012.11.2019%20AQI.pdf" 
+               target="_blank" rel="noopener"
+               style="color:var(--accent); text-decoration:underline;">
+                QĐ 1459/TCMT (12/11/2019)
+            </a>
+        </div>
+    </section>
+
+    <!-- CARDS -->
     <section class="grid">
         <div class="card temp">
             <div class="label">Nhiệt độ</div>
@@ -50,11 +79,29 @@
             <div class="label">Dòng điện</div>
             <div class="value"><span id="curr">--</span><span class="unit">mA</span></div>
         </div>
+        <div class="card pm1">
+            <div class="label">PM1.0</div>
+            <div class="value"><span id="pm1">--</span><span class="unit">µg/m³</span></div>
+        </div>
+        <div class="card pm25">
+            <div class="label">PM2.5</div>
+            <div class="value"><span id="pm25">--</span><span class="unit">µg/m³</span></div>
+        </div>
+        <div class="card pm10">
+            <div class="label">PM10</div>
+            <div class="value"><span id="pm10">--</span><span class="unit">µg/m³</span></div>
+        </div>
     </section>
 
+    <!-- CHARTS -->
     <section class="chart-container">
         <h2 class="chart-title">Môi trường</h2>
         <canvas id="chart-env"></canvas>
+    </section>
+
+    <section class="chart-container">
+        <h2 class="chart-title">Bụi mịn</h2>
+        <canvas id="chart-pm"></canvas>
     </section>
 
     <section class="chart-container admin-only" style="display:none;">
@@ -67,7 +114,7 @@
         <canvas id="chart-curr"></canvas>
     </section>
 
-
+    <!-- ADMIN SYSTEM DATA -->
     <section class="chart-container admin-only" style="display:none;">
         <h2 class="chart-title">Dữ liệu hệ thống (Admin)</h2>
         <div class="grid">
@@ -86,12 +133,67 @@
         </div>
     </section>
 
+    <!-- AQI TABLE -->
+    <section class="aqi-table-section">
+        <h2 class="chart-title" style="text-align:center; margin-bottom:20px;">Bảng ngưỡng AQI</h2>
+        <table class="aqi-table">
+            <thead>
+                <tr>
+                    <th>Khoảng AQI</th>
+                    <th>Mức độ</th>
+                    <th>Ảnh hưởng sức khỏe</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="background: rgba(76,175,80,0.1);">
+                    <td><span class="aqi-badge" style="background:#4CAF50;">0 – 50</span></td>
+                    <td><strong>Tốt</strong></td>
+                    <td>Chất lượng không khí tốt, không ảnh hưởng sức khỏe.</td>
+                </tr>
+                <tr style="background: rgba(255,235,59,0.1);">
+                    <td><span class="aqi-badge" style="background:#FFEB3B; color:#000;">51 – 100</span></td>
+                    <td><strong>Trung bình</strong></td>
+                    <td>Nhóm nhạy cảm (trẻ em, người già, hen suyễn) nên hạn chế hoạt động ngoài trời lâu.</td>
+                </tr>
+                <tr style="background: rgba(255,152,0,0.1);">
+                    <td><span class="aqi-badge" style="background:#FF9800;">101 – 150</span></td>
+                    <td><strong>Kém</strong></td>
+                    <td>Nhóm nhạy cảm bị ảnh hưởng sức khỏe; người khỏe mạnh có thể bị kích ứng mắt, họng.</td>
+                </tr>
+                <tr style="background: rgba(244,67,54,0.1);">
+                    <td><span class="aqi-badge" style="background:#F44336;">151 – 200</span></td>
+                    <td><strong>Xấu</strong></td>
+                    <td>Mọi người bắt đầu bị ảnh hưởng sức khỏe; nhóm nhạy cảm bị ảnh hưởng nghiêm trọng hơn.</td>
+                </tr>
+                <tr style="background: rgba(156,39,176,0.1);">
+                    <td><span class="aqi-badge" style="background:#9C27B0;">201 – 300</span></td>
+                    <td><strong>Rất xấu</strong></td>
+                    <td>Cảnh báo sức khỏe cho toàn bộ cộng đồng; hạn chế ra ngoài.</td>
+                </tr>
+                <tr style="background: rgba(123,31,162,0.15);">
+                    <td><span class="aqi-badge" style="background:#7B1FA2;">301 – 500</span></td>
+                    <td><strong>Nguy hại</strong></td>
+                    <td>Khẩn cấp: ảnh hưởng nghiêm trọng đến toàn bộ dân số, ở trong nhà.</td>
+                </tr>
+            </tbody>
+        </table>
+        <div style="text-align:center; margin-top:16px; font-size:12px; color:var(--text-muted);">
+            Tham khảo: 
+            <a href="https://sonnmt.langson.gov.vn/upload/105376/20250319/01-btnmt-qc05_c7c2a.pdf" 
+               target="_blank" rel="noopener"
+               style="color:var(--accent); text-decoration:underline;">
+                QCVN 05:2023/BTNMT
+            </a>
+        </div>
+    </section>
+
     <footer>
         Node ID: 001 | Cập nhật: <span id="updated">--</span>
     </footer>
 
+    <!-- SCRIPTS -->
     <script src="chart.min.js"></script>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="chartjs-adapter-date-fns.bundle.min.js"></script>
     <script src="auth-check.js"></script>
     <script>
         function toggleMenu(e) {
@@ -103,11 +205,8 @@
             if (m) m.classList.remove('open');
         });
         function handleAuthAction() {
-            if (isAdmin()) {
-                logout();
-            } else {
-                window.location.href = 'index.html';
-            }
+            if (isAdmin()) logout();
+            else window.location.href = 'index.html';
         }
     </script>
     <script src="app.js"></script>

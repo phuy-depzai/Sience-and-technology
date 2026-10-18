@@ -896,3 +896,651 @@ footer {
     height: 400px;
     width: 100%;
 }
+/* DATE SELECTOR */
+.date-selector {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    padding: 16px 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+
+.date-selector label {
+    font-size: 14px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.date-selector input[type="date"] {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.date-selector input[type="date"]:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+/* AQI BANNER */
+.aqi-banner {
+    text-align: center;
+    padding: 32px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin-bottom: 24px;
+}
+.aqi-value { line-height: 1; margin-bottom: 8px; transition: color 0.3s; }
+.aqi-label { font-size: 14px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; }
+.aqi-status { transition: background 0.3s; }
+
+/* Card PM colors */
+.card.pm1 .value { color: #FFC107; }
+.card.pm25 .value { color: #FF5722; }
+.card.pm10 .value { color: #FF9800; }
+/* AQI TABLE */
+.aqi-table-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.aqi-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.aqi-table thead th {
+    background: var(--bg);
+    color: var(--text);
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 2px solid var(--border);
+}
+
+.aqi-table tbody td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    vertical-align: middle;
+}
+
+.aqi-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.aqi-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 8px;
+    color: #fff;
+    font-weight: 600;
+    font-size: 13px;
+    min-width: 80px;
+    text-align: center;
+}
+
+.aqi-table-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.aqi-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.aqi-table thead th {
+    background: var(--bg);
+    color: var(--text);
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 2px solid var(--border);
+}
+
+.aqi-table tbody td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    vertical-align: middle;
+}
+
+.aqi-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.aqi-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 8px;
+    color: #fff;
+    font-weight: 600;
+    font-size: 13px;
+    min-width: 80px;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .aqi-table {
+        font-size: 12px;
+    }
+    .aqi-table thead th,
+    .aqi-table tbody td {
+        padding: 8px 10px;
+    }
+    .aqi-badge {
+        min-width: 60px;
+        padding: 3px 8px;
+        font-size: 11px;
+    }
+    .aqi-table-section {
+        padding: 16px;
+    }
+}
+/* Hiệu ứng Hero trượt lên */
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hero h1 {
+    animation: fadeUp 0.8s ease-out forwards;
+}
+
+.hero .subtitle {
+    animation: fadeUp 0.8s ease-out 0.2s forwards;
+    opacity: 0; /* Giữ ẩn lúc đầu để đợi animation */
+}
+
+.hero-actions {
+    animation: fadeUp 0.8s ease-out 0.4s forwards;
+    opacity: 0;
+}
+
+/* Hiệu ứng Hover cho Card */
+.feature, .spec-card, .knowledge-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.feature:hover, .spec-card:hover, .knowledge-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+    border-color: var(--accent);
+}
+/* Nút phát sáng nhẹ */
+.btn-primary {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    box-shadow: 0 0 15px var(--accent);
+    transform: scale(1.05);
+}
+/* Nút phát sáng nhẹ */
+.btn-primary {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    box-shadow: 0 0 15px var(--accent);
+    transform: scale(1.05);
+}
+/* Nền Hero chuyển động */
+.hero {
+    position: relative;
+    overflow: hidden;
+}
+.hero::before {
+    content: "";
+    position: absolute;
+    top: -50%; left: -50%; width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(76,175,80,0.1) 0%, transparent 60%);
+    animation: rotateBg 20s linear infinite;
+    z-index: 0;
+}
+@keyframes rotateBg {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+.hero h1, .hero .subtitle, .hero-actions {
+    position: relative;
+    z-index: 1;
+}
+/* Icon bay lơ lửng */
+.feature .icon {
+    animation: floatIcon 3s ease-in-out infinite;
+    display: inline-block;
+}
+.feature:nth-child(2) .icon { animation-delay: 0.5s; }
+.feature:nth-child(3) .icon { animation-delay: 1s; }
+
+@keyframes floatIcon {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+/* ==========================================
+   ANIMATION & HIỆU ỨNG
+   ========================================== */
+
+/* 1. Vòng tròn AQI Dashboard */
+.aqi-circle-container {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    margin: 0 auto;
+}
+.aqi-circle {
+    transform: rotate(-90deg); /* Xoay để vòng tròn chạy từ trên xuống */
+}
+.aqi-circle-bg {
+    fill: none;
+    stroke: var(--border);
+    stroke-width: 10;
+}
+.aqi-circle-progress {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 10;
+    stroke-linecap: round;
+    stroke-dasharray: 565.48; /* Chu vi vòng tròn bán kính 90 */
+    stroke-dashoffset: 565.48; /* Ẩn hoàn toàn lúc đầu */
+    transition: stroke-dashoffset 1.5s ease-out, stroke 0.5s ease;
+}
+.aqi-circle-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+/* 2. Hero: Nền xoay + Text trượt lên (Mặt nạ) */
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes textReveal {
+    0% { clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0% 100%); }
+    100% { clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); }
+}
+
+@keyframes rotateBg {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.hero {
+    position: relative;
+    overflow: hidden;
+}
+.hero::before {
+    content: "";
+    position: absolute;
+    top: -50%; left: -50%; width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(76,175,80,0.15) 0%, transparent 60%);
+    animation: rotateBg 15s linear infinite;
+    z-index: 0;
+}
+
+.hero h1 {
+    clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0% 100%);
+    animation: textReveal 1.2s cubic-bezier(0.77, 0, 0.175, 1) forwards !important;
+    position: relative;
+    z-index: 1;
+}
+
+.hero .subtitle {
+    clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0% 100%);
+    animation: textReveal 1.2s cubic-bezier(0.77, 0, 0.175, 1) 0.3s forwards !important;
+    position: relative;
+    z-index: 1;
+}
+.hero h2 {
+    animation: fadeUp 0.8s ease-out 0.2s forwards; /* Delay 0.2s để chạy sau h1 */
+    opacity: 0; /* Ẩn lúc đầu để đợi animation */
+    position: relative;
+    z-index: 1;
+}
+
+/* Nhớ dời cái .hero .subtitle lùi lại một chút để không bị trùng */
+.hero .subtitle {
+    animation: fadeUp 0.8s ease-out 0.4s forwards; /* Delay 0.4s */
+    opacity: 0;
+    position: relative;
+    z-index: 1;
+}
+.hero-actions {
+    animation: fadeUp 0.8s ease-out 0.6s forwards !important;
+    opacity: 0;
+    display: flex; 
+    gap: 16px; 
+    justify-content: center; 
+    margin-top: 24px;
+    position: relative;
+    z-index: 1;
+}
+
+/* 3. Parallax Image (Ảnh chạy chậm hơn chữ khi cuộn) */
+.content-img {
+    overflow: hidden; /* Cắt phần ảnh bị tràn ra ngoài */
+    border-radius: 12px;
+}
+.content-img img {
+    will-change: transform;
+    transition: transform 0.1s linear;
+}
+
+/* 4. Icon bay lơ lửng */
+@keyframes floatIcon {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+.feature .icon {
+    animation: floatIcon 3s ease-in-out infinite;
+    display: inline-block;
+}
+.feature:nth-child(2) .icon { animation-delay: 0.5s; }
+.feature:nth-child(3) .icon { animation-delay: 1s; }
+
+/* 5. Hover 3D cho Card */
+.feature, .spec-card, .knowledge-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.feature:hover, .spec-card:hover, .knowledge-card:hover {
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    border-color: var(--accent);
+    z-index: 10;
+}
+
+
+.nav {
+    transition: transform 0.3s ease-in-out;
+}
+.nav.nav-hidden {
+    transform: translateY(-100%);
+}
+@keyframes numberPop {
+    0% { opacity: 0; transform: translateY(10px) scale(0.9); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.card .value span {
+    display: inline-block;
+}
+.card .value span.updated {
+    animation: numberPop 0.4s ease-out forwards;
+}
+#scrollTopBtn {
+    display: none;
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 99;
+    border: none;
+    outline: none;
+    background-color: var(--accent);
+    color: white;
+    cursor: pointer;
+    padding: 15px;
+    border-radius: 50%;
+    font-size: 20px;
+    font-weight: bold;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    transform: translateY(20px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+#scrollTopBtn.show {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+#scrollTopBtn:hover {
+    background-color: #45a049;
+    transform: translateY(-3px);
+}
+
+/* ==========================================
+   NÚT BẤM (SLIDING FILL EFFECT)
+   ========================================== */
+.btn-primary {
+    position: relative;
+    display: inline-block;
+    padding: 10px 20px;
+    background: var(--accent);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    overflow: hidden;
+    z-index: 1;
+    /* Hiệu ứng bóng đổ mượt */
+    transition: box-shadow 0.3s ease;
+}
+
+/* Tạo lớp nền đậm hơn để trượt vào */
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: var(--accent-hover); /* Màu xanh đậm hơn */
+    transition: left 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: -1;
+}
+
+/* Khi rê chuột: Nền trượt vào, bóng sáng lên */
+.btn-primary:hover::before {
+    left: 0;
+}
+
+.btn-primary:hover {
+    box-shadow: 0 0 15px rgba(76, 175, 80, 0.6);
+}
+/* Viền phát sáng Gradient chuyển động */
+.feature, .spec-card, .knowledge-card, .card {
+    position: relative;
+}
+
+.feature::after, .spec-card::after, .knowledge-card::after, .card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 2px; /* Độ dày của viền */
+    border-radius: inherit;
+    background: linear-gradient(45deg, transparent 30%, var(--accent) 50%, transparent 70%);
+    background-size: 200% 200%;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: borderGlow 3s linear infinite;
+    pointer-events: none; /* Để không cản trở click chuột */
+    opacity: 0.6;
+    transition: opacity 0.3s;
+}
+
+.feature:hover::after, .spec-card:hover::after, .knowledge-card:hover::after, .card:hover::after {
+    opacity: 1; /* Sáng lên khi rê chuột vào */
+}
+
+@keyframes borderGlow {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+}
+/* Marker bản đồ nảy lên */
+@keyframes mapBounce {
+    0% { transform: translateY(-50px); opacity: 0; }
+    60% { transform: translateY(10px); opacity: 1; }
+    80% { transform: translateY(-5px); }
+    100% { transform: translateY(0); }
+}
+
+.leaflet-interactive.bounce-marker {
+    animation: mapBounce 0.8s cubic-bezier(0.28, 0.84, 0.42, 1) both;
+    transform-box: fill-box;
+    transform-origin: center bottom;
+}
+/* ==========================================
+   BẢNG TÁC ĐỘNG Ô NHIỄM (POLLUTANT GRID)
+   ========================================== */
+.pollutant-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.pollutant-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 30px;
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Hiệu ứng rê chuột */
+.pollutant-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--accent);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.pollutant-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px dashed var(--border);
+}
+
+.pollutant-icon {
+    font-size: 28px;
+    background: rgba(76, 175, 80, 0.1);
+    padding: 10px;
+    border-radius: 12px;
+    line-height: 1;
+}
+
+.pollutant-header h4 {
+    font-size: 18px;
+    color: var(--accent);
+    margin: 0;
+    font-weight: 600;
+}
+
+.pollutant-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.pollutant-list li {
+    position: relative;
+    padding: 10px 0 10px 24px;
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.5;
+    border-bottom: 1px solid var(--border);
+}
+
+.pollutant-list li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+/* Tạo dấu chấm tròn màu xanh thay cho dấu chấm đầu dòng */
+.pollutant-list li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 18px;
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--accent);
+}
+.hero {
+    position: relative;
+    overflow: hidden;
+}
+.aqi-bg-glow {
+    position: absolute;
+    top: -20%; left: 50%;
+    transform: translateX(-50%);
+    width: 800px; height: 800px;
+    background: radial-gradient(circle, rgba(76,175,80,0.15) 0%, transparent 60%);
+    filter: blur(60px);
+    z-index: 0;
+    animation: pulseGlow 8s infinite alternate;
+}
+@keyframes pulseGlow {
+    0% { transform: translateX(-50%) scale(1); opacity: 0.5; }
+    100% { transform: translateX(-50%) scale(1.2); opacity: 1; }
+}
+.hero h1, .hero h2, .hero .subtitle, .hero-actions { position: relative; z-index: 1; }
+.live-aqi-card {
+    background: rgba(26, 31, 46, 0.6);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 30px 60px;
+    border-radius: 24px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    margin-bottom: 10px;
+}
+.hero h1 {
+    font-size: 56px; /* To hơn xíu */
+    letter-spacing: -1px; /* Chữ sát lại nhìn hiện đại hơn */
+    margin-bottom: 16px;
+}
+.hero h2 {
+    font-size: 24px;
+    font-weight: 400; /* Mảnh hơn */
+    color: #8899a6;
+    margin-bottom: 40px;
+}
