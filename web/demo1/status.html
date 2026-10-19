@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AirWatch Status</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234CAF50'/><text x='50' y='68' font-size='60' font-family='Arial' font-weight='bold' fill='white' text-anchor='middle'>A</text></svg>">
+<style>
+:root {
+    --bg: #0d1117;
+    --bg-card: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #7d8590;
+    --accent: #3fb950;
+    --accent-blue: #58a6ff;
+    --green: #3fb950;
+    --yellow: #d29922;
+    --blue: #58a6ff;
+    --purple: #a371f7;
+    --orange: #ff9800;
+    --red: #f85149;
+    --gray: #484f58;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+}
+.wrap {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+}
+
+/* HEADER */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 48px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+}
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: 700;
+}
+.logo-mark {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-blue));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 800;
+    box-shadow: 0 4px 12px rgba(63,185,80,0.3);
+}
+.logo span { color: var(--accent); }
+.nav {
+    display: flex;
+    gap: 24px;
+}
+.nav a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.2s;
+}
+.nav a:hover { color: var(--accent); }
+
+/* TITLE */
+.title {
+    text-align: center;
+    margin-bottom: 40px;
+}
+.title h1 {
+    font-size: 40px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+}
+.title p {
+    color: var(--text-muted);
+    font-size: 15px;
+}
+
+/* BANNER */
+.banner {
+    padding: 32px;
+    border-radius: 16px;
+    margin-bottom: 48px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    border: 1px solid;
+    transition: all 0.3s;
+}
+.banner.ok {
+    background: linear-gradient(135deg, rgba(63,185,80,0.12), rgba(63,185,80,0.03));
+    border-color: rgba(63,185,80,0.35);
+}
+.banner.degraded {
+    background: linear-gradient(135deg, rgba(210,153,34,0.12), rgba(210,153,34,0.03));
+    border-color: rgba(210,153,34,0.35);
+}
+.banner.down {
+    background: linear-gradient(135deg, rgba(248,81,73,0.12), rgba(248,81,73,0.03));
+    border-color: rgba(248,81,73,0.35);
+}
+.banner-icon {
+    font-size: 52px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+.banner-text h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: var(--green);
+}
+.banner.degraded .banner-text h2 { color: var(--yellow); }
+.banner.down .banner-text h2 { color: var(--red); }
+.banner-text p {
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+/* SECTION TITLE */
+.section-title {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-bottom: 16px;
+    padding-left: 4px;
+}
+
+/* SERVICES */
+.services {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 8px;
+    margin-bottom: 32px;
+}
+.service {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 24px;
+    align-items: center;
+}
+.service:last-child { border-bottom: none; }
+.service-left { min-width: 0; }
+.service-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.service-name-icon { font-size: 16px; }
+.service-name-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 400;
+    margin-left: 4px;
+}
+
+.bars-wrap { padding-top: 4px; }
+.bars {
+    display: flex;
+    gap: 3px;
+    height: 34px;
+    align-items: stretch;
+}
+.bar {
+    flex: 1;
+    min-width: 2px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    background: var(--gray);
+    opacity: 0.9;
+}
+.bar:hover {
+    transform: scaleY(1.2);
+    opacity: 1;
+    box-shadow: 0 0 8px currentColor;
+}
+.bar.working     { background: var(--green); color: var(--green); }
+.bar.debug       { background: var(--yellow); color: var(--yellow); }
+.bar.attach      { background: var(--blue); color: var(--blue); }
+.bar.testing     { background: var(--purple); color: var(--purple); }
+.bar.maintenance { background: var(--orange); color: var(--orange); }
+.bar.offline     { background: var(--red); color: var(--red); }
+.bar.unknown     { background: var(--gray); opacity: 0.5; }
+
+.date-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    padding: 0 2px;
+    letter-spacing: 0.5px;
+}
+
+.service-right {
+    text-align: right;
+    flex-shrink: 0;
+    min-width: 130px;
+}
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
+}
+.badge::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 8px currentColor;
+    animation: pulse 2s infinite;
+}
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.4; }
+}
+.badge.working     { background: rgba(63,185,80,0.15);  color: var(--green); }
+.badge.debug       { background: rgba(210,153,34,0.15); color: var(--yellow); }
+.badge.attach      { background: rgba(88,166,255,0.15); color: var(--blue); }
+.badge.testing     { background: rgba(163,113,247,0.15);color: var(--purple); }
+.badge.maintenance { background: rgba(255,152,0,0.15);  color: var(--orange); }
+.badge.offline     { background: rgba(248,81,73,0.15);  color: var(--red); }
+.badge.offline::before { animation: none; }
+.uptime {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+}
+.note {
+    grid-column: 1 / -1;
+    font-size: 12px;
+    color: var(--text-muted);
+    padding: 8px 12px;
+    background: rgba(88,166,255,0.06);
+    border-left: 2px solid var(--accent-blue);
+    border-radius: 4px;
+    margin-top: 4px;
+    font-style: italic;
+}
+
+/* LEGEND */
+.legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 40px;
+    padding: 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    background: var(--green);
+}
+.legend-dot.debug       { background: var(--yellow); }
+.legend-dot.attach      { background: var(--blue); }
+.legend-dot.testing     { background: var(--purple); }
+.legend-dot.maintenance { background: var(--orange); }
+.legend-dot.offline     { background: var(--red); }
+.legend-dot.unknown     { background: var(--gray); opacity: 0.5; }
+
+/* INCIDENTS */
+.incidents {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 48px 32px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-bottom: 40px;
+}
+.incidents-icon {
+    font-size: 40px;
+    margin-bottom: 12px;
+    display: block;
+}
+
+/* FOOTER */
+.footer {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 12px;
+    line-height: 2;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+}
+.updated-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    margin-bottom: 16px;
+    font-size: 12px;
+}
+.updated-pill::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 6px var(--green);
+    animation: pulse 2s infinite;
+}
+.footer a {
+    color: var(--accent);
+    text-decoration: none;
+}
+.footer a:hover { text-decoration: underline; }
+
+/* RESPONSIVE */
+@media (max-width: 640px) {
+    .wrap { padding: 24px 16px 60px; }
+    .header { flex-direction: column; gap: 16px; align-items: flex-start; }
+    .nav { gap: 16px; }
+    .title h1 { font-size: 28px; }
+    .banner { flex-direction: column; text-align: center; padding: 24px; }
+    .banner-text h2 { font-size: 20px; }
+    .service { grid-template-columns: 1fr; gap: 12px; }
+    .service-right { text-align: left; }
+    .bars { height: 26px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+    <header class="header">
+        <a href="https://airwatch.io.vn/index.html" class="logo">
+            <div class="logo-mark">A</div>
+            Air<span>Watch</span>
+        </a>
+        <nav class="nav">
+            <a href="https://airwatch.io.vn/index.html">Trang chủ</a>
+            <a href="https://airwatch.io.vn/dashboard.html">Dashboard</a>
+        </nav>
+    </header>
+
+    <div class="title">
+        <h1>System Status</h1>
+        <p>Trạng thái realtime của hệ thống AirWatch</p>
+    </div>
+
+    <div class="banner ok" id="banner">
+        <div class="banner-icon" id="banner-icon">✅</div>
+        <div class="banner-text">
+            <h2 id="banner-title">All Systems Operational</h2>
+            <p id="banner-desc">Tất cả dịch vụ đang hoạt động bình thường</p>
+        </div>
+    </div>
+
+    <div class="section-title">Current Status · 30 ngày gần nhất</div>
+    <div class="services" id="services">
+        <div style="padding: 40px; text-align: center; color: var(--text-muted);">Đang tải...</div>
+    </div>
+
+    <div class="legend">
+        <div class="legend-item"><span class="legend-dot"></span> Working</div>
+        <div class="legend-item"><span class="legend-dot debug"></span> Debug</div>
+        <div class="legend-item"><span class="legend-dot attach"></span> Attach</div>
+        <div class="legend-item"><span class="legend-dot testing"></span> Testing</div>
+        <div class="legend-item"><span class="legend-dot maintenance"></span> Maintenance</div>
+        <div class="legend-item"><span class="legend-dot offline"></span> Offline</div>
+        <div class="legend-item"><span class="legend-dot unknown"></span> Chưa có dữ liệu</div>
+    </div>
+
+    <div class="section-title">Past Incidents</div>
+    <div class="incidents">
+        <span class="incidents-icon">🎉</span>
+        Không có sự cố nào trong 30 ngày qua
+    </div>
+
+    <footer class="footer">
+        <div class="updated-pill">Cập nhật lúc: <span id="updated">--</span> · Auto refresh 10s</div>
+        <div>
+            <a href="https://airwatch.io.vn/index.html">AirWatch</a> ·
+            <a href="https://airwatch.io.vn/dashboard.html">Dashboard</a> ·
+            <a href="https://airwatch.io.vn/admin.html">Admin</a>
+        </div>
+        <div style="margin-top: 8px;">© 2026 AirWatch · An Giang, Việt Nam</div>
+    </footer>
+</div>
+
+<script>
+const API = 'https://airwatch.io.vn';
+
+const SERVICES = {
+    stm32:  { icon: '🔌', name: 'NODE (STM32)',    desc: 'Trạm quan trắc cảm biến' },
+    esp32:  { icon: '📡', name: 'GATEWAY (ESP32)', desc: 'Cổng LoRa → WiFi → MQTT' },
+    api:    { icon: '🌐', name: 'Web API',          desc: 'REST API + WebSocket' },
+    system: { icon: '🖥️', name: 'SYSTEM',           desc: 'Server · Database · Node-RED' }
+};
+
+const LABEL = {
+    working: 'Working', debug: 'Debug', attach: 'Attach',
+    testing: 'Testing', maintenance: 'Maintenance', offline: 'Offline',
+    unknown: 'Chưa có dữ liệu'
+};
+
+const STORAGE_PREFIX = 'aw_status_history_v2_';
+const DAY_MS = 24 * 3600 * 1000;
+
+function todayKey() {
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function dateKey(offsetDays) {
+    const d = new Date(Date.now() - offsetDays * DAY_MS);
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function loadHistory(service) {
+    try {
+        return JSON.parse(localStorage.getItem(STORAGE_PREFIX + service) || '{}');
+    } catch(e) { return {}; }
+}
+
+function saveHistory(service, history) {
+    // Chỉ giữ 30 ngày gần nhất
+    const cutoff = dateKey(29);
+    const cleaned = {};
+    Object.keys(history).forEach(d => {
+        if (d >= cutoff) cleaned[d] = history[d];
+    });
+    try { localStorage.setItem(STORAGE_PREFIX + service, JSON.stringify(cleaned)); } catch(e) {}
+    return cleaned;
+}
+
+function trackStatus(service, status) {
+    const h = loadHistory(service);
+    h[todayKey()] = status;
+    return saveHistory(service, h);
+}
+
+function renderBars(history) {
+    let bars = '';
+    for (let i = 29; i >= 0; i--) {
+        const dk = dateKey(i);
+        const d = new Date(Date.now() - i * DAY_MS);
+        const dd = String(d.getDate()).padStart(2,'0');
+        const mm = String(d.getMonth()+1).padStart(2,'0');
+        const st = history[dk] || 'unknown';
+        const tooltip = dd + '/' + mm + ': ' + LABEL[st];
+        bars += '<div class="bar ' + st + '" title="' + tooltip + '"></div>';
+    }
+    return bars;
+}
+
+function calcUptime(history) {
+    let ok = 0, total = 0;
+    for (let i = 29; i >= 0; i--) {
+        const dk = dateKey(i);
+        if (!history[dk]) continue; // bỏ qua ngày chưa có data
+        total++;
+        const s = history[dk];
+        if (s === 'working' || s === 'attach' || s === 'testing') ok++;
+    }
+    if (total === 0) return null;
+    return (ok / total * 100).toFixed(2);
+}
+
+function renderDateLabels() {
+    const f = (n) => {
+        const d = new Date(Date.now() - n * DAY_MS);
+        return String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0');
+    };
+    return '<span>' + f(29) + '</span><span>' + f(20) + '</span><span>' + f(10) + '</span><span>Hôm nay</span>';
+}
+
+async function loadStatus() {
+    try {
+        const r = await fetch(API + '/api/status');
+        const data = await r.json();
+        const services = data.services || {};
+
+        let anyDown = false, anyDegraded = false, allOk = true;
+
+        const html = Object.keys(SERVICES).map(key => {
+            const info = SERVICES[key];
+            const svc = services[key] || { status: 'offline', note: '' };
+            const status = svc.status || 'offline';
+            const history = trackStatus(key, status);
+            const uptime = calcUptime(history);
+
+            if (status !== 'working') allOk = false;
+            if (status === 'offline') anyDown = true;
+            if (status === 'debug' || status === 'maintenance') anyDegraded = true;
+
+            const uptimeText = uptime === null ? 'chưa có dữ liệu' : uptime + '% uptime';
+            const noteHtml = svc.note ? '<div class="note">' + svc.note + '</div>' : '';
+
+            return '<div class="service">' +
+                '<div class="service-left">' +
+                    '<div class="service-name">' +
+                        '<span class="service-name-icon">' + info.icon + '</span>' +
+                        info.name +
+                        '<span class="service-name-desc">· ' + info.desc + '</span>' +
+                    '</div>' +
+                    '<div class="bars-wrap">' +
+                        '<div class="bars">' + renderBars(history) + '</div>' +
+                        '<div class="date-labels">' + renderDateLabels() + '</div>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="service-right">' +
+                    '<div class="badge ' + status + '">' + LABEL[status] + '</div>' +
+                    '<div class="uptime">' + uptimeText + '</div>' +
+                '</div>' +
+                noteHtml +
+            '</div>';
+        }).join('');
+
+        document.getElementById('services').innerHTML = html;
+
+        const banner = document.getElementById('banner');
+        const icon = document.getElementById('banner-icon');
+        const title = document.getElementById('banner-title');
+        const desc = document.getElementById('banner-desc');
+
+        if (anyDown) {
+            banner.className = 'banner down';
+            icon.textContent = '⚠️';
+            title.textContent = 'Major Outage';
+            desc.textContent = 'Có dịch vụ đang offline';
+        } else if (anyDegraded) {
+            banner.className = 'banner degraded';
+            icon.textContent = '🟡';
+            title.textContent = 'Partial Degradation';
+            desc.textContent = 'Một số dịch vụ đang bảo trì hoặc debug';
+        } else if (!allOk) {
+            banner.className = 'banner degraded';
+            icon.textContent = '🟡';
+            title.textContent = 'Minor Issues';
+            desc.textContent = 'Một số dịch vụ đang gặp sự cố nhỏ';
+        } else {
+            banner.className = 'banner ok';
+            icon.textContent = '✅';
+            title.textContent = 'All Systems Operational';
+            desc.textContent = 'Tất cả dịch vụ đang hoạt động bình thường';
+        }
+
+        document.getElementById('updated').textContent = new Date().toLocaleTimeString('vi-VN');
+    } catch(e) {
+        console.error('[STATUS]', e);
+        document.getElementById('updated').textContent = 'Lỗi kết nối';
+    }
+}
+
+loadStatus();
+setInterval(loadStatus, 10000);
+</script>
+</body>
+</html>

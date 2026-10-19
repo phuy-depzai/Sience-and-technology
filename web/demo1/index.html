@@ -10,11 +10,11 @@
 <body class="landing">
         <nav class="nav">
             <button id="scrollTopBtn" title="Lên đầu trang">↑</button>
-        <a href="index.html" class="logo">AirWatch</a>
+        <a href="/" class="logo">AirWatch</a>
         <ul class="nav-links">
-            <li><a href="dashboard.html">Dashboard</a></li>
-            <li><a href="map.html">Bản đồ</a></li>
-            <li class="admin-only" style="display:none;"><a href="admin.html">Quản lý</a></li>
+            <li><a href="/dashboard">Dashboard</a></li>
+            <li><a href="/map">Bản đồ</a></li>
+            <li class="admin-only" style="display:none;"><a href="/admin">Quản lý</a></li>
             <li class="dropdown">
                 <button onclick="toggleMenu(event)" class="btn-primary" id="auth-btn" style="padding: 8px 16px; font-size: 13px;">Guest ▾</button>
                 <div class="dropdown-menu" id="dropdown-menu">
@@ -41,7 +41,6 @@
         <span style="background: #4CAF50; color: white; padding: 4px 16px; border-radius: 20px; font-size: 14px; font-weight: 600;" id="hero-aqi-text">Đang tải...</span>
     </div>
     <div style="display: flex; gap: 16px; margin-top: 24px;">
-        <a href="dashboard.html" class="btn-primary btn-large">Xem Dashboard</a>
         <a href="#van-de" class="btn-secondary">Tìm hiểu thêm</a>
     </div>
 </div>
@@ -386,10 +385,6 @@
             Nguồn: <a href="https://www.eea.europa.eu/" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: underline;">EEA (European Environment Agency)</a>
         </p>
 
-        <div class="content-text" style="text-align: center; margin-bottom: 40px;">
-            <h3 style="font-size: 28px;">Tác động theo từng chất ô nhiễm</h3>
-        </div>
-
                <div class="content-text" style="text-align: center; margin-bottom: 40px;">
             <h3 style="font-size: 28px;">Tác động theo từng chất ô nhiễm</h3>
             <p style="color: var(--text-muted);">Ảnh hưởng cụ thể của từng loại khí độc và bụi mịn đến cơ thể con người.</p>
@@ -446,7 +441,7 @@
 
     <section class="section cta-section">
         <h2>Sẵn sàng xem dữ liệu?</h2>
-        <a href="dashboard.html" class="btn-primary btn-large">Mở Dashboard</a>
+        <a href="/dashboard" class="btn-primary btn-large">Mở Dashboard</a>
     </section>
 
     <footer>
