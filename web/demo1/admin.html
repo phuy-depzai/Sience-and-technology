@@ -14,13 +14,13 @@
     <ul class="nav-links">
         <li><a href="/">Trang chủ</a></li>
         <li><a href="/dashboard">Dashboard</a></li>
-        <li><a href="/status">Status</a></li>
+        <li><a href="https://status.airwatch.io.vn/">Status</a></li>
         <li class="dropdown">
             <button onclick="toggleMenu(event)" class="btn-primary" id="auth-btn" style="padding:8px 16px; font-size:13px;">Admin ▾</button>
             <div class="dropdown-menu" id="dropdown-menu">
                 <button onclick="toggleTheme()"><span id="theme-icon">🌙</span><span id="theme-label">Chế độ tối</span></button>
                 <div class="dropdown-divider"></div>
-                <a href="#" id="auth-action" onclick="handleAuthAction(); return false;">🚪 Đăng xuất</a>
+                <a href="#" id="auth-action" onclick="handleAuthAction(); return false;">Đăng xuất</a>
             </div>
         </li>
     </ul>
@@ -28,24 +28,29 @@
 
 <header class="admin-header">
     <h1>Quản trị hệ thống</h1>
-    <p class="admin-subtitle">Quản lý node và điều khiển trạng thái hệ thống</p>
+    <p class="admin-subtitle">Quản lý node, trạng thái và dữ liệu test</p>
 </header>
 
 <div class="admin-tabs">
-    <button class="admin-tab active" data-tab="nodes" onclick="switchTab('nodes')"><span>📋</span> Quản lý node</button>
-    <button class="admin-tab" data-tab="status" onclick="switchTab('status')"><span>🎛️</span> Chỉnh sửa status page</button>
+    <button class="admin-tab active" data-tab="nodes" onclick="switchTab('nodes')">Quản lý node</button>
+    <button class="admin-tab" data-tab="status" onclick="switchTab('status')">Trạng thái</button>
+    <button class="admin-tab" data-tab="debug" onclick="switchTab('debug')">Debug</button>
+    <button class="admin-tab" data-tab="log" onclick="switchTab('log')">Log hoạt động</button>
+    <button class="admin-tab" data-tab="notes" onclick="switchTab('notes')">Ghi chú</button>
+    <button class="admin-tab head-admin-only" data-tab="users" onclick="switchTab('users')" style="display:none;">Người dùng</button>
+    <button class="admin-tab" data-tab="db" onclick="switchTab('db')">Database</button>
 </div>
 
+<!-- TAB 1: NODES -->
 <section class="admin-panel" id="tab-nodes">
     <div class="panel-head">
         <h2 class="chart-title">Quản lý node</h2>
-        <button onclick="loadNodes()" class="btn-primary btn-refresh"><span>🔄</span> Refresh</button>
+        <button onclick="loadNodes()" class="btn-primary btn-refresh">Làm mới</button>
     </div>
-
     <div class="nodes-layout">
         <div id="nodes-map" class="nodes-map"></div>
         <div class="node-form">
-            <h3>➕ Thêm node mới</h3>
+            <h3>Thêm node</h3>
             <label>ID Node</label>
             <input id="node-id" class="status-input" placeholder="VD: 001">
             <label>Tên Node</label>
@@ -54,51 +59,48 @@
             <input id="node-lat" class="status-input" placeholder="Click bản đồ" readonly>
             <label>Longitude</label>
             <input id="node-lng" class="status-input" placeholder="Click bản đồ" readonly>
-            <button onclick="addNode()" class="btn-primary btn-update" style="width:100%; margin-top:12px;">💾 Thêm node</button>
-            <p class="node-form-hint">💡 Click lên bản đồ bên trái để tự động lấy tọa độ</p>
+            <button onclick="addNode()" class="btn-primary btn-update" style="width:100%; margin-top:12px;">Thêm</button>
+            <p class="node-form-hint">Click lên bản đồ để lấy tọa độ</p>
         </div>
     </div>
-
     <h3 class="chart-title" style="margin-top:32px; font-size:18px;">Danh sách node</h3>
     <div id="nodes-list" class="nodes-list">Đang tải...</div>
 </section>
 
+<!-- TAB 2: STATUS -->
 <section class="admin-panel" id="tab-status" style="display:none;">
-    <h2 class="chart-title">Chỉnh sửa status page</h2>
+    <h2 class="chart-title">Chỉnh sửa trạng thái</h2>
 
-    <div class="status-presets-label">Chọn nhanh log có sẵn:</div>
+    <div class="status-presets-label">Chọn nhanh:</div>
     <div class="status-presets" id="status-presets">
-        <button class="preset-btn working"     onclick="applyPreset('working')">🟢 Working</button>
-        <button class="preset-btn debug"       onclick="applyPreset('debug')">🟡 Debug</button>
-        <button class="preset-btn attach"      onclick="applyPreset('attach')">🔵 Attach</button>
-        <button class="preset-btn testing"     onclick="applyPreset('testing')">🟣 Testing</button>
-        <button class="preset-btn maintenance" onclick="applyPreset('maintenance')">🟠 Maintenance</button>
-        <button class="preset-btn offline"     onclick="applyPreset('offline')">🔴 Offline</button>
+        <button class="preset-btn working"     onclick="applyPreset('working')">Working</button>
+        <button class="preset-btn debug"       onclick="applyPreset('debug')">Debug</button>
+        <button class="preset-btn attach"      onclick="applyPreset('attach')">Attach</button>
+        <button class="preset-btn testing"     onclick="applyPreset('testing')">Testing</button>
+        <button class="preset-btn maintenance" onclick="applyPreset('maintenance')">Maintenance</button>
+        <button class="preset-btn offline"     onclick="applyPreset('offline')">Offline</button>
     </div>
 
     <div class="status-form">
         <label>Service:</label>
         <select id="sel-service" class="status-select">
-            <option value="stm32">🔌 NODE (STM32)</option>
-            <option value="esp32">📡 GATEWAY (ESP32)</option>
-            <option value="api">🌐 Web API</option>
-            <option value="system">🖥️ SYSTEM</option>
+            <option value="stm32">NODE (STM32)</option>
+            <option value="esp32">GATEWAY (ESP32)</option>
+            <option value="api">Web API</option>
+            <option value="system">SYSTEM</option>
         </select>
-
         <label>Trạng thái:</label>
         <select id="sel-status" class="status-select">
-            <option value="working">🟢 working</option>
-            <option value="debug">🟡 debug</option>
-            <option value="attach">🔵 attach</option>
-            <option value="testing">🟣 testing</option>
-            <option value="maintenance">🟠 maintenance</option>
-            <option value="offline">🔴 offline</option>
+            <option value="working">working</option>
+            <option value="debug">debug</option>
+            <option value="attach">attach</option>
+            <option value="testing">testing</option>
+            <option value="maintenance">maintenance</option>
+            <option value="offline">offline</option>
         </select>
-
-        <label>Log:</label>
-        <input id="inp-note" class="status-input" type="text" placeholder="Ghi chú..." maxlength="120">
-
-        <button onclick="updateServiceStatus()" class="btn-primary btn-update">💾 Cập nhật</button>
+        <label>Ghi chú:</label>
+        <input id="inp-note" class="status-input" type="text" placeholder="..." maxlength="120">
+        <button onclick="updateServiceStatus()" class="btn-primary btn-update">Cập nhật</button>
     </div>
 
     <h3 class="chart-title" style="margin-top:32px; font-size:18px;">Trạng thái hiện tại</h3>
@@ -106,8 +108,421 @@
     <div class="status-updated">Cập nhật lúc: <strong id="status-updated">--</strong></div>
 </section>
 
+<!-- TAB 3: DEBUG -->
+<section class="admin-panel" id="tab-debug" style="display:none;">
+    <div class="panel-head">
+        <h2 class="chart-title">Debug Dashboard</h2>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button onclick="loadDebugData()" class="btn-primary btn-refresh">Làm mới</button>
+            <button onclick="clearDebugData()" class="btn-secondary btn-danger">Xóa tất cả</button>
+        </div>
+    </div>
+
+    <div class="debug-notice">
+        Sandbox test UI. Không ảnh hưởng DB chính. Nhập data → test dashboard → xóa.
+    </div>
+
+    <div class="debug-toolbar">
+        <div class="toolbar-group">
+            <label>Preset:</label>
+            <select id="dbg-preset-select" class="status-select" onchange="loadPreset()">
+                <option value="">-- Chọn --</option>
+            </select>
+            <button onclick="savePreset()" class="btn-mini">Lưu mới</button>
+            <button onclick="updateCurrentPreset()" class="btn-mini">Cập nhật</button>
+            <button onclick="deleteCurrentPreset()" class="btn-mini btn-danger">Xóa</button>
+        </div>
+        <div class="toolbar-group">
+            <label>Sensor:</label>
+            <button onclick="openCloneDialog()" class="btn-mini">Clone từ sensor</button>
+        </div>
+        <div class="toolbar-group">
+            <label>Simulate:</label>
+            <input id="dbg-sim-count" class="status-input mini" type="number" placeholder="10" value="10" min="1" max="200">
+            <button onclick="simulatePackets(false)" class="btn-mini">Random</button>
+            <button onclick="simulatePackets(true)" class="btn-mini btn-warn">Có edge</button>
+        </div>
+    </div>
+
+    <h3 class="chart-title" style="font-size:18px;">Records (Debug DB)</h3>
+    <div class="table-toolbar">
+        <input id="dbg-search" class="status-input" placeholder="Tìm theo note hoặc id..." oninput="filterDebugTable()">
+        <select id="dbg-filter-type" class="status-select" onchange="filterDebugTable()">
+            <option value="">Tất cả type</option>
+            <option value="manual">Manual</option>
+            <option value="simulated">Simulated</option>
+            <option value="cloned">Cloned</option>
+            <option value="restored">Restored</option>
+            <option value="edge">Edge</option>
+            <option value="custom">Custom</option>
+        </select>
+        <span class="table-count" id="dbg-count">0 records</span>
+        <button onclick="deleteSelectedDebug()" class="btn-mini btn-danger" id="btn-bulk-del" disabled>Xóa đã chọn</button>
+    </div>
+    <div class="debug-table-wrap">
+        <table class="debug-table" id="debug-table">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" onchange="toggleSelectAll(this.checked)" id="dbg-check-all"></th>
+                    <th>ID</th><th>ts</th><th>T</th><th>H</th><th>V</th><th>I</th>
+                    <th>PM1</th><th>PM2.5</th><th>PM10</th><th>VOC</th><th>NOx</th><th>SGP</th>
+                    <th>Type</th><th>Note</th><th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="debug-tbody">
+                <tr><td colspan="16" style="text-align:center; padding:20px; color:var(--text-muted);">Đang tải...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3 class="chart-title" style="margin-top:32px; font-size:18px;">Nhập liệu</h3>
+    <div class="debug-form-vertical">
+        <div class="form-header">
+            <span class="form-mode" id="dbg-form-mode">Mode: <strong>INSERT</strong></span>
+        </div>
+        <div class="form-fields">
+            <div class="field"><label>T (°C)<span class="hint">-10 to 60</span></label><input id="dbg-t" type="number" step="0.01" oninput="validateField('t')"><span class="err" id="err-t"></span></div>
+            <div class="field"><label>H (%)<span class="hint">0 to 100</span></label><input id="dbg-h" type="number" step="0.01" oninput="validateField('h')"><span class="err" id="err-h"></span></div>
+            <div class="field"><label>V (V)<span class="hint">1.5 to 5.0</span></label><input id="dbg-v" type="number" step="0.001" oninput="validateField('v')"><span class="err" id="err-v"></span></div>
+            <div class="field"><label>I (A)<span class="hint">-1.0 to 2.0</span></label><input id="dbg-i" type="number" step="0.001" oninput="validateField('i')"><span class="err" id="err-i"></span></div>
+            <div class="field"><label>PM1.0<span class="hint">0 to 500</span></label><input id="dbg-pm1" type="number" oninput="validateField('pm1')"><span class="err" id="err-pm1"></span></div>
+            <div class="field"><label>PM2.5<span class="hint">0 to 500</span></label><input id="dbg-pm25" type="number" oninput="validateField('pm25')"><span class="err" id="err-pm25"></span></div>
+            <div class="field"><label>PM10<span class="hint">0 to 1000</span></label><input id="dbg-pm10" type="number" oninput="validateField('pm10')"><span class="err" id="err-pm10"></span></div>
+            <div class="field"><label>VOC<span class="hint">0 to 65535</span></label><input id="dbg-voc" type="number" oninput="validateField('voc')"><span class="err" id="err-voc"></span></div>
+            <div class="field"><label>NOx<span class="hint">0 to 65535</span></label><input id="dbg-nox" type="number" oninput="validateField('nox')"><span class="err" id="err-nox"></span></div>
+            <div class="field"><label>SGP OK<span class="hint">0 hoặc 1</span></label>
+                <select id="dbg-sgp" class="status-input"><option value="0">0 — warm-up</option><option value="1">1 — ready</option></select>
+            </div>
+            <div class="field full"><label>Test type</label>
+                <select id="dbg-test-type" class="status-input">
+                    <option value="manual">manual</option>
+                    <option value="edge">edge</option>
+                    <option value="custom">custom</option>
+                </select>
+            </div>
+            <div class="field full"><label>Note</label><input id="dbg-note" type="text" placeholder="Ghi chú test case" maxlength="200"><span class="err" id="err-note"></span></div>
+        </div>
+        <div class="form-actions">
+            <button onclick="saveDebugRecord()" class="btn-primary btn-update" id="btn-save-debug">Lưu (Insert)</button>
+            <button onclick="resetDebugForm()" class="btn-secondary btn-reset">Reset</button>
+            <button onclick="cancelEditMode()" class="btn-secondary" id="btn-cancel-edit" style="display:none;">Hủy edit</button>
+        </div>
+    </div>
+
+    <h3 class="chart-title" style="margin-top:32px; font-size:18px;">Dashboard Preview</h3>
+    <div class="aqi-banner">
+        <div class="aqi-circle-container">
+            <svg class="aqi-circle" width="200" height="200">
+                <circle class="aqi-circle-bg" cx="100" cy="100" r="90" />
+                <circle class="aqi-circle-progress" id="dbg-aqi-progress" cx="100" cy="100" r="90" />
+            </svg>
+            <div class="aqi-circle-text">
+                <div class="aqi-value" id="dbg-aqi" style="font-size:48px; font-weight:700; color:#4CAF50; line-height:1;">--</div>
+                <div class="aqi-label" style="font-size:14px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-top:4px;">AQI</div>
+            </div>
+        </div>
+        <div class="aqi-status" id="dbg-aqi-text" style="display:inline-block; margin-top:16px; padding:4px 16px; border-radius:12px; background:#4CAF50; color:#fff; font-weight:600;">--</div>
+    </div>
+
+    <div class="grid">
+        <div class="card temp"><div class="label">Nhiệt độ</div><div class="value"><span id="dbg-card-t">--</span><span class="unit">°C</span></div></div>
+        <div class="card hum"><div class="label">Độ ẩm</div><div class="value"><span id="dbg-card-h">--</span><span class="unit">%</span></div></div>
+        <div class="card volt"><div class="label">Điện áp</div><div class="value"><span id="dbg-card-v">--</span><span class="unit">V</span></div></div>
+        <div class="card curr"><div class="label">Dòng điện</div><div class="value"><span id="dbg-card-i">--</span><span class="unit">mA</span></div></div>
+        <div class="card pm1"><div class="label">PM1.0</div><div class="value"><span id="dbg-card-pm1">--</span><span class="unit">µg/m³</span></div></div>
+        <div class="card pm25"><div class="label">PM2.5</div><div class="value"><span id="dbg-card-pm25">--</span><span class="unit">µg/m³</span></div></div>
+        <div class="card pm10"><div class="label">PM10</div><div class="value"><span id="dbg-card-pm10">--</span><span class="unit">µg/m³</span></div></div>
+    </div>
+
+    <div class="chart-container">
+        <h4 class="chart-title" style="font-size:16px;">Môi trường</h4>
+        <canvas id="dbg-chart-env"></canvas>
+    </div>
+    <div class="chart-container">
+        <h4 class="chart-title" style="font-size:16px;">Bụi mịn</h4>
+        <canvas id="dbg-chart-pm"></canvas>
+    </div>
+    <div class="chart-container">
+        <h4 class="chart-title" style="font-size:16px;">Điện áp & Dòng điện</h4>
+        <canvas id="dbg-chart-power"></canvas>
+    </div>
+</section>
+
+<!-- TAB 4: LOG -->
+<section class="admin-panel" id="tab-log" style="display:none;">
+    <div class="panel-head">
+        <h2 class="chart-title">Log hoạt động</h2>
+        <div style="display:flex; gap:8px;">
+            <button onclick="loadLogs()" class="btn-primary btn-refresh">Làm mới</button>
+            <button onclick="openNewLogDialog()" class="btn-primary btn-update">Ghi log</button>
+        </div>
+    </div>
+
+    <div class="debug-notice" style="background:rgba(210,153,34,0.08); border-left-color:#d29922;">
+        Audit log các thao tác admin. Filter theo action/severity.
+    </div>
+
+    <div class="table-toolbar">
+        <select id="log-filter-action" class="status-select" onchange="loadLogs()">
+            <option value="">Tất cả action</option>
+            <option value="debug_created">debug_created</option>
+            <option value="debug_updated">debug_updated</option>
+            <option value="debug_deleted">debug_deleted</option>
+            <option value="debug_cleared">debug_cleared</option>
+            <option value="debug_cloned">debug_cloned</option>
+            <option value="debug_restored">debug_restored</option>
+            <option value="debug_simulated">debug_simulated</option>
+            <option value="preset_created">preset_created</option>
+            <option value="preset_updated">preset_updated</option>
+            <option value="preset_deleted">preset_deleted</option>
+            <option value="status_changed">status_changed</option>
+            <option value="node_added">node_added</option>
+            <option value="node_deleted">node_deleted</option>
+            <option value="log_created">log_created</option>
+        </select>
+        <select id="log-filter-severity" class="status-select" onchange="loadLogs()">
+            <option value="">Tất cả severity</option>
+            <option value="info">info</option>
+            <option value="warn">warn</option>
+            <option value="error">error</option>
+            <option value="fatal">fatal</option>
+        </select>
+        <input id="log-search" class="status-input" placeholder="Tìm trong target/details/author..." oninput="filterLogTable()">
+        <span class="table-count" id="log-count">0 logs</span>
+    </div>
+
+    <div id="log-list" class="log-list">
+        <div style="text-align:center; padding:40px; color:var(--text-muted);">Đang tải...</div>
+    </div>
+</section>
+
+<!-- TAB 5: NOTES -->
+<section class="admin-panel" id="tab-notes" style="display:none;">
+    <div class="panel-head">
+        <h2 class="chart-title">Ghi chú admin</h2>
+        <div style="display:flex; gap:8px;">
+            <button onclick="loadNotes()" class="btn-primary btn-refresh">Làm mới</button>
+            <button onclick="openNewNoteDialog()" class="btn-primary btn-update">Ghi chú mới</button>
+        </div>
+    </div>
+
+    <div class="debug-notice" style="background:rgba(163,113,247,0.08); border-left-color:#a371f7;">
+        Ghi chú tự do của admin. Chia sẻ cho mọi admin cùng xem. Pin để ghim lên đầu.
+    </div>
+
+    <div class="table-toolbar">
+        <select id="note-filter-author" class="status-select" onchange="loadNotes()">
+            <option value="">Tất cả admin</option>
+            <option value="phuyy">phuyy</option>
+        </select>
+        <select id="note-filter-tag" class="status-select" onchange="loadNotes()">
+            <option value="">Tất cả tag</option>
+            <option value="note">Note</option>
+            <option value="todo">Todo</option>
+            <option value="bug">Bug</option>
+            <option value="maint">Maint</option>
+            <option value="idea">Idea</option>
+        </select>
+        <input id="note-search" class="status-input" placeholder="Tìm trong tiêu đề/nội dung..." oninput="filterNoteList()">
+        <span class="table-count" id="note-count">0 notes</span>
+    </div>
+
+    <div id="note-list" class="note-list">
+        <div style="text-align:center; padding:40px; color:var(--text-muted);">Đang tải...</div>
+    </div>
+</section>
+<section class="admin-panel head-admin-only" id="tab-users" style="display:none;">
+    <div class="panel-head">
+        <h2 class="chart-title">Quản lý người dùng</h2>
+        <div style="display:flex; gap:8px;">
+            <button onclick="loadUsers()" class="btn-primary btn-refresh">Làm mới</button>
+            <button onclick="openNewUserDialog()" class="btn-primary btn-update">Thêm user</button>
+        </div>
+    </div>
+
+    <div class="debug-notice" style="background:rgba(163,113,247,0.08); border-left-color:#a371f7;">
+        Chỉ head_admin mới thấy tab này. Admin thường không có quyền tạo/sửa user.
+    </div>
+
+    <div class="debug-table-wrap">
+        <table class="debug-table" id="users-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Active</th>
+                    <th>TOTP</th>
+                    <th>Last Login</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="users-tbody">
+                <tr><td colspan="8" style="text-align:center; padding:20px; color:var(--text-muted);">Đang tải...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+<section class="admin-panel" id="tab-db" style="display:none;">
+    <div class="panel-head">
+        <h2 class="chart-title">Database Viewer</h2>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <select id="db-table-select" class="status-select" onchange="loadDBTable()">
+                <option value="sensor">sensor</option>
+                <option value="sensor_debug">sensor_debug</option>
+                <option value="nodes">nodes</option>
+                <option value="admin_logs">admin_logs</option>
+                <option value="admin_notes">admin_notes</option>
+                <option value="debug_presets">debug_presets</option>
+                <option value="admin_users" class="head-admin-only" style="display:none;">admin_users</option>
+            </select>
+            <input id="db-search" class="status-input" placeholder="Tìm..." oninput="debouncedDBSearch()">
+            <button onclick="loadDBTable()" class="btn-primary">Làm mới</button>
+        </div>
+    </div>
+
+    <div class="debug-notice">
+        Readonly. Không sửa/xóa từ đây. Tối đa 100 dòng/trang. admin_users chỉ head_admin xem được.
+    </div>
+
+    <div class="debug-table-wrap">
+        <table class="debug-table" id="db-table">
+            <thead id="db-thead"></thead>
+            <tbody id="db-tbody">
+                <tr><td style="text-align:center; padding:20px;">Đang tải...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="table-toolbar" style="justify-content:space-between;">
+        <button onclick="dbPrevPage()" class="btn-mini" id="db-prev">← Trang trước</button>
+        <span class="table-count" id="db-pagination">0 / 0</span>
+        <button onclick="dbNextPage()" class="btn-mini" id="db-next">Trang sau →</button>
+    </div>
+</section>
 <footer>Admin Panel · <span id="updated">--</span></footer>
 
+<!-- ========== DIALOGS ========== -->
+
+<div id="clone-dialog" class="modal-overlay" style="display:none;">
+    <div class="modal-box" style="max-width:800px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <h3 style="margin:0;">Clone từ sensor thật</h3>
+            <button onclick="closeCloneDialog()" style="background:transparent; border:none; color:var(--text-muted); font-size:22px; cursor:pointer; padding:0 8px;">×</button>
+        </div>
+        <p style="color:var(--text-muted); font-size:13px; margin:0 0 16px;">Chọn 1 record sensor hoặc tick "Clone tất cả".</p>
+
+        <div style="display:flex; gap:12px; align-items:center; padding:14px 16px; background:rgba(88,166,255,0.08); border:1px solid rgba(88,166,255,0.2); border-radius:10px; margin-bottom:14px;">
+            <input type="checkbox" id="clone-all-check" onchange="toggleCloneAll()" style="width:18px; height:18px; accent-color:var(--accent); cursor:pointer; flex-shrink:0;">
+            <label for="clone-all-check" style="cursor:pointer; font-size:13px; margin:0; flex:1;">Clone TẤT CẢ sensor</label>
+            <input id="clone-all-limit" type="number" class="status-input" style="width:80px;" value="50" min="1" max="500" placeholder="50">
+            <span style="font-size:12px; color:var(--text-muted); white-space:nowrap;">records</span>
+        </div>
+
+        <div id="clone-list-wrapper">
+            <input id="clone-search" class="status-input" placeholder="Tìm theo ID hoặc timestamp..." oninput="filterSensorList()" style="width:100%; margin-bottom:12px;">
+            <div id="clone-sensor-list" class="clone-list">
+                <div style="text-align:center; padding:20px; color:var(--text-muted);">Đang tải...</div>
+            </div>
+        </div>
+
+        <div style="display:flex; gap:8px; margin-top:16px; justify-content:flex-end;">
+            <button onclick="closeCloneDialog()" class="btn-secondary" style="padding:10px 20px; border-radius:10px;">Hủy</button>
+            <button onclick="cloneAllSensors()" class="btn-primary" id="btn-clone-all" style="display:none; padding:10px 20px; border-radius:10px;">Clone tất cả</button>
+        </div>
+    </div>
+</div>
+
+<div id="log-dialog" class="modal-overlay" style="display:none;">
+    <div class="modal-box">
+        <h3>Ghi log mới</h3>
+        <div class="form-fields" style="margin-top:16px;">
+            <div class="field full"><label>Action <span class="hint">*</span></label>
+                <input id="log-form-action" type="text" placeholder="VD: manual_note" maxlength="50">
+            </div>
+            <div class="field full"><label>Target</label>
+                <input id="log-form-target" type="text" placeholder="VD: sensor_debug#26" maxlength="100">
+            </div>
+            <div class="field full"><label>Details</label>
+                <textarea id="log-form-details" rows="3" placeholder="Mô tả chi tiết..." maxlength="500"></textarea>
+            </div>
+            <div class="field full"><label>Severity</label>
+                <select id="log-form-severity" class="status-input">
+                    <option value="info">info</option>
+                    <option value="warn">warn</option>
+                    <option value="error">error</option>
+                    <option value="fatal">fatal</option>
+                </select>
+            </div>
+        </div>
+        <div style="display:flex; gap:8px; margin-top:20px; justify-content:flex-end;">
+            <button onclick="closeLogDialog()" class="btn-secondary">Hủy</button>
+            <button onclick="submitNewLog()" class="btn-primary">Ghi</button>
+        </div>
+    </div>
+</div>
+
+<div id="note-dialog" class="modal-overlay" style="display:none;">
+    <div class="modal-box">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <h3 style="margin:0;" id="note-dialog-title">Ghi chú mới</h3>
+            <button onclick="closeNoteDialog()" style="background:transparent; border:none; color:var(--text-muted); font-size:22px; cursor:pointer;">×</button>
+        </div>
+        <div class="form-fields" style="margin-top:16px;">
+            <div class="field full"><label>Tiêu đề <span class="hint">*</span></label>
+                <input id="note-form-title" type="text" placeholder="VD: Bug dashboard chart" maxlength="100">
+            </div>
+            <div class="field full"><label>Nội dung <span class="hint">*</span></label>
+                <textarea id="note-form-content" rows="6" placeholder="Mô tả chi tiết..." maxlength="2000"></textarea>
+            </div>
+            <div class="field"><label>Tag</label>
+                <select id="note-form-tag" class="status-input">
+                    <option value="note">Note</option>
+                    <option value="todo">Todo</option>
+                    <option value="bug">Bug</option>
+                    <option value="maint">Maint</option>
+                    <option value="idea">Idea</option>
+                </select>
+            </div>
+            <div class="field"><label>Author</label>
+                <input id="note-form-author" type="text" readonly style="background:rgba(88,166,255,0.05);">
+            </div>
+        </div>
+        <div style="display:flex; gap:8px; margin-top:20px; justify-content:flex-end;">
+            <button onclick="closeNoteDialog()" class="btn-secondary">Hủy</button>
+            <button onclick="submitNote()" class="btn-primary">Lưu</button>
+        </div>
+    </div>
+</div>
+<div id="user-dialog" class="modal-overlay" style="display:none;">
+    <div class="modal-box" style="max-width:500px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <h3 style="margin:0;" id="user-dialog-title">Thêm user mới</h3>
+            <button onclick="closeUserDialog()" style="background:transparent; border:none; color:var(--text-muted); font-size:22px; cursor:pointer;">×</button>
+        </div>
+        <div class="form-fields" style="margin-top:16px;">
+            <div class="field full"><label>Username <span class="hint">*</span></label>
+                <input id="user-form-username" type="text" placeholder="a-z A-Z 0-9 _" maxlength="30">
+            </div>
+            <div class="field full"><label>Password <span class="hint">* (≥8 ký tự)</span></label>
+                <input id="user-form-password" type="password" placeholder="Nhập password">
+            </div>
+            <div class="field full"><label>Role</label>
+                <select id="user-form-role" class="status-input">
+                    <option value="admin">Admin (không cần OTP)</option>
+                    <option value="head_admin">Head Admin (cần OTP)</option>
+                </select>
+            </div>
+        </div>
+        <div style="display:flex; gap:8px; margin-top:20px; justify-content:flex-end;">
+            <button onclick="closeUserDialog()" class="btn-secondary">Hủy</button>
+            <button onclick="submitUser()" class="btn-primary" id="user-dialog-submit">Thêm</button>
+        </div>
+        <div class="login-error" id="user-dialog-error" style="margin-top:12px;"></div>
+    </div>
+</div>
+<!-- ========== SCRIPTS ========== -->
 <script src="chart.min.js"></script>
 <script src="auth-check.js"></script>
 <script>
@@ -128,26 +543,46 @@ function toggleTheme(){ const l=document.body.classList.toggle('light'); localSt
 function updateThemeLabel(){ const i=document.getElementById('theme-icon'),lb=document.getElementById('theme-label'); if(!i||!lb)return; i.textContent=document.body.classList.contains('light')?'☀️':'🌙'; lb.textContent=document.body.classList.contains('light')?'Chế độ sáng':'Chế độ tối'; }
 if(localStorage.getItem('theme')==='light') document.body.classList.add('light');
 updateThemeLabel();
-
-function switchTab(name){
+const TABS = ['nodes','status','debug','log','notes','users','db'];
+if (name === 'db') setTimeout(() => { if (typeof loadDBTable === 'function') loadDBTable(); }, 100);
+function switchTab(name, updateHash){
     document.querySelectorAll('.admin-tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===name));
-    const nodes  = document.getElementById('tab-nodes');
-    const status = document.getElementById('tab-status');
-    if (name === 'nodes') {
-        nodes.style.display = '';
-        status.style.display = 'none';
-        nodes.classList.remove('panel-enter');
-        void nodes.offsetWidth;
-        nodes.classList.add('panel-enter');
-        setTimeout(() => { if (typeof initNodesMap === 'function') initNodesMap(); }, 100);
-    } else {
-        nodes.style.display = 'none';
-        status.style.display = '';
-        status.classList.remove('panel-enter');
-        void status.offsetWidth;
-        status.classList.add('panel-enter');
+    TABS.forEach(p => {
+        const el = document.getElementById('tab-' + p);
+        if (el) el.style.display = p === name ? '' : 'none';
+    });
+    if (name === 'nodes') setTimeout(() => { if (typeof initNodesMap === 'function') initNodesMap(); }, 100);
+    if (name === 'debug') setTimeout(() => { if (typeof loadDebugData === 'function') loadDebugData(); if (typeof loadPresets === 'function') loadPresets(); }, 100);
+    if (name === 'log')   setTimeout(() => { if (typeof loadLogs === 'function') loadLogs(); }, 100);
+    if (name === 'notes') setTimeout(() => { if (typeof loadNotes === 'function') loadNotes(); }, 100);
+    if (name === 'users') setTimeout(() => { if (typeof loadUsers === 'function') loadUsers(); }, 100);
+    const activeEl = document.getElementById('tab-' + name);
+    if (activeEl) {
+        activeEl.classList.remove('panel-enter');
+        void activeEl.offsetWidth;
+        activeEl.classList.add('panel-enter');
+    }
+    if (updateHash !== false) {
+        if (location.hash !== '#' + name) {
+            history.replaceState(null, '', '#' + name);
+        }
+        try { localStorage.setItem('admin_tab', name); } catch(e){}
     }
 }
+
+window.addEventListener('DOMContentLoaded', () => {
+    let initial = (location.hash || '').replace('#','');
+    if (!TABS.includes(initial)) {
+        initial = localStorage.getItem('admin_tab') || 'nodes';
+    }
+    if (!TABS.includes(initial)) initial = 'nodes';
+    switchTab(initial, false);
+});
+
+window.addEventListener('hashchange', () => {
+    const name = (location.hash || '').replace('#','');
+    if (TABS.includes(name)) switchTab(name, false);
+});
 
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(e => {
@@ -161,14 +596,6 @@ document.querySelectorAll('.admin-panel, .admin-header').forEach(el => observer.
 <script>
     if (typeof initNodesMap === 'function') setTimeout(initNodesMap, 300);
 </script>
-<script>
-(function() {
-    const token = localStorage.getItem('token') || localStorage.getItem('auth_token') || '';
-    if (token.startsWith('adm_')) {
-        const el = document.getElementById('nav-admin');
-        if (el) el.style.display = '';
-    }
-})();
-</script>
+
 </body>
 </html>

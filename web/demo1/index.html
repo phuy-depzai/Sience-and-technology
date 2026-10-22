@@ -449,7 +449,7 @@
         <p>Dự án Khoa học Kỹ thuật 2026</p>
     </footer>
 
-    <div class="modal-overlay" id="login-modal" style="display:none;">
+       <div class="modal-overlay" id="login-modal" style="display:none;">
         <div class="modal">
             <button class="modal-close" onclick="closeLogin()">×</button>
             <div class="login-logo">AirWatch</div>
@@ -463,9 +463,36 @@
                     <span>Mật khẩu</span>
                     <input type="password" id="login-pass" autocomplete="current-password" required>
                 </label>
+                <label id="login-otp-wrap" style="display:none;">
+                    <span>Mã OTP (6 số)</span>
+                    <input type="text" id="login-otp" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" placeholder="123456">
+                </label>
                 <button type="submit" class="btn-primary btn-full">Đăng nhập</button>
                 <div class="login-error" id="login-error"></div>
             </form>
+        </div>
+    </div>
+        <!-- QR SETUP MODAL -->
+    <div class="modal-overlay" id="qr-modal" style="display:none;">
+        <div class="modal" style="max-width:480px;">
+            <button class="modal-close" onclick="closeQRModal()">×</button>
+            <h2>Setup Google Authenticator</h2>
+            <p style="color:var(--text-muted); font-size:13px; margin:8px 0 16px;">
+                Quét QR bằng Google Authenticator / FreeOTP, sau đó nhập mã 6 số bên dưới.
+            </p>
+            <div style="text-align:center; padding:16px; background:#fff; border-radius:10px; margin-bottom:16px;">
+                <img id="qr-img" src="" alt="QR Code" style="width:280px; height:280px; display:block; margin:0 auto;">
+            </div>
+            <details style="margin-bottom:16px;">
+                <summary style="cursor:pointer; color:var(--text-muted); font-size:12px;">Hoặc nhập secret bằng tay</summary>
+                <code id="qr-secret" style="display:block; padding:8px; background:var(--bg); border-radius:6px; margin-top:8px; font-size:11px; word-break:break-all;"></code>
+            </details>
+            <label>
+                <span>Nhập mã 6 số từ app</span>
+                <input type="text" id="qr-otp" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="123456" autocomplete="one-time-code">
+            </label>
+            <button onclick="verifyQRCode()" class="btn-primary btn-full" id="qr-verify-btn">Xác nhận</button>
+            <div class="login-error" id="qr-error"></div>
         </div>
     </div>
 
