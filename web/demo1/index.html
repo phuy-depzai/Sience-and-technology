@@ -7,12 +7,24 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 </head>
+
 <body class="landing">
         <nav class="nav">
             <button id="scrollTopBtn" title="Lên đầu trang">↑</button>
         <a href="/" class="logo">AirWatch</a>
         <ul class="nav-links">
-            <li><a href="/dashboard">Dashboard</a></li>
+            <li style="position: relative;">
+    <a href="/dashboard" id="nav-dashboard-btn">Dashboard</a>
+    <!-- POPOVER -->
+    <div id="welcome-popover" class="welcome-popover">
+        <div class="popover-arrow"></div>
+        <p>Chờ đã, bạn đã xem thông tin về ô nhiễm chưa?</p>
+        <div class="popover-actions">
+            <button onclick="handlePopover('no')" class="btn-pop-outline">Chưa</button>
+            <a href="/dashboard" onclick="handlePopover('yes')" class="btn-pop-solid">Rồi</a>
+        </div>
+    </div>
+</li>
             <li><a href="/map">Bản đồ</a></li>
             <li class="admin-only" style="display:none;"><a href="/admin">Quản lý</a></li>
             <li class="dropdown">
@@ -41,11 +53,18 @@
         <span style="background: #4CAF50; color: white; padding: 4px 16px; border-radius: 20px; font-size: 14px; font-weight: 600;" id="hero-aqi-text">Đang tải...</span>
     </div>
     <div style="display: flex; gap: 16px; margin-top: 24px;">
-        <a href="#van-de" class="btn-secondary">Tìm hiểu thêm</a>
+        <a href="javascript:void(0)" onclick="handlePopover('no')" class="btn-secondary">Tìm hiểu thêm</a>
     </div>
 </div>
     </header>
     <!-- PHẦN VẤN ĐỀ -->
+     <section class="hook-top">
+    <p class="hook-q">Không khí quanh <em>bạn</em>, bạn có thực sự biết nó sạch đến đâu?</p>
+    <p class="hook-hint">
+        Câu trả lời không ở đây. 
+        <span class="scroll-indicator">Cuộn xuống để khám phá <span class="arrow">↓</span></span>
+    </p>
+</section>  
     <section id="van-de" class="content-section">
         <div class="content-row">
             <div class="content-img">
@@ -243,22 +262,22 @@
             <h2>Hiểu rõ hơn về ô nhiễm không khí</h2>
         </div>
         <div class="knowledge-grid">
-            <a href="pm25.html" class="knowledge-card">
+            <a href="/pm25" class="knowledge-card">
                 <div class="knowledge-arrow">↗</div>
                 <h3>PM2.5 là gì?</h3>
                 <p>Bụi PM2.5 là vật chất dạng hạt trôi nổi trong không khí với đường kính bằng 2.5 micromet hoặc nhỏ hơn...</p>
             </a>
-            <a href="pm10.html" class="knowledge-card">
+            <a href="/pm10" class="knowledge-card">
                 <div class="knowledge-arrow">↗</div>
                 <h3>PM10 là gì?</h3>
                 <p>Bụi PM10 là vật chất dạng hạt lơ lửng trong không khí với đường kính khoảng 10 micromet hoặc nhỏ hơn...</p>
             </a>
-            <a href="ozone.html" class="knowledge-card">
+            <a href="/ozone" class="knowledge-card">
                 <div class="knowledge-arrow">↗</div>
                 <h3>Ozone là gì?</h3>
                 <p>Ozone (O₃) là khí được hình thành bởi bức xạ cực tím mặt trời (ánh sáng mặt trời) và các phân tử oxi...</p>
             </a>
-            <a href="nguon.html" class="knowledge-card">
+            <a href="/nguon" class="knowledge-card">
                 <div class="knowledge-arrow">↗</div>
                 <h3>Nguồn ô nhiễm</h3>
                 <p>Công nghiệp, giao thông, nông nghiệp, hộ gia đình và các nguồn tự nhiên gây ô nhiễm không khí...</p>
@@ -439,10 +458,10 @@
         </div>
     </section>
 
-    <section class="section cta-section">
-        <h2>Sẵn sàng xem dữ liệu?</h2>
-        <a href="/dashboard" class="btn-primary btn-large">Mở Dashboard</a>
-    </section>
+  <section class="section cta-section">
+    <h2>Sẵn sàng xem dữ liệu?</h2>
+    <a href="/dashboard" onclick="handlePopover('yes')" class="btn-primary btn-large">Mở Dashboard</a>
+</section>
 
     <footer>
         <p><strong>AirWatch</strong> — Hệ thống quan trắc không khí LoRa</p>
@@ -777,5 +796,54 @@
             }
         });
 </script>
+<script>
+
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const navBtn = document.getElementById('nav-dashboard-btn');
+    const popover = document.getElementById('welcome-popover');
+    const demoBtn = document.getElementById('demo-trigger'); // Đưa vào đây để script chạy sau khi HTML load xong
+
+    // 1. Logic hiện Popover khi bấm Dashboard
+    if (navBtn && popover) {
+        navBtn.addEventListener('click', (e) => {
+            if (localStorage.getItem('has_seen_pollution') === '1') return; // Đã xem thì cho đi luôn
+            e.preventDefault();
+            popover.classList.add('show');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!navBtn.contains(e.target) && !popover.contains(e.target)) {
+                popover.classList.remove('show');
+            }
+        });
+    }
+
+    // 2. Logic nút Reset demo (đã được đưa vào DOMContentLoaded)
+    if (demoBtn) {
+        demoBtn.addEventListener('click', () => {
+            localStorage.removeItem('airwatch_welcomed_v1');
+            localStorage.removeItem('has_seen_pollution');
+            location.reload();
+        });
+    }
+});
+
+function handlePopover(action) {
+    const popover = document.getElementById('welcome-popover');
+    if (popover) popover.classList.remove('show');
+    localStorage.setItem('has_seen_pollution', '1');
+
+    if (action === 'no') {
+        const target = document.getElementById('van-de');
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+</script>
+
+<!-- Cái nút Reset đặt ở đây, có style inline để nó tàng hình -->
+<button id="demo-trigger" title="Reset demo" style="position: fixed; bottom: 8px; left: 8px; width: 24px; height: 24px; background: transparent; border: none; cursor: pointer; z-index: 9998; opacity: 0.05; border-radius: 50%;"></button>
+
 </body>
 </html>

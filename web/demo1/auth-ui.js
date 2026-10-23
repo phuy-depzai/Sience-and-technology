@@ -44,7 +44,7 @@ function handleAuthAction() {
         if (modal) {
             modal.style.display = 'flex';
         } else {
-            window.location.href = 'index.html';
+            window.location.href = '/';
         }
     }
 }

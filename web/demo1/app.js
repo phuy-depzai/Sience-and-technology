@@ -65,7 +65,7 @@ function tsToMs(ts) { return new Date(ts.replace(' ', 'T')).getTime(); }
 
 function toggleMenu(e) { e.stopPropagation(); const m = document.getElementById('dropdown-menu'); if (m) m.classList.toggle('open'); }
 document.addEventListener('click', () => { const m = document.getElementById('dropdown-menu'); if (m) m.classList.remove('open'); });
-function handleAuthAction() { if (isAdmin()) logout(); else window.location.href = 'index.html'; }
+function handleAuthAction() { if (isAdmin()) logout(); else window.location.href = '/'; }
 function toggleTheme() { const isLight = document.body.classList.toggle('light'); localStorage.setItem('theme', isLight ? 'light' : 'dark'); updateThemeLabel(); const di = document.getElementById('date-picker'); if (di && di.value) loadByDate(); }
 function applyTheme() { const s = localStorage.getItem('theme') || 'dark'; if (s === 'light') document.body.classList.add('light'); else document.body.classList.remove('light'); updateThemeLabel(); }
 function updateThemeLabel() { const i = document.getElementById('theme-icon'), l = document.getElementById('theme-label'); if (!i || !l) return; if (document.body.classList.contains('light')) { i.textContent = '☀️'; l.textContent = 'Chế độ sáng'; } else { i.textContent = '🌙'; l.textContent = 'Chế độ tối'; } }
@@ -1273,6 +1273,7 @@ function renderNoteList() {
         box.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-muted);">Chưa có ghi chú. Bấm "Ghi chú mới" để tạo.</div>';
         return;
     }
+    
     const tagIcon = { note: '📝', todo: '✅', bug: '🐛', maint: '🔧', idea: '💡' };
     box.innerHTML = notesFiltered.map(n => `
         <div class="note-card ${n.pinned ? 'pinned' : ''}" data-id="${n.id}">
@@ -1293,6 +1294,12 @@ function renderNoteList() {
                 <span>👤 <strong>${n.author}</strong></span>
                 <span>🕐 ${formatVN(n.ts, true)}</span>
                 ${n.updated_at ? '<span>✏️ sửa: ' + formatVN(n.updated_at, true) + '</span>' : ''}
+            </div>
+            <div class="note-comments">
+                <button class="note-comments-toggle" onclick="toggleNoteComments(${n.id})">
+                    💬 Bình luận
+                </button>
+                <div id="nc-wrap-${n.id}" style="display:none;"></div>
             </div>
         </div>
     `).join('');
@@ -1652,4 +1659,174 @@ function dbNextPage() {
     dbState.offset += dbState.limit;
     loadDBTable();
 }
-if (document.getElementById('chart-env')) connectWebSocket();
+// ============ NOTE COMMENTS ============
+async function loadNoteComments(noteId, container) {
+    container.innerHTML = '<div style="font-size:12px; color:var(--text-muted);">Đang tải...</div>';
+    try {
+        const r = await fetch(API + '/api/notes/' + noteId + '/comments');
+        const list = await r.json();
+        renderNoteComments(noteId, container, list);
+    } catch(e) {
+        container.innerHTML = '<div style="font-size:12px; color:var(--red);">Lỗi: ' + e.message + '</div>';
+    }
+}
+
+function renderNoteComments(noteId, container, list) {
+    const currentUser = localStorage.getItem('admin_user') || '';
+    const commentsHtml = list.length ? list.map(c => {
+        const initial = (c.username || '?').charAt(0).toUpperCase();
+        const canDel = c.username === currentUser || (typeof isHeadAdmin === 'function' && isHeadAdmin());
+        const time = (c.created_at || '').slice(0, 16);
+        return `
+            <div class="comment-item">
+                <div class="comment-avatar">${initial}</div>
+                <div class="comment-body">
+                    <div class="comment-header">
+                        <span class="comment-user">${c.username}</span>
+                        <span class="comment-time">${time}</span>
+                        ${canDel ? `<button class="comment-del" onclick="delNoteComment(${c.id}, ${noteId}, this)" title="Xóa">🗑️</button>` : ''}
+                    </div>
+                    <div class="comment-content">${escapeHtml(c.content)}</div>
+                </div>
+            </div>
+        `;
+    }).join('') : '<div style="font-size:12px; color:var(--text-muted); font-style:italic;">Chưa có comment</div>';
+
+    container.innerHTML = `
+        <div class="note-comments-list" id="nc-list-${noteId}">${commentsHtml}</div>
+        <div class="comment-input-row">
+            <textarea class="comment-input" id="nc-input-${noteId}" placeholder="Viết comment..." rows="1"></textarea>
+            <button class="btn-primary btn-mini" onclick="submitNoteComment(${noteId})">Gửi</button>
+        </div>
+    `;
+}
+
+function escapeHtml(s) {
+    return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+async function submitNoteComment(noteId) {
+    const input = document.getElementById('nc-input-' + noteId);
+    const content = (input.value || '').trim();
+    if (!content) return;
+    try {
+        const r = await fetch(API + '/api/notes/' + noteId + '/comments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Auth-Token': getToken() },
+            body: JSON.stringify({ content })
+        });
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        input.value = '';
+        const container = document.getElementById('nc-wrap-' + noteId);
+        await loadNoteComments(noteId, container);
+    } catch(e) { alert('Lỗi: ' + e.message); }
+}
+
+async function delNoteComment(id, noteId, btn) {
+    if (!confirm('Xóa comment này?')) return;
+    try {
+        const r = await fetch(API + '/api/comments/' + id, {
+            method: 'DELETE',
+            headers: { 'X-Auth-Token': getToken() }
+        });
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const container = document.getElementById('nc-wrap-' + noteId);
+        await loadNoteComments(noteId, container);
+    } catch(e) { alert('Lỗi: ' + e.message); }
+}
+
+function toggleNoteComments(noteId) {
+    const wrap = document.getElementById('nc-wrap-' + noteId);
+    if (!wrap) return;
+    if (wrap.style.display === 'none' || !wrap.style.display) {
+        wrap.style.display = 'block';
+        loadNoteComments(noteId, wrap);
+    } else {
+        wrap.style.display = 'none';
+    }
+}
+// ============ INCIDENTS MANAGEMENT ============
+let incidentsData = [];
+
+async function loadIncidents() {
+    const tbody = document.getElementById('incidents-tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:var(--text-muted);">Đang tải...</td></tr>';
+    try {
+        const r = await fetch(API + '/api/incidents?days=90');
+        incidentsData = await r.json();
+        if (!incidentsData.length) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:var(--text-muted);">Chưa có sự cố nào</td></tr>';
+            return;
+        }
+        tbody.innerHTML = incidentsData.map(i => `
+            <tr>
+                <td>${i.id}</td>
+                <td>${i.service}</td>
+                <td><span class="type-badge ${i.status === 'offline' ? 'edge' : 'manual'}">${i.status}</span></td>
+                <td style="font-size:11px;">${i.started_at || '—'}</td>
+                <td style="font-size:11px; color:#d29922;">${i.eta || '—'}</td>
+                <td style="font-size:11px; color:#3fb950;">${i.resolved_at || '—'}</td>
+                <td>${i.note || '—'}</td>
+                <td><button class="action-btn del" onclick="deleteIncident(${i.id})" title="Xóa">🗑️</button></td>
+            </tr>
+        `).join('');
+    } catch(e) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:20px; color:#f85149;">Lỗi: ${e.message}</td></tr>`;
+    }
+}
+
+function openIncidentDialog() {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    document.getElementById('inc-started').value = now.toISOString().slice(0,16);
+    document.getElementById('inc-eta').value = '';
+    document.getElementById('inc-resolved').value = '';
+    document.getElementById('inc-note').value = '';
+    document.getElementById('incident-dialog').style.display = 'flex';
+}
+
+function closeIncidentDialog() {
+    document.getElementById('incident-dialog').style.display = 'none';
+}
+
+async function submitIncident() {
+    const service = document.getElementById('inc-service').value;
+    const status = document.getElementById('inc-status').value;
+    const started = document.getElementById('inc-started').value;
+    const eta = document.getElementById('inc-eta').value;
+    const resolved = document.getElementById('inc-resolved').value;
+    const note = document.getElementById('inc-note').value.trim();
+    
+    if (!started) { alert('Vui lòng nhập thời gian bắt đầu'); return; }
+    
+    try {
+        const r = await fetch(API + '/api/incidents', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Auth-Token': getToken() },
+            body: JSON.stringify({
+                service, status,
+                started_at: started.replace('T', ' ') + ':00',
+                eta: eta ? eta.replace('T', ' ') + ':00' : null,
+                resolved_at: resolved ? resolved.replace('T', ' ') + ':00' : null,
+                note
+            })
+        });
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error || 'HTTP ' + r.status);
+        closeIncidentDialog();
+        await loadIncidents();
+    } catch(e) { alert('Lỗi: ' + e.message); }
+}
+
+async function deleteIncident(id) {
+    if (!confirm('Xóa sự cố #' + id + '?')) return;
+    try {
+        const r = await fetch(API + '/api/incidents/' + id, {
+            method: 'DELETE',
+            headers: { 'X-Auth-Token': getToken() }
+        });
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        await loadIncidents();
+    } catch(e) { alert('Lỗi: ' + e.message); }
+}

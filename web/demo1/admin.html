@@ -38,6 +38,7 @@
     <button class="admin-tab" data-tab="log" onclick="switchTab('log')">Log hoạt động</button>
     <button class="admin-tab" data-tab="notes" onclick="switchTab('notes')">Ghi chú</button>
     <button class="admin-tab head-admin-only" data-tab="users" onclick="switchTab('users')" style="display:none;">Người dùng</button>
+    <button class="admin-tab" data-tab="incidents" onclick="switchTab('incidents')">Sự cố</button>
     <button class="admin-tab" data-tab="db" onclick="switchTab('db')">Database</button>
 </div>
 
@@ -331,7 +332,9 @@
         <div style="text-align:center; padding:40px; color:var(--text-muted);">Đang tải...</div>
     </div>
 </section>
-<section class="admin-panel head-admin-only" id="tab-users" style="display:none;">
+
+<!-- TAB 6: USERS -->
+<section class="admin-panel" id="tab-users" style="display:none;">
     <div class="panel-head">
         <h2 class="chart-title">Quản lý người dùng</h2>
         <div style="display:flex; gap:8px;">
@@ -341,7 +344,7 @@
     </div>
 
     <div class="debug-notice" style="background:rgba(163,113,247,0.08); border-left-color:#a371f7;">
-        Chỉ head_admin mới thấy tab này. Admin thường không có quyền tạo/sửa user.
+        Admin thường không có quyền tạo/sửa user.
     </div>
 
     <div class="debug-table-wrap">
@@ -364,6 +367,38 @@
         </table>
     </div>
 </section>
+
+<!-- TAB 7: INCIDENTS -->
+<section class="admin-panel" id="tab-incidents" style="display:none;">
+    <div class="panel-head">
+        <h2 class="chart-title">Quản lý sự cố</h2>
+        <div style="display:flex; gap:8px;">
+            <button onclick="loadIncidents()" class="btn-primary btn-refresh">Làm mới</button>
+            <button onclick="openIncidentDialog()" class="btn-primary btn-update">Thêm sự cố</button>
+        </div>
+    </div>
+    <div class="debug-table-wrap">
+        <table class="debug-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Service</th>
+                    <th>Status</th>
+                    <th>Bắt đầu</th>
+                    <th>Dự kiến</th>
+                    <th>Thực tế</th>
+                    <th>Ghi chú</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="incidents-tbody">
+                <tr><td colspan="8" style="text-align:center; padding:20px; color:var(--text-muted);">Đang tải...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- TAB 8: DB -->
 <section class="admin-panel" id="tab-db" style="display:none;">
     <div class="panel-head">
         <h2 class="chart-title">Database Viewer</h2>
@@ -375,6 +410,7 @@
                 <option value="admin_logs">admin_logs</option>
                 <option value="admin_notes">admin_notes</option>
                 <option value="debug_presets">debug_presets</option>
+                <option value="incidents">incidents</option>
                 <option value="admin_users" class="head-admin-only" style="display:none;">admin_users</option>
             </select>
             <input id="db-search" class="status-input" placeholder="Tìm..." oninput="debouncedDBSearch()">
@@ -401,6 +437,7 @@
         <button onclick="dbNextPage()" class="btn-mini" id="db-next">Trang sau →</button>
     </div>
 </section>
+
 <footer>Admin Panel · <span id="updated">--</span></footer>
 
 <!-- ========== DIALOGS ========== -->
@@ -495,6 +532,7 @@
         </div>
     </div>
 </div>
+
 <div id="user-dialog" class="modal-overlay" style="display:none;">
     <div class="modal-box" style="max-width:500px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
@@ -522,6 +560,50 @@
         <div class="login-error" id="user-dialog-error" style="margin-top:12px;"></div>
     </div>
 </div>
+
+<div id="incident-dialog" class="modal-overlay" style="display:none;">
+    <div class="modal-box" style="max-width:520px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <h3 style="margin:0;">Thêm sự cố</h3>
+            <button onclick="closeIncidentDialog()" style="background:transparent; border:none; color:var(--text-muted); font-size:22px; cursor:pointer;">×</button>
+        </div>
+        <div class="form-fields" style="margin-top:16px;">
+            <div class="field full"><label>Service</label>
+                <select id="inc-service" class="status-input">
+                    <option value="stm32">NODE (STM32)</option>
+                    <option value="esp32">GATEWAY (ESP32)</option>
+                    <option value="api">Web API</option>
+                    <option value="system">SYSTEM</option>
+                </select>
+            </div>
+            <div class="field full"><label>Status</label>
+                <select id="inc-status" class="status-input">
+                    <option value="offline">Offline</option>
+                    <option value="debug">Debug</option>
+                    <option value="maintenance">Maintenance</option>
+                    <option value="testing">Testing</option>
+                </select>
+            </div>
+            <div class="field full"><label>Bắt đầu lúc</label>
+                <input id="inc-started" type="datetime-local" class="status-input">
+            </div>
+            <div class="field full"><label>Dự kiến khắc phục</label>
+                <input id="inc-eta" type="datetime-local" class="status-input">
+            </div>
+            <div class="field full"><label>Khắc phục thực tế (bỏ trống nếu chưa xong)</label>
+                <input id="inc-resolved" type="datetime-local" class="status-input">
+            </div>
+            <div class="field full"><label>Ghi chú</label>
+                <input id="inc-note" type="text" class="status-input" placeholder="VD: Mất kết nối WiFi">
+            </div>
+        </div>
+        <div style="display:flex; gap:8px; margin-top:20px; justify-content:flex-end;">
+            <button onclick="closeIncidentDialog()" class="btn-secondary">Hủy</button>
+            <button onclick="submitIncident()" class="btn-primary">Lưu</button>
+        </div>
+    </div>
+</div>
+
 <!-- ========== SCRIPTS ========== -->
 <script src="chart.min.js"></script>
 <script src="auth-check.js"></script>
@@ -538,13 +620,14 @@
 <script>
 function toggleMenu(e){e.stopPropagation();document.getElementById('dropdown-menu').classList.toggle('open');}
 document.addEventListener('click',()=>{const m=document.getElementById('dropdown-menu');if(m)m.classList.remove('open');});
-function handleAuthAction(){ if(isAdmin()) logout(); else window.location.href='index.html'; }
+function handleAuthAction(){ if(isAdmin()) logout(); else window.location.href='/'; }
 function toggleTheme(){ const l=document.body.classList.toggle('light'); localStorage.setItem('theme',l?'light':'dark'); updateThemeLabel(); }
 function updateThemeLabel(){ const i=document.getElementById('theme-icon'),lb=document.getElementById('theme-label'); if(!i||!lb)return; i.textContent=document.body.classList.contains('light')?'☀️':'🌙'; lb.textContent=document.body.classList.contains('light')?'Chế độ sáng':'Chế độ tối'; }
 if(localStorage.getItem('theme')==='light') document.body.classList.add('light');
 updateThemeLabel();
-const TABS = ['nodes','status','debug','log','notes','users','db'];
-if (name === 'db') setTimeout(() => { if (typeof loadDBTable === 'function') loadDBTable(); }, 100);
+
+const TABS = ['nodes','status','debug','log','notes','users','incidents','db'];
+
 function switchTab(name, updateHash){
     document.querySelectorAll('.admin-tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===name));
     TABS.forEach(p => {
@@ -556,6 +639,8 @@ function switchTab(name, updateHash){
     if (name === 'log')   setTimeout(() => { if (typeof loadLogs === 'function') loadLogs(); }, 100);
     if (name === 'notes') setTimeout(() => { if (typeof loadNotes === 'function') loadNotes(); }, 100);
     if (name === 'users') setTimeout(() => { if (typeof loadUsers === 'function') loadUsers(); }, 100);
+    if (name === 'incidents') setTimeout(() => { if (typeof loadIncidents === 'function') loadIncidents(); }, 100);
+    if (name === 'db') setTimeout(() => { if (typeof loadDBTable === 'function') loadDBTable(); }, 100);
     const activeEl = document.getElementById('tab-' + name);
     if (activeEl) {
         activeEl.classList.remove('panel-enter');

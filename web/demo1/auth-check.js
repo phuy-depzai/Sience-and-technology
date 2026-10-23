@@ -52,5 +52,5 @@ async function login(user, pass, otp) {
 async function logout() {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('admin_user');
-    window.location.href = 'index.html';
+    window.location.href = '/';
 }
