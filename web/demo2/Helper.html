@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Tài liệu Kỹ thuật - AirWatch</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #000;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px;
+            background-color: #fff;
+        }
+        h1 { text-align: center; font-size: 24px; text-transform: uppercase; margin-bottom: 40px; }
+        h2 { font-size: 20px; margin-top: 30px; border-bottom: 2px solid #333; padding-bottom: 5px; }
+        h3 { font-size: 16px; margin-top: 20px; }
+        p { text-align: justify; margin-bottom: 10px; }
+        
+        /* Bảng biểu */
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 14px; }
+        th, td { border: 1px solid #333; padding: 8px 12px; text-align: left; }
+        th { background-color: #f2f2f2; font-weight: bold; }
+        tr { page-break-inside: avoid; }
+
+        /* Khung code */
+        pre {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            line-height: 1.4;
+            page-break-inside: avoid;
+        }
+        
+        /* Nút in (sẽ bị ẩn khi in ra PDF) */
+        .print-btn {
+            display: block;
+            width: 200px;
+            margin: 0 auto 20px;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+        }
+        .print-btn:hover { background-color: #45a049; }
+        
+        @media print {
+            .print-btn { display: none; }
+            body { padding: 0; }
+            @page { margin: 20mm; }
+        }
+    </style>
+</head>
+<body>
+
+    <button class="print-btn" onclick="window.print()">In / Lưu thành PDF</button>
+
+    <h1>TÀI LIỆU KỸ THUẬT TỔNG HỢP DỰ ÁN AIRWATCH</h1>
+
+    <h2>PHẦN 1: CẤU TRÚC FILE HTML / FRONTEND</h2>
+    
+    <h3>1.1. Cấu trúc chuẩn của một file HTML</h3>
+    <p>Mọi file HTML trong dự án đều tuân theo cấu trúc chuẩn sau:</p>
+    <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="vi"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Tên trang&lt;/title&gt;
+    &lt;link rel="icon" href="..."&gt;
+    &lt;link rel="stylesheet" href="style.css"&gt;
+&lt;/head&gt;
+&lt;body class="landing"&gt;
+    &lt;!-- Nội dung trang --&gt;
+    
+    &lt;script src="app.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+    <h3>1.2. Phân chia chức năng các file</h3>
+    <table>
+        <tr><th>File</th><th>Chức năng</th><th>Số dòng ước tính</th></tr>
+        <tr><td>index.html</td><td>Trang chủ (Landing page)</td><td>~600</td></tr>
+        <tr><td>dashboard.html</td><td>Dashboard hiển thị sensor realtime</td><td>~300</td></tr>
+        <tr><td>admin.html</td><td>Admin panel 8 tab</td><td>~900</td></tr>
+        <tr><td>status.html</td><td>Status page (uptime, incidents)</td><td>~450</td></tr>
+        <tr><td>map.html</td><td>Bản đồ các node</td><td>~200</td></tr>
+        <tr><td>style.css</td><td>CSS dùng chung toàn site</td><td>~2000</td></tr>
+        <tr><td>app.js</td><td>Logic chung (dashboard, admin)</td><td>~1800</td></tr>
+        <tr><td>auth-check.js</td><td>Logic đăng nhập, check token</td><td>~60</td></tr>
+        <tr><td>auth-ui.js</td><td>UI đăng nhập (modal, OTP form)</td><td>~250</td></tr>
+    </table>
+
+    <h3>1.3. Quy ước đặt tên</h3>
+    <ul>
+        <li>Class CSS: kebab-case (vd: note-card, admin-panel).</li>
+        <li>ID HTML: camelCase hoặc kebab-case (vd: btn-save, welcomeToast).</li>
+        <li>Biến JS: camelCase (vd: currentRole, incidentsData).</li>
+        <li>Hàm JS: camelCase, bắt đầu bằng động từ (vd: loadUsers(), deleteIncident()).</li>
+        <li>Hằng số: UPPER_SNAKE_CASE (vd: API, TABS, PM25_BP).</li>
+    </ul>
+
+    <h2>PHẦN 2: CẤU TRÚC DRIVER C/C++ CHO STM32</h2>
+    <p>Khi lập trình STM32 với cảm biến, dự án làm việc theo mô hình File .h (khai báo) + File .cpp (định nghĩa). Mục đích là tách giao diện (interface) khỏi phần thực thi (implementation).</p>
+
+    <h3>2.1. Cấu trúc file header (.h)</h3>
+    <p>File .h chứa: khai báo thư viện, hằng số, struct, nguyên mẫu hàm. Đây là "hợp đồng" giữa file .cpp với phần còn lại của chương trình.</p>
+    <pre><code>#ifndef SHT31_H
+#define SHT31_H
+
+#include &lt;Arduino.h&gt;
+#include &lt;Wire.h&gt;
+
+#define SHT31_ADDR 0x44
+#define SHT31_CMD_MEASURE 0x2C06
+#define SHT31_CMD_SOFT_RESET 0x30A2
+
+struct SHT31Data {
+    float temperature;
+    float humidity;
+    bool valid;
+};
+
+class SHT31 {
+public:
+    SHT31();
+    bool begin();
+    bool readData(SHT31Data &amp;outData);
+    void softReset();
+    void sleep();
+    
+private:
+    uint8_t crc8(const uint8_t *data, int len);
+};
+
+#endif</code></pre>
+
+    <h3>2.2. Cấu trúc file implementation (.cpp)</h3>
+    <p>File .cpp chứa: định nghĩa thân hàm, logic xử lý. Đây là phần "chạy thật".</p>
+    <pre><code>#include "sht31.h"
+
+SHT31::SHT31() {}
+
+bool SHT31::begin() {
+    Wire.begin();
+    delay(50);
+    Wire.beginTransmission(SHT31_ADDR);
+    Wire.write(SHT31_CMD_SOFT_RESET &gt;&gt; 8);
+    Wire.write(SHT31_CMD_SOFT_RESET &amp; 0xFF);
+    if (Wire.endTransmission() != 0) return false;
+    delay(20);
+    return true;
+}
+
+bool SHT31::readData(SHT31Data &amp;outData) {
+    Wire.beginTransmission(SHT31_ADDR);
+    Wire.write(SHT31_CMD_MEASURE &gt;&gt; 8);
+    Wire.write(SHT31_CMD_MEASURE &amp; 0xFF);
+    if (Wire.endTransmission() != 0) { outData.valid = false; return false; }
+    
+    delay(20);
+    
+    Wire.requestFrom(SHT31_ADDR, 6);
+    if (Wire.available() != 6) { outData.valid = false; return false; }
+    
+    uint8_t raw[6];
+    for (int i = 0; i &lt; 6; i++) raw[i] = Wire.read();
+    
+    uint16_t rawTemp = (raw[0] &lt;&lt; 8) | raw[1];
+    uint16_t rawHum  = (raw[3] &lt;&lt; 8) | raw[4];
+    
+    outData.temperature = -45 + 175.0 * rawTemp / 65535.0;
+    outData.humidity    = 100.0 * rawHum / 65535.0;
+    outData.valid = true;
+    return true;
+}</code></pre>
+
+    <h3>2.3. Cách include và sử dụng trong main.cpp</h3>
+    <pre><code>#include "sht31.h"
+#include "pms7003.h"
+#include "lora_ra08h.h"
+
+SHT31 sht;
+PMS7003 pms;
+LoRaRA08H lora;
+
+void setup() {
+    Serial.begin(115200);
+    if (!sht.begin()) Serial.println("SHT31 lỗi!");
+    if (!pms.begin()) Serial.println("PMS7003 lỗi!");
+    if (!lora.begin()) Serial.println("LoRa lỗi!");
+}
+
+void loop() {
+    SHT31Data env;
+    if (sht.readData(env)) {
+        Serial.print("Nhiệt độ: "); Serial.println(env.temperature);
+    }
+    String payload = String(env.temperature) + "," + String(env.humidity);
+    lora.send(payload);
+    delay(300000);
+}</code></pre>
+
+    <h2>PHẦN 3: CẤU TRÚC FIRMWARE STM32 (LOGIC CHẠY)</h2>
+    
+    <h3>3.1. Mô hình State Machine (Máy trạng thái)</h3>
+    <p>Firmware STM32 hoạt động theo mô hình State Machine, không chạy tuần tự liên tục. Đây là cách tối ưu pin tối đa:</p>
+    <pre><code>[STOP MODE] ──(RTC wake 7p)──&gt; [INIT] ──(30s)──&gt; [MEASURE] ──(90s)──&gt; [SEND LORA] ──(1s)──&gt; [STOP MODE]
+                                        (bật MOSFET)   (đọc cảm biến)   (TX 920MHz)         (tắt MOSFET)</code></pre>
+
+    <h3>3.2. Code mẫu với chế độ ngủ sâu</h3>
+    <pre><code>#include "stm32f1xx_hal.h"
+
+RTC_HandleTypeDef hrtc;
+
+void enterStopMode(uint32_t seconds) {
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
+    HAL_UART_DeInit(&amp;huart1);
+    
+    RTC_AlarmTypeDef alarm = {0};
+    alarm.AlarmTime.Seconds = seconds % 60;
+    alarm.AlarmTime.Minutes = (seconds / 60) % 60;
+    alarm.AlarmMask = RTC_ALARMMASK_DATEWEEKDAY | RTC_ALARMMASK_HOURS;
+    HAL_RTC_SetAlarm_IT(&amp;hrtc, &amp;alarm, RTC_FORMAT_BIN);
+    
+    HAL_SuspendTick();
+    HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
+    
+    SystemClock_Config();
+    HAL_ResumeTick();
+    HAL_UART_Init(&amp;huart1);
+}</code></pre>
+
+    <h3>3.3. Thuật toán lọc nhiễu cảm biến (Sensor Filtering)</h3>
+    <p>Cảm biến bụi mịn (PMS7003) và cảm biến khí thường bị nhảy số do môi trường. STM32 cần chạy thuật toán Trung bình trượt (Moving Average) trước khi gửi để biểu đồ không bị răng cưa và báo động giả.</p>
+    <pre><code>#define FILTER_SIZE 10
+float pm25_buffer[FILTER_SIZE] = {0};
+int buffer_index = 0;
+
+float filterPM25(float new_val) {
+    pm25_buffer[buffer_index] = new_val;
+    buffer_index = (buffer_index + 1) % FILTER_SIZE;
+    
+    float sum = 0;
+    for (int i = 0; i &lt; FILTER_SIZE; i++) {
+        sum += pm25_buffer[i];
+    }
+    return sum / FILTER_SIZE;
+}</code></pre>
+
+    <h2>PHẦN 4: ĐỊNH DẠNG GÓI TIN TRUYỀN THÔNG (PAYLOAD)</h2>
+    <p>Để tiết kiệm băng thông và pin, STM32 sẽ không gửi dạng JSON (quá dài), mà gửi dạng chuỗi CSV qua LoRa.</p>
+    <h3>4.1. Gói tin từ Node (STM32) gửi lên Gateway (ESP32) qua LoRa</h3>
+    <ul>
+        <li>Cấu trúc: ID_NODE, NHIET_DO, DO_AM, PM25, CO, VOC, NOX, PIN</li>
+        <li>Ví dụ thực tế: 01,31.5,75.2,15,12,110,5,95</li>
+    </ul>
+    <h3>4.2. Gói tin từ Gateway (ESP32) gửi lên Server qua MQTT</h3>
+    <p>Topic: airwatch/node01/data</p>
+    <pre><code>{
+  "node_id": "01",
+  "timestamp": 1698398400,
+  "sensors": {
+    "temp": 31.5,
+    "hum": 75.2,
+    "pm25": 15,
+    "co": 12,
+    "voc": 110,
+    "nox": 5
+  },
+  "battery": 95,
+  "rssi": -85
+}</code></pre>
+
+    <h2>PHẦN 5: THUẬT TOÁN TÍNH CHỈ SỐ AQI</h2>
+    <h3>5.1. Công thức nội suy tuyến tính</h3>
+    <p>I = ((I_high - I_low) / (C_high - C_low)) * (C - C_low) + I_low</p>
+    
+    <h3>5.2. Bảng ngưỡng Breakpoints (PM2.5)</h3>
+    <table>
+        <tr><th>AQI</th><th>Nồng độ (µg/m³)</th><th>Mức độ</th><th>Màu</th></tr>
+        <tr><td>0 - 50</td><td>0.0 - 25</td><td>Tốt</td><td>Xanh lá</td></tr>
+        <tr><td>51 - 100</td><td>25.1 - 50</td><td>Trung bình</td><td>Vàng</td></tr>
+        <tr><td>101 - 150</td><td>50.1 - 80</td><td>Kém</td><td>Cam</td></tr>
+        <tr><td>151 - 200</td><td>80.1 - 150</td><td>Xấu</td><td>Đỏ</td></tr>
+        <tr><td>201 - 300</td><td>150.1 - 250</td><td>Rất xấu</td><td>Tím</td></tr>
+        <tr><td>301 - 500</td><td>250.1 - 500</td><td>Nguy hại</td><td>Nâu đỏ</td></tr>
+    </table>
+
+    <h3>5.3. Code Node-RED tính AQI</h3>
+    <pre><code>const PM25_BP = [[0,25,0,50],[25,50,51,100],[50,80,101,150],[80,150,151,200],[150,250,201,300],[250,500,301,500]];
+
+function calcSubIndex(c, bp) {
+    if (c &lt;= bp[0][0]) return bp[0][2];
+    for (let i = 0; i &lt; bp.length; i++) {
+        const [cL, cH, iL, iH] = bp[i];
+        if (c &gt;= cL &amp;&amp; c &lt;= cH) {
+            if (cH === cL) return iH;
+            return Math.round((iH - iL) / (cH - cL) * (c - cL) + iL);
+        }
+    }
+    return 500; 
+}
+function calcAQI(pm25) {
+    return calcSubIndex(pm25, PM25_BP);
+}</code></pre>
+
+    <h2>PHẦN 6: CƠ CHẾ ĐỒNG BỘ THỜI GIAN (RTC &amp; NTP)</h2>
+    <p><strong>Tại Node (STM32):</strong> Sử dụng module DS3231 (RTC). Chip này có pin riêng, chạy như đồng hồ đeo tay, đếm thời gian liên tục kể cả khi STM32 ngủ. Khi mất điện, DS3231 vẫn chạy.</p>
+    <p><strong>Tại Gateway (ESP32):</strong> ESP32 có WiFi nên dùng giao thức NTP để đồng bộ giờ chuẩn xác từ Server quốc tế. Gateway đính kèm mốc thời gian (timestamp) vào gói JSON gửi lên Server.</p>
+
+    <h2>PHẦN 7: CẤU HÌNH MQTT</h2>
+    <h3>7.1. Cài Mosquitto broker trên VPS</h3>
+    <pre><code>sudo apt install mosquitto mosquitto-clients
+sudo systemctl enable mosquitto &amp;&amp; sudo systemctl start mosquitto</code></pre>
+
+    <h3>7.2. Cấu hình Mosquitto (/etc/mosquitto/conf.d/airwatch.conf)</h3>
+    <pre><code>listener 1883
+allow_anonymous true</code></pre>
+
+    <h3>7.3. Quy ước Topic cho AirWatch</h3>
+    <table>
+        <tr><th>Topic</th><th>Publisher</th><th>Subscriber</th><th>Payload mẫu</th></tr>
+        <tr><td>airwatch/node01/data</td><td>Node/Gateway</td><td>Node-RED</td><td>{"t":30.5,"h":80,"pm25":12}</td></tr>
+        <tr><td>airwatch/node01/cmd</td><td>Node-RED</td><td>Node</td><td>{"cmd":"reboot"}</td></tr>
+    </table>
+
+    <h3>7.4. Cấu hình ESP32 gửi MQTT</h3>
+    <pre><code>#include &lt;WiFi.h&gt;
+#include &lt;PubSubClient.h&gt;
+
+const char* mqtt_server = "airwatch.io.vn";
+WiFiClient espClient;
+PubSubClient client(espClient);
+
+void reconnect() {
+    while (!client.connected()) {
+        if (client.connect("ESP32_Gateway")) {
+            client.subscribe("airwatch/node01/cmd");
+        } else { delay(5000); }
+    }
+}
+
+void setup() {
+    client.setServer(mqtt_server, 1883);
+}
+
+void loop() {
+    if (!client.connected()) reconnect();
+    client.loop();
+    String payload = "{\"t\":30.5,\"h\":80}";
+    client.publish("airwatch/node01/data", payload.c_str());
+    delay(420000);
+}</code></pre>
+
+    <h2>PHẦN 8: CẤU HÌNH NODE-RED</h2>
+    <h3>8.2. Danh sách endpoints hiện có</h3>
+    <table>
+        <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Chức năng</th></tr>
+        <tr><td>POST</td><td>/api/login</td><td>None</td><td>Đăng nhập (bcrypt + TOTP)</td></tr>
+        <tr><td>GET</td><td>/api/data</td><td>None</td><td>Lấy data sensor hôm nay</td></tr>
+        <tr><td>GET</td><td>/api/users</td><td>Head Admin</td><td>Danh sách user</td></tr>
+        <tr><td>GET</td><td>/api/notes</td><td>Admin</td><td>Danh sách note</td></tr>
+        <tr><td>GET</td><td>/api/incidents</td><td>None</td><td>Sự cố 30 ngày</td></tr>
+        <tr><td>GET</td><td>/api/db/:table</td><td>Admin</td><td>Xem bảng DB</td></tr>
+    </table>
+
+    <h2>PHẦN 9: CẤU HÌNH CLOUDFLARE &amp; NGINX</h2>
+    <h3>9.1. Các rule bảo mật Cloudflare</h3>
+    <ol>
+        <li>SSL/TLS: Full (Strict).</li>
+        <li>Bot Fight Mode: ON.</li>
+        <li>Rate Limiting: /api/login -&gt; 10 req/10s.</li>
+        <li>Custom Rule: Chặn User-Agent không chứa "Mozilla" (chặn curl/script).</li>
+    </ol>
+
+    <h2>PHẦN 10: CẤU TRÚC DATABASE SQLITE</h2>
+    <h3>10.1. Sơ đồ các bảng chính</h3>
+    <pre><code>CREATE TABLE sensor (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ts DATETIME DEFAULT CURRENT_TIMESTAMP,
+    t REAL, h REAL, pm1 REAL, pm25 REAL, pm10 REAL, v REAL, i REAL, voc INTEGER, nox INTEGER
+);
+
+CREATE TABLE admin_users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE, password_hash TEXT, role TEXT, active INTEGER DEFAULT 1,
+    totp_secret TEXT, totp_enabled INTEGER DEFAULT 0, last_login DATETIME, created_at DATETIME
+);</code></pre>
+
+    <h2>PHẦN 11: BẢO MẬT 2FA TOTP</h2>
+    <p>TOTP dựa trên thuật toán HMAC-SHA1: OTP = HMAC-SHA1(SECRET_KEY, floor(CURRENT_TIMESTAMP / 30)). Cả app điện thoại và Server dùng chung 1 SECRET_KEY.</p>
+    <pre><code>const passOK = bcrypt.compareSync(inputPass, user.password_hash);
+const otpOK = speakeasy.totp.verify({
+    secret: user.totp_secret, encoding: 'base32', token: inputOTP, window: 1
+});
+if (passOK &amp;&amp; otpOK) { /* Cấp token */ }</code></pre>
+
+    <h2>PHẦN 12: CHECKLIST TRƯỚC KHI DEMO &amp; LỖI THƯỜNG GẶP</h2>
+    <h3>12.2. Các lỗi thường gặp và cách fix</h3>
+    <table>
+        <tr><th>Lỗi</th><th>Nguyên nhân</th><th>Cách fix</th></tr>
+        <tr><td>401 Unauthorized</td><td>Token hết hạn/bị xóa</td><td>Login lại</td></tr>
+        <tr><td>ERR_TOO_MANY_REDIRECTS</td><td>Nginx rewrite loop</td><td>Sửa rule (?!index)</td></tr>
+        <tr><td>CORS blocked</td><td>Thiếu subdomain origins</td><td>Thêm vào function node</td></tr>
+        <tr><td>SERVFAIL DNSSEC</td><td>DS record lệch</td><td>Xóa DS tại registrar</td></tr>
+        <tr><td>FunctionNode timeout</td><td>Query DB chậm</td><td>Thêm index, tăng timeout</td></tr>
+    </table>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Tài liệu Kỹ thuật - AirWatch</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #000;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px;
+            background-color: #fff;
+        }
+        h1 { text-align: center; font-size: 24px; text-transform: uppercase; margin-bottom: 40px; }
+        h2 { font-size: 20px; margin-top: 30px; border-bottom: 2px solid #333; padding-bottom: 5px; }
+        h3 { font-size: 16px; margin-top: 20px; }
+        p { text-align: justify; margin-bottom: 10px; }
+        
+        /* Bảng biểu */
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 14px; }
+        th, td { border: 1px solid #333; padding: 8px 12px; text-align: left; }
+        th { background-color: #f2f2f2; font-weight: bold; }
+        tr { page-break-inside: avoid; }
+
+        /* Khung code */
+        pre {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            line-height: 1.4;
+            page-break-inside: avoid;
+        }
+        
+        /* Nút in (sẽ bị ẩn khi in ra PDF) */
+        .print-btn {
+            display: block;
+            width: 200px;
+            margin: 0 auto 20px;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+        }
+        .print-btn:hover { background-color: #45a049; }
+        
+        @media print {
+            .print-btn { display: none; }
+            body { padding: 0; }
+            @page { margin: 20mm; }
+        }
+    </style>
+</head>
+<body>
+
+    <button class="print-btn" onclick="window.print()">In / Lưu thành PDF</button>
+
+    <h1>TÀI LIỆU KỸ THUẬT TỔNG HỢP DỰ ÁN AIRWATCH</h1>
+
+    <h2>PHẦN 1: CẤU TRÚC FILE HTML / FRONTEND</h2>
+    
+    <h3>1.1. Cấu trúc chuẩn của một file HTML</h3>
+    <p>Mọi file HTML trong dự án đều tuân theo cấu trúc chuẩn sau:</p>
+    <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="vi"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Tên trang&lt;/title&gt;
+    &lt;link rel="icon" href="..."&gt;
+    &lt;link rel="stylesheet" href="style.css"&gt;
+&lt;/head&gt;
+&lt;body class="landing"&gt;
+    &lt;!-- Nội dung trang --&gt;
+    
+    &lt;script src="app.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+    <h3>1.2. Phân chia chức năng các file</h3>
+    <table>
+        <tr><th>File</th><th>Chức năng</th><th>Số dòng ước tính</th></tr>
+        <tr><td>index.html</td><td>Trang chủ (Landing page)</td><td>~600</td></tr>
+        <tr><td>dashboard.html</td><td>Dashboard hiển thị sensor realtime</td><td>~300</td></tr>
+        <tr><td>admin.html</td><td>Admin panel 8 tab</td><td>~900</td></tr>
+        <tr><td>status.html</td><td>Status page (uptime, incidents)</td><td>~450</td></tr>
+        <tr><td>map.html</td><td>Bản đồ các node</td><td>~200</td></tr>
+        <tr><td>style.css</td><td>CSS dùng chung toàn site</td><td>~2000</td></tr>
+        <tr><td>app.js</td><td>Logic chung (dashboard, admin)</td><td>~1800</td></tr>
+        <tr><td>auth-check.js</td><td>Logic đăng nhập, check token</td><td>~60</td></tr>
+        <tr><td>auth-ui.js</td><td>UI đăng nhập (modal, OTP form)</td><td>~250</td></tr>
+    </table>
+
+    <h3>1.3. Quy ước đặt tên</h3>
+    <ul>
+        <li>Class CSS: kebab-case (vd: note-card, admin-panel).</li>
+        <li>ID HTML: camelCase hoặc kebab-case (vd: btn-save, welcomeToast).</li>
+        <li>Biến JS: camelCase (vd: currentRole, incidentsData).</li>
+        <li>Hàm JS: camelCase, bắt đầu bằng động từ (vd: loadUsers(), deleteIncident()).</li>
+        <li>Hằng số: UPPER_SNAKE_CASE (vd: API, TABS, PM25_BP).</li>
+    </ul>
+
+    <h2>PHẦN 2: CẤU TRÚC DRIVER C/C++ CHO STM32</h2>
+    <p>Khi lập trình STM32 với cảm biến, dự án làm việc theo mô hình File .h (khai báo) + File .cpp (định nghĩa). Mục đích là tách giao diện (interface) khỏi phần thực thi (implementation).</p>
+
+    <h3>2.1. Cấu trúc file header (.h)</h3>
+    <p>File .h chứa: khai báo thư viện, hằng số, struct, nguyên mẫu hàm. Đây là "hợp đồng" giữa file .cpp với phần còn lại của chương trình.</p>
+    <pre><code>#ifndef SHT31_H
+#define SHT31_H
+
+#include &lt;Arduino.h&gt;
+#include &lt;Wire.h&gt;
+
+#define SHT31_ADDR 0x44
+#define SHT31_CMD_MEASURE 0x2C06
+#define SHT31_CMD_SOFT_RESET 0x30A2
+
+struct SHT31Data {
+    float temperature;
+    float humidity;
+    bool valid;
+};
+
+class SHT31 {
+public:
+    SHT31();
+    bool begin();
+    bool readData(SHT31Data &amp;outData);
+    void softReset();
+    void sleep();
+    
+private:
+    uint8_t crc8(const uint8_t *data, int len);
+};
+
+#endif</code></pre>
+
+    <h3>2.2. Cấu trúc file implementation (.cpp)</h3>
+    <p>File .cpp chứa: định nghĩa thân hàm, logic xử lý. Đây là phần "chạy thật".</p>
+    <pre><code>#include "sht31.h"
+
+SHT31::SHT31() {}
+
+bool SHT31::begin() {
+    Wire.begin();
+    delay(50);
+    Wire.beginTransmission(SHT31_ADDR);
+    Wire.write(SHT31_CMD_SOFT_RESET &gt;&gt; 8);
+    Wire.write(SHT31_CMD_SOFT_RESET &amp; 0xFF);
+    if (Wire.endTransmission() != 0) return false;
+    delay(20);
+    return true;
+}
+
+bool SHT31::readData(SHT31Data &amp;outData) {
+    Wire.beginTransmission(SHT31_ADDR);
+    Wire.write(SHT31_CMD_MEASURE &gt;&gt; 8);
+    Wire.write(SHT31_CMD_MEASURE &amp; 0xFF);
+    if (Wire.endTransmission() != 0) { outData.valid = false; return false; }
+    
+    delay(20);
+    
+    Wire.requestFrom(SHT31_ADDR, 6);
+    if (Wire.available() != 6) { outData.valid = false; return false; }
+    
+    uint8_t raw[6];
+    for (int i = 0; i &lt; 6; i++) raw[i] = Wire.read();
+    
+    uint16_t rawTemp = (raw[0] &lt;&lt; 8) | raw[1];
+    uint16_t rawHum  = (raw[3] &lt;&lt; 8) | raw[4];
+    
+    outData.temperature = -45 + 175.0 * rawTemp / 65535.0;
+    outData.humidity    = 100.0 * rawHum / 65535.0;
+    outData.valid = true;
+    return true;
+}</code></pre>
+
+    <h3>2.3. Cách include và sử dụng trong main.cpp</h3>
+    <pre><code>#include "sht31.h"
+#include "pms7003.h"
+#include "lora_ra08h.h"
+
+SHT31 sht;
+PMS7003 pms;
+LoRaRA08H lora;
+
+void setup() {
+    Serial.begin(115200);
+    if (!sht.begin()) Serial.println("SHT31 lỗi!");
+    if (!pms.begin()) Serial.println("PMS7003 lỗi!");
+    if (!lora.begin()) Serial.println("LoRa lỗi!");
+}
+
+void loop() {
+    SHT31Data env;
+    if (sht.readData(env)) {
+        Serial.print("Nhiệt độ: "); Serial.println(env.temperature);
+    }
+    String payload = String(env.temperature) + "," + String(env.humidity);
+    lora.send(payload);
+    delay(300000);
+}</code></pre>
+
+    <h2>PHẦN 3: CẤU TRÚC FIRMWARE STM32 (LOGIC CHẠY)</h2>
+    
+    <h3>3.1. Mô hình State Machine (Máy trạng thái)</h3>
+    <p>Firmware STM32 hoạt động theo mô hình State Machine, không chạy tuần tự liên tục. Đây là cách tối ưu pin tối đa:</p>
+    <pre><code>[STOP MODE] ──(RTC wake 7p)──&gt; [INIT] ──(30s)──&gt; [MEASURE] ──(90s)──&gt; [SEND LORA] ──(1s)──&gt; [STOP MODE]
+                                        (bật MOSFET)   (đọc cảm biến)   (TX 920MHz)         (tắt MOSFET)</code></pre>
+
+    <h3>3.2. Code mẫu với chế độ ngủ sâu</h3>
+    <pre><code>#include "stm32f1xx_hal.h"
+
+RTC_HandleTypeDef hrtc;
+
+void enterStopMode(uint32_t seconds) {
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
+    HAL_UART_DeInit(&amp;huart1);
+    
+    RTC_AlarmTypeDef alarm = {0};
+    alarm.AlarmTime.Seconds = seconds % 60;
+    alarm.AlarmTime.Minutes = (seconds / 60) % 60;
+    alarm.AlarmMask = RTC_ALARMMASK_DATEWEEKDAY | RTC_ALARMMASK_HOURS;
+    HAL_RTC_SetAlarm_IT(&amp;hrtc, &amp;alarm, RTC_FORMAT_BIN);
+    
+    HAL_SuspendTick();
+    HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
+    
+    SystemClock_Config();
+    HAL_ResumeTick();
+    HAL_UART_Init(&amp;huart1);
+}</code></pre>
+
+    <h3>3.3. Thuật toán lọc nhiễu cảm biến (Sensor Filtering)</h3>
+    <p>Cảm biến bụi mịn (PMS7003) và cảm biến khí thường bị nhảy số do môi trường. STM32 cần chạy thuật toán Trung bình trượt (Moving Average) trước khi gửi để biểu đồ không bị răng cưa và báo động giả.</p>
+    <pre><code>#define FILTER_SIZE 10
+float pm25_buffer[FILTER_SIZE] = {0};
+int buffer_index = 0;
+
+float filterPM25(float new_val) {
+    pm25_buffer[buffer_index] = new_val;
+    buffer_index = (buffer_index + 1) % FILTER_SIZE;
+    
+    float sum = 0;
+    for (int i = 0; i &lt; FILTER_SIZE; i++) {
+        sum += pm25_buffer[i];
+    }
+    return sum / FILTER_SIZE;
+}</code></pre>
+
+    <h2>PHẦN 4: ĐỊNH DẠNG GÓI TIN TRUYỀN THÔNG (PAYLOAD)</h2>
+    <p>Để tiết kiệm băng thông và pin, STM32 sẽ không gửi dạng JSON (quá dài), mà gửi dạng chuỗi CSV qua LoRa.</p>
+    <h3>4.1. Gói tin từ Node (STM32) gửi lên Gateway (ESP32) qua LoRa</h3>
+    <ul>
+        <li>Cấu trúc: ID_NODE, NHIET_DO, DO_AM, PM25, CO, VOC, NOX, PIN</li>
+        <li>Ví dụ thực tế: 01,31.5,75.2,15,12,110,5,95</li>
+    </ul>
+    <h3>4.2. Gói tin từ Gateway (ESP32) gửi lên Server qua MQTT</h3>
+    <p>Topic: airwatch/node01/data</p>
+    <pre><code>{
+  "node_id": "01",
+  "timestamp": 1698398400,
+  "sensors": {
+    "temp": 31.5,
+    "hum": 75.2,
+    "pm25": 15,
+    "co": 12,
+    "voc": 110,
+    "nox": 5
+  },
+  "battery": 95,
+  "rssi": -85
+}</code></pre>
+
+    <h2>PHẦN 5: THUẬT TOÁN TÍNH CHỈ SỐ AQI</h2>
+    <h3>5.1. Công thức nội suy tuyến tính</h3>
+    <p>I = ((I_high - I_low) / (C_high - C_low)) * (C - C_low) + I_low</p>
+    
+    <h3>5.2. Bảng ngưỡng Breakpoints (PM2.5)</h3>
+    <table>
+        <tr><th>AQI</th><th>Nồng độ (µg/m³)</th><th>Mức độ</th><th>Màu</th></tr>
+        <tr><td>0 - 50</td><td>0.0 - 25</td><td>Tốt</td><td>Xanh lá</td></tr>
+        <tr><td>51 - 100</td><td>25.1 - 50</td><td>Trung bình</td><td>Vàng</td></tr>
+        <tr><td>101 - 150</td><td>50.1 - 80</td><td>Kém</td><td>Cam</td></tr>
+        <tr><td>151 - 200</td><td>80.1 - 150</td><td>Xấu</td><td>Đỏ</td></tr>
+        <tr><td>201 - 300</td><td>150.1 - 250</td><td>Rất xấu</td><td>Tím</td></tr>
+        <tr><td>301 - 500</td><td>250.1 - 500</td><td>Nguy hại</td><td>Nâu đỏ</td></tr>
+    </table>
+
+    <h3>5.3. Code Node-RED tính AQI</h3>
+    <pre><code>const PM25_BP = [[0,25,0,50],[25,50,51,100],[50,80,101,150],[80,150,151,200],[150,250,201,300],[250,500,301,500]];
+
+function calcSubIndex(c, bp) {
+    if (c &lt;= bp[0][0]) return bp[0][2];
+    for (let i = 0; i &lt; bp.length; i++) {
+        const [cL, cH, iL, iH] = bp[i];
+        if (c &gt;= cL &amp;&amp; c &lt;= cH) {
+            if (cH === cL) return iH;
+            return Math.round((iH - iL) / (cH - cL) * (c - cL) + iL);
+        }
+    }
+    return 500; 
+}
+function calcAQI(pm25) {
+    return calcSubIndex(pm25, PM25_BP);
+}</code></pre>
+
+    <h2>PHẦN 6: CƠ CHẾ ĐỒNG BỘ THỜI GIAN (RTC &amp; NTP)</h2>
+    <p><strong>Tại Node (STM32):</strong> Sử dụng module DS3231 (RTC). Chip này có pin riêng, chạy như đồng hồ đeo tay, đếm thời gian liên tục kể cả khi STM32 ngủ. Khi mất điện, DS3231 vẫn chạy.</p>
+    <p><strong>Tại Gateway (ESP32):</strong> ESP32 có WiFi nên dùng giao thức NTP để đồng bộ giờ chuẩn xác từ Server quốc tế. Gateway đính kèm mốc thời gian (timestamp) vào gói JSON gửi lên Server.</p>
+
+    <h2>PHẦN 7: CẤU HÌNH MQTT</h2>
+    <h3>7.1. Cài Mosquitto broker trên VPS</h3>
+    <pre><code>sudo apt install mosquitto mosquitto-clients
+sudo systemctl enable mosquitto &amp;&amp; sudo systemctl start mosquitto</code></pre>
+
+    <h3>7.2. Cấu hình Mosquitto (/etc/mosquitto/conf.d/airwatch.conf)</h3>
+    <pre><code>listener 1883
+allow_anonymous true</code></pre>
+
+    <h3>7.3. Quy ước Topic cho AirWatch</h3>
+    <table>
+        <tr><th>Topic</th><th>Publisher</th><th>Subscriber</th><th>Payload mẫu</th></tr>
+        <tr><td>airwatch/node01/data</td><td>Node/Gateway</td><td>Node-RED</td><td>{"t":30.5,"h":80,"pm25":12}</td></tr>
+        <tr><td>airwatch/node01/cmd</td><td>Node-RED</td><td>Node</td><td>{"cmd":"reboot"}</td></tr>
+    </table>
+
+    <h3>7.4. Cấu hình ESP32 gửi MQTT</h3>
+    <pre><code>#include &lt;WiFi.h&gt;
+#include &lt;PubSubClient.h&gt;
+
+const char* mqtt_server = "airwatch.io.vn";
+WiFiClient espClient;
+PubSubClient client(espClient);
+
+void reconnect() {
+    while (!client.connected()) {
+        if (client.connect("ESP32_Gateway")) {
+            client.subscribe("airwatch/node01/cmd");
+        } else { delay(5000); }
+    }
+}
+
+void setup() {
+    client.setServer(mqtt_server, 1883);
+}
+
+void loop() {
+    if (!client.connected()) reconnect();
+    client.loop();
+    String payload = "{\"t\":30.5,\"h\":80}";
+    client.publish("airwatch/node01/data", payload.c_str());
+    delay(420000);
+}</code></pre>
+
+    <h2>PHẦN 8: CẤU HÌNH NODE-RED</h2>
+    <h3>8.2. Danh sách endpoints hiện có</h3>
+    <table>
+        <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Chức năng</th></tr>
+        <tr><td>POST</td><td>/api/login</td><td>None</td><td>Đăng nhập (bcrypt + TOTP)</td></tr>
+        <tr><td>GET</td><td>/api/data</td><td>None</td><td>Lấy data sensor hôm nay</td></tr>
+        <tr><td>GET</td><td>/api/users</td><td>Head Admin</td><td>Danh sách user</td></tr>
+        <tr><td>GET</td><td>/api/notes</td><td>Admin</td><td>Danh sách note</td></tr>
+        <tr><td>GET</td><td>/api/incidents</td><td>None</td><td>Sự cố 30 ngày</td></tr>
+        <tr><td>GET</td><td>/api/db/:table</td><td>Admin</td><td>Xem bảng DB</td></tr>
+    </table>
+
+    <h2>PHẦN 9: CẤU HÌNH CLOUDFLARE &amp; NGINX</h2>
+    <h3>9.1. Các rule bảo mật Cloudflare</h3>
+    <ol>
+        <li>SSL/TLS: Full (Strict).</li>
+        <li>Bot Fight Mode: ON.</li>
+        <li>Rate Limiting: /api/login -&gt; 10 req/10s.</li>
+        <li>Custom Rule: Chặn User-Agent không chứa "Mozilla" (chặn curl/script).</li>
+    </ol>
+
+    <h2>PHẦN 10: CẤU TRÚC DATABASE SQLITE</h2>
+    <h3>10.1. Sơ đồ các bảng chính</h3>
+    <pre><code>CREATE TABLE sensor (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ts DATETIME DEFAULT CURRENT_TIMESTAMP,
+    t REAL, h REAL, pm1 REAL, pm25 REAL, pm10 REAL, v REAL, i REAL, voc INTEGER, nox INTEGER
+);
+
+CREATE TABLE admin_users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE, password_hash TEXT, role TEXT, active INTEGER DEFAULT 1,
+    totp_secret TEXT, totp_enabled INTEGER DEFAULT 0, last_login DATETIME, created_at DATETIME
+);</code></pre>
+
+    <h2>PHẦN 11: BẢO MẬT 2FA TOTP</h2>
+    <p>TOTP dựa trên thuật toán HMAC-SHA1: OTP = HMAC-SHA1(SECRET_KEY, floor(CURRENT_TIMESTAMP / 30)). Cả app điện thoại và Server dùng chung 1 SECRET_KEY.</p>
+    <pre><code>const passOK = bcrypt.compareSync(inputPass, user.password_hash);
+const otpOK = speakeasy.totp.verify({
+    secret: user.totp_secret, encoding: 'base32', token: inputOTP, window: 1
+});
+if (passOK &amp;&amp; otpOK) { /* Cấp token */ }</code></pre>
+
+    <h2>PHẦN 12: CHECKLIST TRƯỚC KHI DEMO &amp; LỖI THƯỜNG GẶP</h2>
+    <h3>12.2. Các lỗi thường gặp và cách fix</h3>
+    <table>
+        <tr><th>Lỗi</th><th>Nguyên nhân</th><th>Cách fix</th></tr>
+        <tr><td>401 Unauthorized</td><td>Token hết hạn/bị xóa</td><td>Login lại</td></tr>
+        <tr><td>ERR_TOO_MANY_REDIRECTS</td><td>Nginx rewrite loop</td><td>Sửa rule (?!index)</td></tr>
+        <tr><td>CORS blocked</td><td>Thiếu subdomain origins</td><td>Thêm vào function node</td></tr>
+        <tr><td>SERVFAIL DNSSEC</td><td>DS record lệch</td><td>Xóa DS tại registrar</td></tr>
+        <tr><td>FunctionNode timeout</td><td>Query DB chậm</td><td>Thêm index, tăng timeout</td></tr>
+    </table>
+
+</body>
+</html>
+    <h2>PHẦN 13: THIẾT KẾ CƠ KHÍ VÀ ĐỐI LƯU KHÍ</h2>
+    
+    <h3>13.1. Kết cấu vỏ hộp</h3>
+    <p>Vỏ hộp được chế tạo bằng nhựa ABS phủ lớp chống tia UV. Hộp được chia làm 3 khoang độc lập: Khoang Logic (chứa MCU, mạch nguồn), Khoang Sensor (chứa các cảm biến môi trường) và Khoang Bảo trì (chứa cổng nạp ST-Link).</p>
+    
+    <h3>13.2. Cơ chế đối lưu khí</h3>
+    <p>Hệ thống sử dụng 3 quạt độc lập (0.13A/quạt). Quạt khoang Sensor hút khí vào trong 30 giây đầu mỗi chu kỳ. Hai quạt khoang Logic được điều khiển dựa trên nhiệt độ đọc từ cảm biến nhiệt trở, tự động bật khi nhiệt độ vượt 30°C.</p>
+
+    <h3>13.3. Thiết kế chắn bức xạ nhiệt (Radiation Shield)</h3>
+    <p>Để tránh sai số do ánh nắng mặt trời chiếu trực tiếp vào cảm biến nhiệt độ/độ ẩm, hệ thống sử dụng kết cấu tấm chắn xếp lớp (louvered plates). Thiết kế này cho phép không khí lưu thông nhưng chặn hoàn toàn bức xạ nhiệt.</p>
+
+    <h3>13.4. Chống nhiễu LoRa</h3>
+    <p>Dây ăng-ten sử dụng cáp đồng trục tiêu chuẩn 50Ω. Kẹp thêm lõi ferrite tại các đầu nối để triệt tiêu nhiễu tần số cao lan truyền theo dây dẫn.</p>
+    <h2>PHẦN 14: BẢNG TÍNH TOÁN NĂNG LƯỢNG TIÊU THỤ</h2>
+    
+    <h3>14.1. Bảng tính năng lượng trong 1 chu kỳ (7 phút)</h3>
+    <table>
+        <tr><th>STT</th><th>Linh kiện</th><th>Điện áp</th><th>Dòng tiêu thụ</th><th>Trạng thái / Thời gian</th><th>Năng lượng (Wh)</th></tr>
+        <tr><td>1</td><td>STM32F103</td><td>3.3 V</td><td>36 mA (Run)<br>13.5 µA (Stop)</td><td>Run: 2 phút<br>Stop: 5 phút</td><td>0.003960</td></tr>
+        <tr><td>2</td><td>SHT31</td><td>3.3 V</td><td>0.6 mA</td><td>Ngắt MOSFET, đo 2 phút</td><td>0.000066</td></tr>
+        <tr><td>3</td><td>PMS7003</td><td>5.0 V</td><td>50 mA</td><td>Ngắt MOSFET, đo 2 phút</td><td>0.008333</td></tr>
+        <tr><td>4</td><td>ZE07-CO</td><td>5.0 V</td><td>40 mA</td><td>Luôn bật 24/7 (7 phút)</td><td>0.023333</td></tr>
+        <tr><td>5</td><td>SGP41</td><td>3.3 V</td><td>3.0 mA (Đo)<br>34 µA (Idle)</td><td>Đo: 2 phút<br>Idle: 5 phút</td><td>0.000343</td></tr>
+        <tr><td>6</td><td>LSM6DS3</td><td>3.3 V</td><td>0.9 mA</td><td>Luôn bật 24/7</td><td>0.000346</td></tr>
+        <tr><td>7</td><td>INA226</td><td>3.3 V</td><td>0.33 mA</td><td>Luôn bật 24/7</td><td>0.000127</td></tr>
+        <tr><td>8</td><td>DS3231</td><td>3.3 V</td><td>0.17 mA</td><td>Luôn bật 24/7</td><td>0.000065</td></tr>
+        <tr><td>9</td><td>RA-08H (LoRa)</td><td>3.3 V</td><td>115 mA (TX)</td><td>TX: 1s</td><td>0.000105</td></tr>
+        <tr><td>10</td><td>Quạt Khoang Sensor</td><td>5.0 V</td><td>130 mA</td><td>Bật 30s mỗi chu kỳ</td><td>0.005416</td></tr>
+        <tr><td colspan="5"><strong>TỔNG CỘNG (Ngày thường)</strong></td><td><strong>0.041850</strong></td></tr>
+    </table>
+
+    <h3>14.2. Bảng đánh giá khả năng tự chủ</h3>
+    <table>
+        <tr><th>Kịch bản</th><th>Tiêu thụ/ngày</th><th>Số ngày tự chủ (Không có nắng)</th><th>Ghi chú</th></tr>
+        <tr><td>Ngày thường</td><td>10.14 Wh</td><td>~ 5.6 ngày</td><td>Đáp ứng tốt mục tiêu dự phòng 3-5 ngày</td></tr>
+        <tr><td>Ngày nóng cực đoan</td><td>13.82 Wh</td><td>~ 4.1 ngày</td><td>Vẫn đảm bảo hệ thống hoạt động liên tục</td></tr>
+    </table>
+        <h2>PHẦN 15: CƠ CHẾ AN TOÀN VẬT LÝ</h2>
+    
+    <h3>15.1. Phát hiện xâm nhập</h3>
+    <p>Hệ thống trang bị bàn phím ma trận chống nước (có nắp đậy silicon) kết hợp với khóa điện từ (Solenoid lock - 5V, 0.2A). Hệ thống sử dụng 2 cấp độ mã khóa: Cấp 1 mở khoang Logic/Sensor, Cấp 2 mở khoang Bảo trì.</p>
+    
+    <h3>15.2. Cảnh báo khẩn cấp (Emergency)</h3>
+    <p>Node tự động gửi cảnh báo khẩn cấp về Server trong các trường hợp: Phát hiện node bị mở hoặc phá hoại trái phép; Dung lượng pin xuống dưới ngưỡng an toàn; Node bị rơi hoặc tác động ngoại lực (phát hiện qua cảm biến gia tốc LSM6DS3).</p>
+    
+    <h3>15.3. Tự phục hồi khi gặp lỗi</h3>
+    <p>STM32 hoặc cảm biến gặp lỗi bất thường trong quá trình vận hành sẽ tự động reset hệ thống, đồng thời gửi cảnh báo (warning) về server để ghi nhận sự cố.</p>
+        <h2>PHẦN 16: LUỒNG DỮ LIỆU WEBSOCKET REALTIME</h2>
+    
+    <h3>16.1. Cơ chế hoạt động</h3>
+    <p>Để Dashboard cập nhật số liệu ngay lập tức mà không cần tải lại trang (F5), hệ thống sử dụng giao thức WebSocket. Khi có dữ liệu mới từ MQTT, Node-RED sẽ đẩy trực tiếp (push) gói tin JSON xuống trình duyệt của người dùng.</p>
+
+    <h3>16.2. Code JS phía Client</h3>
+    <pre><code>let ws = new WebSocket('wss://airwatch.io.vn/ws/data');
+ws.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    if (data.t !== undefined) {
+        document.getElementById('temp').innerText = data.t.toFixed(2);
+        document.getElementById('hum').innerText = data.h.toFixed(2);
+        updateAQI(data.pm25, data.pm10);
+    }
+};</code></pre>
+    <h2>PHẦN 17: QUY TRÌNH NẠP FIRMWARE KIT RA-08H</h2>
+    
+    <h3>17.1. Chuẩn bị phần cứng</h3>
+    <p>Sử dụng cáp Micro-USB kết nối Kit Ra-08H với máy tính. Máy tính sẽ tự động nhận diện cổng COM thông qua chip CH340 tích hợp trên board.</p>
+    
+    <h3>17.2. Nạp Firmware qua UART</h3>
+    <p>Để vào chế độ nạp (Boot Mode), thực hiện tuần tự: Giữ nút BOOT -> Nhấn nút RST -> Thả nút RST -> Thả nút BOOT. Sau đó sử dụng tool tremo_loader.py để nạp file .bin.</p>
+    <pre><code>python3 tremo_loader.py -p /dev/ttyUSB0 -b 115200 flash 0x08000000 "firmware.bin"</code></pre>
+        <h2>PHẦN 18: HƯỚNG DẪN SỬ DỤNG WEBSITE</h2>
+    
+    <h3>18.1. Dành cho Khách (Guest)</h3>
+    <ul>
+        <li>Xem Dashboard: Hiển thị nhiệt độ, độ ẩm, bụi mịn theo thời gian thực.</li>
+        <li>Xem Bản đồ: Hiển thị vị trí các trạm quan trắc trên toàn quốc.</li>
+        <li>Xem Trạng thái: Kiểm tra tình trạng hoạt động của các trạm và lịch sử sự cố.</li>
+    </ul>
+    
+    <h3>18.2. Dành cho Quản trị viên (Admin)</h3>
+    <ul>
+        <li><strong>Quản lý Node:</strong> Thêm, xóa, chỉnh sửa tọa độ các trạm.</li>
+        <li><strong>Trạng thái:</strong> Cập nhật tình trạng dịch vụ (Working, Offline...).</li>
+        <li><strong>Debug:</strong> Giả lập dữ liệu để test giao diện.</li>
+        <li><strong>Người dùng:</strong> Tạo tài khoản, phân quyền, khóa tài khoản.</li>
+        <li><strong>Sự cố:</strong> Ghi nhận lịch sử bảo trì, thời gian dự kiến khắc phục.</li>
+        <li><strong>Database:</strong> Xem trực tiếp dữ liệu thô trong các bảng SQLite.</li>
+    </ul>
+        <h2>PHẦN 19: KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN</h2>
+    
+    <h3>19.1. Kết quả đạt được</h3>
+    <p>Hệ thống đã hoàn thiện được kiến trúc End-to-End từ việc đọc cảm biến tại Node, truyền sóng LoRa về Gateway, đẩy dữ liệu qua MQTT lên Server và hiển thị trực quan lên Website. Hệ thống có khả năng tự chủ năng lượng nhờ pin mặt trời và các chế độ ngủ sâu của vi điều khiển.</p>
+    
+    <h3>19.2. Hạn chế</h3>
+    <p>Do giới hạn về mặt thời gian và thiết bị, hệ thống hiện tại mới chỉ triển khai trên 1 trạm (Node). Khoảng cách truyền sóng thực tế trong môi trường đô thị chưa được kiểm chứng ở khoảng cách xa nhất.</p>
+    
+    <h3>19.3. Hướng phát triển</h3>
+    <ul>
+        <li>Mở rộng mạng lưới lên 10-20 trạm sử dụng kiến trúc mạng Mesh.</li>
+        <li>Chuyển đổi Backend sang Node.js + PostgreSQL để chịu tải hàng ngàn người dùng.</li>
+        <li>Tích hợp thêm AI để dự báo chất lượng không khí dựa trên dữ liệu lịch sử.</li>
+        <li>Bổ sung module GPS để tự động cập nhật tọa độ khi di chuyển trạm.</li>
+    </ul>
+
+</body>
+</html>
