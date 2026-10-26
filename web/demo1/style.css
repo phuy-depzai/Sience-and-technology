@@ -3339,3 +3339,11 @@ footer {
 .btn-pop-solid:hover {
     background: var(--accent-hover);
 }
+.note-tag.tag-fatal {
+    background: #f85149;
+    color: #fff;
+    font-weight: 600;
+}
+.note-card.pinned {
+    border-left: 4px solid #f85149;
+}

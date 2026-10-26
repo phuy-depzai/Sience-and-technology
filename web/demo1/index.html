@@ -782,19 +782,44 @@
     fetch('https://airwatch.io.vn/api/data')
         .then(res => res.json())
         .then(data => {
-            if(data && data.length > 0) {
+            if (data && data.length > 0) {
                 const last = data[data.length - 1];
-                // Tính AQI đơn giản
-                const aqi = Math.max(last.pm25 * 2, last.pm10); // Ước lượng nhanh
+                const PM25_BP = [[0,25,0,50],[25,50,51,100],[50,80,101,150],[80,150,151,200],[150,250,201,300],[250,500,301,500]];
+                const PM10_BP = [[0,50,0,50],[50,150,51,100],[150,250,101,150],[250,350,151,200],[350,430,201,300],[430,600,301,500]];
+                const CO_BP = [[0,8.7,0,50],[8.7,26,51,100],[26,39,101,150],[39,52,151,200],[52,79,201,300],[79,131,301,500]];
+                function subIdx(c, bp) {
+                    if (c <= bp[0][0]) return bp[0][2];
+                    for (let i = 0; i < bp.length; i++) {
+                        const [cL, cH, iL, iH] = bp[i];
+                        if (c >= cL && c <= cH) {
+                            if (cH === cL) return iH;
+                            return Math.round((iH - iL) / (cH - cL) * (c - cL) + iL);
+                        }
+                    }
+                    return 500;
+                }
+                const aqi = Math.max(
+                    subIdx(last.pm25 || 0, PM25_BP),
+                    subIdx(last.pm10 || 0, PM10_BP),
+                    subIdx(last.co || 0, CO_BP)
+                );
                 const el = document.getElementById('hero-aqi');
                 const textEl = document.getElementById('hero-aqi-text');
                 el.textContent = Math.round(aqi);
-                
-                if (aqi <= 50) { el.style.color = '#4CAF50'; textEl.style.background = '#4CAF50'; textEl.textContent = 'Tốt'; }
-                else if (aqi <= 100) { el.style.color = '#FFEB3B'; textEl.style.background = '#FFEB3B'; textEl.style.color='#000'; textEl.textContent = 'Trung bình'; }
-                else { el.style.color = '#FF9800'; textEl.style.background = '#FF9800'; textEl.textContent = 'Kém'; }
+                let color = '', text = '', textColor = '#fff';
+                if (aqi <= 50) { color = '#4CAF50'; text = 'Tốt'; }
+                else if (aqi <= 100) { color = '#FFEB3B'; text = 'Trung bình'; textColor = '#000'; }
+                else if (aqi <= 150) { color = '#FF9800'; text = 'Kém'; }
+                else if (aqi <= 200) { color = '#F44336'; text = 'Xấu'; }
+                else if (aqi <= 300) { color = '#9C27B0'; text = 'Rất xấu'; }
+                else { color = '#7B1FA2'; text = 'Nguy hại'; }
+                el.style.color = color;
+                textEl.style.background = color;
+                textEl.style.color = textColor;
+                textEl.textContent = text;
             }
-        });
+        })
+        .catch(err => console.error('[AQI]', err));
 </script>
 <script>
 

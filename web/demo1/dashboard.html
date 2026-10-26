@@ -24,13 +24,9 @@
     </nav>
 
     <header>
-        <h1>
-            Dashboard
-            <span class="status" id="status">LIVE</span>
-        </h1>
+        <h1>Dashboard <span class="status" id="status">LIVE</span></h1>
     </header>
 
-    <!-- DATE SELECTOR -->
     <section class="date-selector">
         <label>Xem dữ liệu ngày:</label>
         <input type="date" id="date-picker">
@@ -38,7 +34,6 @@
         <button onclick="loadToday()" class="btn-secondary" style="padding: 8px 16px;">Hôm nay</button>
     </section>
 
-    <!-- AQI BANNER (VÒNG TRÒN SVG) -->
     <section class="aqi-banner">
         <div class="aqi-circle-container">
             <svg class="aqi-circle" width="200" height="200">
@@ -52,17 +47,11 @@
         </div>
         <div class="aqi-status" id="aqi-text" style="display:inline-block; margin-top:16px; padding:4px 16px; border-radius:12px; background:#4CAF50; color:#fff; font-weight:600;">--</div>
         <div class="aqi-desc" style="font-size:12px; color:var(--text-muted); margin-top:12px;">
-            Nguồn công thức: 
-            <a href="https://cem.gov.vn/storage/news_file_attach/QD%201459%20TCMT%20ngay%2012.11.2019%20AQI.pdf" 
-               target="_blank" rel="noopener"
-               style="color:var(--accent); text-decoration:underline;">
-                QĐ 1459/TCMT (12/11/2019)
-            </a>
+            Nguồn công thức: <a href="https://cem.gov.vn/storage/news_file_attach/QD%201459%20TCMT%20ngay%2012.11.2019%20AQI.pdf" target="_blank" rel="noopener" style="color:var(--accent); text-decoration:underline;">QĐ 1459/TCMT (12/11/2019)</a>
         </div>
     </section>
 
-    <!-- CARDS -->
-    <section class="grid">
+       <section class="grid">
         <div class="card temp">
             <div class="label">Nhiệt độ</div>
             <div class="value"><span id="temp">--</span><span class="unit">°C</span></div>
@@ -91,9 +80,21 @@
             <div class="label">PM10</div>
             <div class="value"><span id="pm10">--</span><span class="unit">µg/m³</span></div>
         </div>
+        <div class="card co">
+            <div class="label">CO</div>
+            <div class="value"><span id="co">--</span><span class="unit">ppm</span></div>
+        </div>
+        <div class="card voc">
+            <div class="label">VOC</div>
+            <div class="value"><span id="voc_pct">--</span><span class="unit">%</span></div>
+        </div>
+        <div class="card nox">
+            <div class="label">NOx</div>
+            <div class="value"><span id="nox_pct">--</span><span class="unit">%</span></div>
+        </div>
+    </section>
     </section>
 
-    <!-- CHARTS -->
     <section class="chart-container">
         <h2 class="chart-title">Môi trường</h2>
         <canvas id="chart-env"></canvas>
@@ -102,6 +103,16 @@
     <section class="chart-container">
         <h2 class="chart-title">Bụi mịn</h2>
         <canvas id="chart-pm"></canvas>
+    </section>
+
+    <section class="chart-container">
+        <h2 class="chart-title">Mức độ ô nhiễm khí (VOC & NOx)</h2>
+        <canvas id="chart-gas"></canvas>
+    </section>
+
+    <section class="chart-container">
+        <h2 class="chart-title">Nồng độ CO</h2>
+        <canvas id="chart-co"></canvas>
     </section>
 
     <section class="chart-container admin-only" style="display:none;">
@@ -114,100 +125,42 @@
         <canvas id="chart-curr"></canvas>
     </section>
 
-    <!-- ADMIN SYSTEM DATA -->
     <section class="chart-container admin-only" style="display:none;">
         <h2 class="chart-title">Dữ liệu hệ thống (Admin)</h2>
         <div class="grid">
-            <div class="card">
-                <div class="label">Record DB</div>
-                <div class="value"><span id="db-count">--</span></div>
-            </div>
-            <div class="card">
-                <div class="label">Cập nhật cuối</div>
-                <div class="value" style="font-size: 16px;"><span id="last-seen">--</span></div>
-            </div>
-            <div class="card">
-                <div class="label">Role</div>
-                <div class="value" style="font-size: 20px;"><span id="role-display">--</span></div>
-            </div>
+            <div class="card"><div class="label">Record DB</div><div class="value"><span id="db-count">--</span></div></div>
+            <div class="card"><div class="label">Cập nhật cuối</div><div class="value" style="font-size: 16px;"><span id="last-seen">--</span></div></div>
+            <div class="card"><div class="label">Role</div><div class="value" style="font-size: 20px;"><span id="role-display">--</span></div></div>
         </div>
     </section>
 
-    <!-- AQI TABLE -->
     <section class="aqi-table-section">
         <h2 class="chart-title" style="text-align:center; margin-bottom:20px;">Bảng ngưỡng AQI</h2>
         <table class="aqi-table">
-            <thead>
-                <tr>
-                    <th>Khoảng AQI</th>
-                    <th>Mức độ</th>
-                    <th>Ảnh hưởng sức khỏe</th>
-                </tr>
-            </thead>
+            <thead><tr><th>Khoảng AQI</th><th>Mức độ</th><th>Ảnh hưởng sức khỏe</th></tr></thead>
             <tbody>
-                <tr style="background: rgba(76,175,80,0.1);">
-                    <td><span class="aqi-badge" style="background:#4CAF50;">0 – 50</span></td>
-                    <td><strong>Tốt</strong></td>
-                    <td>Chất lượng không khí tốt, không ảnh hưởng sức khỏe.</td>
-                </tr>
-                <tr style="background: rgba(255,235,59,0.1);">
-                    <td><span class="aqi-badge" style="background:#FFEB3B; color:#000;">51 – 100</span></td>
-                    <td><strong>Trung bình</strong></td>
-                    <td>Nhóm nhạy cảm (trẻ em, người già, hen suyễn) nên hạn chế hoạt động ngoài trời lâu.</td>
-                </tr>
-                <tr style="background: rgba(255,152,0,0.1);">
-                    <td><span class="aqi-badge" style="background:#FF9800;">101 – 150</span></td>
-                    <td><strong>Kém</strong></td>
-                    <td>Nhóm nhạy cảm bị ảnh hưởng sức khỏe; người khỏe mạnh có thể bị kích ứng mắt, họng.</td>
-                </tr>
-                <tr style="background: rgba(244,67,54,0.1);">
-                    <td><span class="aqi-badge" style="background:#F44336;">151 – 200</span></td>
-                    <td><strong>Xấu</strong></td>
-                    <td>Mọi người bắt đầu bị ảnh hưởng sức khỏe; nhóm nhạy cảm bị ảnh hưởng nghiêm trọng hơn.</td>
-                </tr>
-                <tr style="background: rgba(156,39,176,0.1);">
-                    <td><span class="aqi-badge" style="background:#9C27B0;">201 – 300</span></td>
-                    <td><strong>Rất xấu</strong></td>
-                    <td>Cảnh báo sức khỏe cho toàn bộ cộng đồng; hạn chế ra ngoài.</td>
-                </tr>
-                <tr style="background: rgba(123,31,162,0.15);">
-                    <td><span class="aqi-badge" style="background:#7B1FA2;">301 – 500</span></td>
-                    <td><strong>Nguy hại</strong></td>
-                    <td>Khẩn cấp: ảnh hưởng nghiêm trọng đến toàn bộ dân số, ở trong nhà.</td>
-                </tr>
+                <tr style="background: rgba(76,175,80,0.1);"><td><span class="aqi-badge" style="background:#4CAF50;">0 – 50</span></td><td><strong>Tốt</strong></td><td>Chất lượng không khí tốt, không ảnh hưởng sức khỏe.</td></tr>
+                <tr style="background: rgba(255,235,59,0.1);"><td><span class="aqi-badge" style="background:#FFEB3B; color:#000;">51 – 100</span></td><td><strong>Trung bình</strong></td><td>Nhóm nhạy cảm (trẻ em, người già, hen suyễn) nên hạn chế hoạt động ngoài trời lâu.</td></tr>
+                <tr style="background: rgba(255,152,0,0.1);"><td><span class="aqi-badge" style="background:#FF9800;">101 – 150</span></td><td><strong>Kém</strong></td><td>Nhóm nhạy cảm bị ảnh hưởng sức khỏe; người khỏe mạnh có thể bị kích ứng mắt, họng.</td></tr>
+                <tr style="background: rgba(244,67,54,0.1);"><td><span class="aqi-badge" style="background:#F44336;">151 – 200</span></td><td><strong>Xấu</strong></td><td>Mọi người bắt đầu bị ảnh hưởng sức khỏe; nhóm nhạy cảm bị ảnh hưởng nghiêm trọng hơn.</td></tr>
+                <tr style="background: rgba(156,39,176,0.1);"><td><span class="aqi-badge" style="background:#9C27B0;">201 – 300</span></td><td><strong>Rất xấu</strong></td><td>Cảnh báo sức khỏe cho toàn bộ cộng đồng; hạn chế ra ngoài.</td></tr>
+                <tr style="background: rgba(123,31,162,0.15);"><td><span class="aqi-badge" style="background:#7B1FA2;">301 – 500</span></td><td><strong>Nguy hại</strong></td><td>Khẩn cấp: ảnh hưởng nghiêm trọng đến toàn bộ dân số, ở trong nhà.</td></tr>
             </tbody>
         </table>
         <div style="text-align:center; margin-top:16px; font-size:12px; color:var(--text-muted);">
-            Tham khảo: 
-            <a href="https://sonnmt.langson.gov.vn/upload/105376/20250319/01-btnmt-qc05_c7c2a.pdf" 
-               target="_blank" rel="noopener"
-               style="color:var(--accent); text-decoration:underline;">
-                QCVN 05:2023/BTNMT
-            </a>
+            Tham khảo: <a href="https://sonnmt.langson.gov.vn/upload/105376/20250319/01-btnmt-qc05_c7c2a.pdf" target="_blank" rel="noopener" style="color:var(--accent); text-decoration:underline;">QCVN 05:2023/BTNMT</a>
         </div>
     </section>
 
-    <footer>
-        Node ID: 001 | Cập nhật: <span id="updated">--</span>
-    </footer>
+    <footer>Node ID: 001 | Cập nhật: <span id="updated">--</span></footer>
 
-    <!-- SCRIPTS -->
     <script src="chart.min.js"></script>
     <script src="chartjs-adapter-date-fns.bundle.min.js"></script>
     <script src="auth-check.js"></script>
     <script>
-        function toggleMenu(e) {
-            e.stopPropagation();
-            document.getElementById('dropdown-menu').classList.toggle('open');
-        }
-        document.addEventListener('click', () => {
-            const m = document.getElementById('dropdown-menu');
-            if (m) m.classList.remove('open');
-        });
-        function handleAuthAction() {
-            if (isAdmin()) logout();
-            else window.location.href = '/';
-        }
+        function toggleMenu(e) { e.stopPropagation(); document.getElementById('dropdown-menu').classList.toggle('open'); }
+        document.addEventListener('click', () => { const m = document.getElementById('dropdown-menu'); if (m) m.classList.remove('open'); });
+        function handleAuthAction() { if (isAdmin()) logout(); else window.location.href = '/'; }
     </script>
     <script src="app.js"></script>
 </body>
