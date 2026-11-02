@@ -8,7 +8,7 @@ function getToken() {
 
 async function checkAuth() {
     try {
-        const r = await fetch(API_AUTH + '/api/check?token=' + getToken());
+        const r = await fetch(API_AUTH + '/api/check', { headers: { 'X-Auth-Token': getToken() } });
         const data = await r.json();
         currentRole = data.role || 'guest';
         currentUsername = data.username || '';

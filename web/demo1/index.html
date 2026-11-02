@@ -38,7 +38,6 @@
         </ul>
     </nav>
        <header class="hero">
-        <div class="aqi-bg-glow"></div>
         <h1>Air<span class="accent">Watch</span></h1>
         <h2 style="font-size: 32px; margin-bottom: 20px; color: var(--text);">
             Theo dõi chất lượng không khí <br><span class="accent">mọi lúc, mọi nơi</span>
@@ -778,52 +777,7 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 </script>
-<script>
-    fetch('https://airwatch.io.vn/api/data')
-        .then(res => res.json())
-        .then(data => {
-            if (data && data.length > 0) {
-                const last = data[data.length - 1];
-                const PM25_BP = [[0,25,0,50],[25,50,51,100],[50,80,101,150],[80,150,151,200],[150,250,201,300],[250,500,301,500]];
-                const PM10_BP = [[0,50,0,50],[50,150,51,100],[150,250,101,150],[250,350,151,200],[350,430,201,300],[430,600,301,500]];
-                const CO_BP = [[0,8.7,0,50],[8.7,26,51,100],[26,39,101,150],[39,52,151,200],[52,79,201,300],[79,131,301,500]];
-                function subIdx(c, bp) {
-                    if (c <= bp[0][0]) return bp[0][2];
-                    for (let i = 0; i < bp.length; i++) {
-                        const [cL, cH, iL, iH] = bp[i];
-                        if (c >= cL && c <= cH) {
-                            if (cH === cL) return iH;
-                            return Math.round((iH - iL) / (cH - cL) * (c - cL) + iL);
-                        }
-                    }
-                    return 500;
-                }
-                const aqi = Math.max(
-                    subIdx(last.pm25 || 0, PM25_BP),
-                    subIdx(last.pm10 || 0, PM10_BP),
-                    subIdx(last.co || 0, CO_BP)
-                );
-                const el = document.getElementById('hero-aqi');
-                const textEl = document.getElementById('hero-aqi-text');
-                el.textContent = Math.round(aqi);
-                let color = '', text = '', textColor = '#fff';
-                if (aqi <= 50) { color = '#4CAF50'; text = 'Tốt'; }
-                else if (aqi <= 100) { color = '#FFEB3B'; text = 'Trung bình'; textColor = '#000'; }
-                else if (aqi <= 150) { color = '#FF9800'; text = 'Kém'; }
-                else if (aqi <= 200) { color = '#F44336'; text = 'Xấu'; }
-                else if (aqi <= 300) { color = '#9C27B0'; text = 'Rất xấu'; }
-                else { color = '#7B1FA2'; text = 'Nguy hại'; }
-                el.style.color = color;
-                textEl.style.background = color;
-                textEl.style.color = textColor;
-                textEl.textContent = text;
-            }
-        })
-        .catch(err => console.error('[AQI]', err));
-</script>
-<script>
 
-</script>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     const navBtn = document.getElementById('nav-dashboard-btn');
@@ -865,6 +819,39 @@ function handlePopover(action) {
         if (target) target.scrollIntoView({ behavior: 'smooth' });
     }
 }
+</script>
+<script>
+async function updateHeroAQI() {
+    const el = document.getElementById('hero-aqi');
+    const textEl = document.getElementById('hero-aqi-text');
+    if (!el || !textEl) return;
+
+    try {
+        const r = await fetch('https://airwatch.io.vn/api/aqi/current');
+        const d = await r.json();
+
+        if (!d.aqi) {
+            el.textContent = '--';
+            el.style.color = '#8899a6';
+            textEl.textContent = 'Đang thu thập';
+            textEl.style.background = '#8899a6';
+            return;
+        }
+
+        let color = d.aqi <= 50 ? '#4CAF50' : d.aqi <= 100 ? '#FFEB3B' :
+                    d.aqi <= 150 ? '#FF9800' : d.aqi <= 200 ? '#F44336' :
+                    d.aqi <= 300 ? '#9C27B0' : '#7B1FA2';
+
+        el.textContent = Math.round(d.aqi);
+        el.style.color = color;
+        textEl.textContent = d.level;
+        textEl.style.background = color;
+        textEl.style.color = (color === '#FFEB3B') ? '#000' : '#fff';
+    } catch(e) { console.error('[HeroAQI]', e); }
+}
+
+updateHeroAQI();
+setInterval(updateHeroAQI, 5 * 60 * 1000);
 </script>
 
 <!-- Cái nút Reset đặt ở đây, có style inline để nó tàng hình -->

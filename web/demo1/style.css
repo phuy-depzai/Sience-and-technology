@@ -1124,18 +1124,6 @@ footer {
     position: relative;
     overflow: hidden;
 }
-.hero::before {
-    content: "";
-    position: absolute;
-    top: -50%; left: -50%; width: 200%; height: 200%;
-    background: radial-gradient(circle, rgba(76,175,80,0.1) 0%, transparent 60%);
-    animation: rotateBg 20s linear infinite;
-    z-index: 0;
-}
-@keyframes rotateBg {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
 .hero h1, .hero .subtitle, .hero-actions {
     position: relative;
     z-index: 1;
@@ -1212,7 +1200,7 @@ footer {
     content: "";
     position: absolute;
     top: -50%; left: -50%; width: 200%; height: 200%;
-    background: radial-gradient(circle, rgba(76,175,80,0.15) 0%, transparent 60%);
+    background: radial-gradient(circle at 30% 40%, rgba(76,175,80,0.2) 0%, transparent 60%);
     animation: rotateBg 15s linear infinite;
     z-index: 0;
 }
@@ -1512,7 +1500,7 @@ footer {
     top: -20%; left: 50%;
     transform: translateX(-50%);
     width: 800px; height: 800px;
-    background: radial-gradient(circle, rgba(76,175,80,0.15) 0%, transparent 60%);
+    background: radial-gradient(circle at 30% 40%, rgba(76,175,80,0.2) 0%, transparent 60%);
     filter: blur(60px);
     z-index: 0;
     animation: pulseGlow 8s infinite alternate;
@@ -3346,4 +3334,221 @@ footer {
 }
 .note-card.pinned {
     border-left: 4px solid #f85149;
+}
+/* Fix card AQI hero cho light theme */
+body.light .live-aqi-card {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+}
+
+body.light .live-aqi-card > span:first-child {
+    color: #666 !important;
+}
+/* Fix: tab không wrap 2 hàng */
+.admin-tab {
+    white-space: nowrap;
+}
+
+/* Fix: tab scroll ngang, không wrap */
+.admin-tabs {
+    display: flex;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden;
+    white-space: nowrap;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.15) transparent;
+    -webkit-overflow-scrolling: touch;
+}
+.admin-tabs::-webkit-scrollbar {
+    height: 4px;
+}
+.admin-tabs::-webkit-scrollbar-track {
+    background: transparent;
+}
+.admin-tabs::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.15);
+    border-radius: 2px;
+}
+.admin-tab {
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+/* Custom Confirm Modal */
+.custom-confirm-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 99999;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.15s ease;
+    padding: 20px;
+}
+.custom-confirm-overlay.cc-visible { opacity: 1; }
+.custom-confirm-modal {
+    background: var(--bg-card, #161b22);
+    border: 1px solid var(--border, #30363d);
+    border-radius: 14px;
+    padding: 24px 28px;
+    max-width: 460px; width: 100%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    transform: scale(0.95);
+    transition: transform 0.15s ease;
+}
+.custom-confirm-overlay.cc-visible .custom-confirm-modal { transform: scale(1); }
+.custom-confirm-title {
+    margin: 0 0 12px;
+    font-size: 17px; font-weight: 700;
+    color: var(--text, #e7e9ea);
+    display: flex; align-items: center; gap: 8px;
+}
+.custom-confirm-title::before {
+    content: "⚠️"; font-size: 20px;
+}
+.custom-confirm-message {
+    margin: 0 0 24px;
+    font-size: 14px; line-height: 1.5;
+    color: var(--text-muted, #8899a6);
+    white-space: pre-wrap;
+}
+.custom-confirm-actions {
+    display: flex; gap: 10px; justify-content: flex-end;
+}
+.cc-btn {
+    padding: 9px 20px;
+    border-radius: 8px;
+    border: 1px solid var(--border, #30363d);
+    background: var(--bg, #0d1117);
+    color: var(--text, #e7e9ea);
+    font-size: 14px; font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    min-width: 80px;
+}
+.cc-btn:hover { border-color: var(--accent, #4CAF50); }
+.cc-cancel:hover { background: var(--bg-hover, rgba(255,255,255,0.05)); }
+.cc-ok {
+    background: var(--accent, #4CAF50);
+    border-color: var(--accent, #4CAF50);
+    color: #fff;
+}
+.cc-ok:hover { filter: brightness(1.1); }
+.cc-ok.cc-danger {
+    background: #f85149;
+    border-color: #f85149;
+}
+.cc-ok.cc-danger:hover { background: #da3633; }
+
+
+/* ============================================================
+   SIMULATE BUTTONS (Random + Edge)
+   ============================================================ */
+.btn-sim {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border: 1.5px solid transparent;
+    white-space: nowrap;
+    margin-left: 6px;
+}
+
+.btn-sim-normal {
+    background: var(--accent, #4CAF50);
+    color: #fff;
+    border-color: var(--accent, #4CAF50);
+}
+.btn-sim-normal:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.35);
+}
+.btn-sim-normal:active {
+    transform: translateY(0);
+    filter: brightness(0.95);
+}
+
+.btn-sim-edge {
+    background: rgba(255, 152, 0, 0.1);
+    color: #ff9800;
+    border-color: #ff9800;
+}
+.btn-sim-edge:hover {
+    background: rgba(255, 152, 0, 0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+}
+.btn-sim-edge:active {
+    transform: translateY(0);
+    background: rgba(255, 152, 0, 0.15);
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .btn-sim {
+        padding: 7px 12px;
+        font-size: 12px;
+        margin-left: 4px;
+    }
+}
+
+
+/* Custom Toast Notification */
+.custom-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: var(--bg-card, #161b22);
+    border: 1px solid var(--border, #30363d);
+    border-left: 4px solid var(--toast-color, #2196F3);
+    border-radius: 10px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    color: var(--text, #e7e9ea);
+    font-size: 14px;
+    max-width: 420px;
+    z-index: 99999;
+    transform: translateX(120%);
+    opacity: 0;
+    transition: all 0.2s ease;
+}
+.custom-toast.toast-visible {
+    transform: translateX(0);
+    opacity: 1;
+}
+.custom-toast-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+}
+.custom-toast-msg {
+    flex: 1;
+    line-height: 1.4;
+    word-break: break-word;
+}
+.custom-toast-close {
+    background: none;
+    border: none;
+    color: var(--text-muted, #8899a6);
+    font-size: 22px;
+    cursor: pointer;
+    padding: 0 4px;
+    line-height: 1;
+    transition: color 0.15s;
+}
+.custom-toast-close:hover {
+    color: var(--text, #e7e9ea);
+}
+
+/* Stack nhiều toast */
+.custom-toast + .custom-toast {
+    margin-top: 10px;
 }
