@@ -1,8 +1,57 @@
 const API = 'https://airwatch.io.vn';
 
-function getTextColor()   { return document.body.classList.contains('light') ? '#666'     : '#8899a6'; }
+// ===== HELPERS (bị mất khi replace updateCards) =====
+function getTextColor()   { return document.body.classList.contains('light') ? '#666'    : '#8899a6'; }
 function getGridColor()   { return document.body.classList.contains('light') ? '#e0e0e0' : '#2a3040'; }
 function getLegendColor() { return document.body.classList.contains('light') ? '#1a1f2e' : '#e7e9ea'; }
+
+function timeScaleX() {
+    return {
+        type: 'time',
+        time: {
+            unit: 'hour',
+            displayFormats: { hour: 'HH:mm', minute: 'HH:mm' },
+            tooltipFormat: 'HH:mm:ss dd/MM'
+        },
+        ticks: { color: getTextColor(), maxTicksLimit: 10, autoSkip: true },
+        grid: { color: getGridColor() }
+    };
+}
+
+function baseOptions(t, c) {
+    return {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 1500, easing: 'easeOutQuart' },
+        interaction: { mode: 'index', intersect: false },
+        plugins: { legend: { labels: { color: getLegendColor() } } },
+        scales: {
+            x: timeScaleX(),
+            y: {
+                position: 'left',
+                ticks: { color: c },
+                grid: { color: getGridColor() },
+                title: { display: true, text: t, color: c }
+            }
+        }
+    };
+}
+
+function downsample(d, m) {
+    if (d.length <= m) return d;
+    const s = (d.length - 1) / (m - 1);
+    const o = [];
+    for (let i = 0; i < m; i++) o.push(d[Math.round(i * s)]);
+    return o;
+}
+
+function toPoints(a, k, sc) {
+    sc = sc || 1;
+    return a.map(d => {
+        const v = d[k] !== undefined && d[k] !== null ? Number(d[k]) : null;
+        return { x: tsToMs(d.ts), y: v !== null ? v * sc : null };
+    });
+}
 // ============================================================
 // INTENSITY THRESHOLDS — QCVN 05:2023/BTNMT
 // ============================================================
