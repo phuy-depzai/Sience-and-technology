@@ -40,6 +40,7 @@ async function login(user, pass, otp) {
         if (data.ok && data.token) {
             localStorage.setItem('auth_token', data.token);
             localStorage.setItem('admin_user', data.user || user);
+            localStorage.setItem('admin_displayname', data.displayname || data.user); 
             currentRole = data.role || 'admin';
             return { ok: true, data };
         }

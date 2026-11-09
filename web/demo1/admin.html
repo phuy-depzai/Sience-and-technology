@@ -94,12 +94,11 @@
 
     <div class="status-form">
         <label>Service:</label>
-        <select id="sel-service" class="status-select">
-            <option value="stm32">NODE (STM32)</option>
-            <option value="esp32">GATEWAY (ESP32)</option>
-            <option value="api">Web API</option>
-            <option value="system">SYSTEM</option>
-        </select>
+<select id="sel-service" class="status-select">
+    <option value="node">NODE (STM32)</option>
+    <option value="gate">GATEWAY (ESP32)</option>
+    <option value="server">SERVER</option>
+</select>
         <label>Trạng thái:</label>
         <select id="sel-status" class="status-select">
             <option value="working">working</option>
@@ -148,10 +147,10 @@
             <label>Simulate:</label>
             <input id="dbg-sim-count" class="status-input mini" type="number" placeholder="10" value="10" min="1" max="50000">
             <button onclick="simulatePackets(false)" class="btn-sim btn-sim-normal" title="Simulate N records bình thường">
-                🎲 Simulate
+                Simulate
             </button>
             <button onclick="simulatePackets(true)" class="btn-sim btn-sim-edge" title="Simulate với edge cases (nhiệt độ âm, PM cao, ...)">
-                ⚡ Edge Cases
+                Edge Cases
             </button>
         </div>
     </div>
@@ -333,7 +332,7 @@
         </select>
         <select id="note-filter-tag" class="status-select" onchange="loadNotes()">
             <option value="">Tất cả tag</option>
-            <option value="fatal">💀 Fatal</option>
+            <option value="fatal">Fatal</option>
             <option value="note">Note</option>
             <option value="todo">Todo</option>
             <option value="bug">Bug</option>
@@ -362,10 +361,10 @@
     <div class="debug-table-wrap">
         <table class="debug-table" id="users-table">
             <thead>
-                <tr><th>ID</th><th>Username</th><th>Role</th><th>Active</th><th>TOTP</th><th>Last Login</th><th>Created</th><th>Actions</th></tr>
+                <tr><th>ID</th><th>Username</th><th>Display Name</th><th>Role</th><th>Active</th><th>TOTP</th><th>Last Login</th><th>Created</th><th>Actions</th></tr>
             </thead>
             <tbody id="users-tbody">
-                <tr><td colspan="8" style="text-align:center; padding:20px; color:var(--text-muted);">Đang tải...</td></tr>
+                <tr><td colspan="9" style="text-align:center; padding:20px; color:var(--text-muted);">Đang tải...</td></tr>
             </tbody>
         </table>
     </div>
@@ -463,7 +462,7 @@
         </table>
     </div>
     <div class="table-toolbar" style="margin-top:16px;">
-        <button onclick="revokeAllSessions()" class="btn-secondary" style="color:#f85149; border-color:#f85149;">🗑️ Revoke TẤT CẢ + Đăng xuất</button>
+        <button onclick="revokeAllSessions()" class="btn-secondary" style="color:#f85149; border-color:#f85149;">Revoke TẤT CẢ + Đăng xuất</button>
     </div>
 
     <h3 class="chart-title" style="font-size:16px; margin-top:32px;">Lịch sử xác thực 2 lớp</h3>
@@ -537,7 +536,7 @@
             <div class="field full"><label>Nội dung <span class="hint">*</span></label><textarea id="note-form-content" rows="6" placeholder="Mô tả chi tiết..." maxlength="2000"></textarea></div>
             <div class="field"><label>Tag</label>
                 <select id="note-form-tag" class="status-input">
-                    <option value="fatal">💀 Fatal (tự ghim)</option>
+                    <option value="fatal">Fatal (tự ghim)</option>
                     <option value="note">Note</option>
                     <option value="todo">Todo</option>
                     <option value="bug">Bug</option>
@@ -562,6 +561,7 @@
         </div>
         <div class="form-fields" style="margin-top:16px;">
             <div class="field full"><label>Username <span class="hint">*</span></label><input id="user-form-username" type="text" placeholder="a-z A-Z 0-9 _" maxlength="30"></div>
+             <div class="field full"><label>Display Name</label><input id="user-form-displayname" type="text" placeholder="VD: Phú Ý" maxlength="50"></div>
             <div class="field full"><label>Password <span class="hint">* (≥8 ký tự)</span></label><input id="user-form-password" type="password" placeholder="Nhập password"></div>
             <div class="field full"><label>Role</label>
                 <select id="user-form-role" class="status-input">
@@ -586,12 +586,11 @@
         </div>
         <div class="form-fields" style="margin-top:16px;">
             <div class="field full"><label>Service</label>
-                <select id="inc-service" class="status-input">
-                    <option value="stm32">NODE (STM32)</option>
-                    <option value="esp32">GATEWAY (ESP32)</option>
-                    <option value="api">Web API</option>
-                    <option value="system">SYSTEM</option>
-                </select>
+                <select id="inc-service" class="status-select">
+    <option value="node">NODE (STM32)</option>
+    <option value="gate">GATEWAY (ESP32)</option>
+    <option value="server">SERVER</option>
+</select>
             </div>
             <div class="field full"><label>Status</label>
                 <select id="inc-status" class="status-input">

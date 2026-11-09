@@ -436,15 +436,13 @@ body {
         <div style="margin-top: 8px;">© 2026 AirWatch · An Giang, Việt Nam</div>
     </footer>
 </div>
-
 <script>
 const API = 'https://airwatch.io.vn';
 
 const SERVICES = {
-    stm32:  { icon: '🔌', name: 'NODE (STM32)',    desc: 'Trạm quan trắc cảm biến' },
-    esp32:  { icon: '📡', name: 'GATEWAY (ESP32)', desc: 'Cổng LoRa → WiFi → MQTT' },
-    api:    { icon: '🌐', name: 'Web API',          desc: 'REST API + WebSocket' },
-    system: { icon: '🖥️', name: 'SYSTEM',           desc: 'Server · Database · Node-RED' }
+    node:   { icon : '', name: 'NODE',    desc: 'Trạm quan trắc cảm biến' },
+    gate:   { icon : '', name: 'GATEWAY', desc: 'Trạm thu tín hiệu' },
+    server: { icon: '', name: 'SERVER',  desc: 'Server' }
 };
 
 const LABEL = {
@@ -453,42 +451,15 @@ const LABEL = {
     unknown: 'Chưa có dữ liệu'
 };
 
-const STORAGE_PREFIX = 'aw_status_history_v2_';
 const DAY_MS = 24 * 3600 * 1000;
 
-function todayKey() {
-    const d = new Date();
-    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-}
-
+// Tạo key ngày YYYY-MM-DD cho offset ngày
 function dateKey(offsetDays) {
     const d = new Date(Date.now() - offsetDays * DAY_MS);
     return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
 
-function loadHistory(service) {
-    try {
-        return JSON.parse(localStorage.getItem(STORAGE_PREFIX + service) || '{}');
-    } catch(e) { return {}; }
-}
-
-function saveHistory(service, history) {
-    // Chỉ giữ 30 ngày gần nhất
-    const cutoff = dateKey(29);
-    const cleaned = {};
-    Object.keys(history).forEach(d => {
-        if (d >= cutoff) cleaned[d] = history[d];
-    });
-    try { localStorage.setItem(STORAGE_PREFIX + service, JSON.stringify(cleaned)); } catch(e) {}
-    return cleaned;
-}
-
-function trackStatus(service, status) {
-    const h = loadHistory(service);
-    h[todayKey()] = status;
-    return saveHistory(service, h);
-}
-
+// Vẽ 30 ô bar (29 ngày trước → hôm nay)
 function renderBars(history) {
     let bars = '';
     for (let i = 29; i >= 0; i--) {
@@ -503,13 +474,14 @@ function renderBars(history) {
     return bars;
 }
 
+// Tính uptime dựa trên history từ DB
 function calcUptime(history) {
     let ok = 0, total = 0;
     for (let i = 29; i >= 0; i--) {
         const dk = dateKey(i);
-        if (!history[dk]) continue; // bỏ qua ngày chưa có data
-        total++;
         const s = history[dk];
+        if (!s || s === 'unknown') continue;
+        total++;
         if (s === 'working' || s === 'attach' || s === 'testing') ok++;
     }
     if (total === 0) return null;
@@ -534,9 +506,12 @@ async function loadStatus() {
 
         const html = Object.keys(SERVICES).map(key => {
             const info = SERVICES[key];
-            const svc = services[key] || { status: 'offline', note: '' };
+            const svc  = services[key] || { status: 'offline', note: '', history: {} };
             const status = svc.status || 'offline';
-            const history = trackStatus(key, status);
+
+            // 👇 HISTORY TỪ API (backend query DB)
+            const history = svc.history || {};
+
             const uptime = calcUptime(history);
 
             if (status !== 'working') allOk = false;
@@ -544,7 +519,7 @@ async function loadStatus() {
             if (status === 'debug' || status === 'maintenance') anyDegraded = true;
 
             const uptimeText = uptime === null ? 'chưa có dữ liệu' : uptime + '% uptime';
-            const noteHtml = svc.note ? '<div class="note">' + svc.note + '</div>' : '';
+            const noteHtml   = svc.note ? '<div class="note">' + svc.note + '</div>' : '';
 
             return '<div class="service">' +
                 '<div class="service-left">' +
@@ -568,32 +543,33 @@ async function loadStatus() {
 
         document.getElementById('services').innerHTML = html;
 
+        // === BANNER ===
         const banner = document.getElementById('banner');
-        const icon = document.getElementById('banner-icon');
-        const title = document.getElementById('banner-title');
-        const desc = document.getElementById('banner-desc');
+        const icon   = document.getElementById('banner-icon');
+        const title  = document.getElementById('banner-title');
+        const desc   = document.getElementById('banner-desc');
 
-        if (anyDown) {
-            banner.className = 'banner down';
-            icon.textContent = '⚠️';
-            title.textContent = 'Major Outage';
-            desc.textContent = 'Có dịch vụ đang offline';
-        } else if (anyDegraded) {
-            banner.className = 'banner degraded';
-            icon.textContent = '🟡';
-            title.textContent = 'Partial Degradation';
-            desc.textContent = 'Một số dịch vụ đang bảo trì hoặc debug';
-        } else if (!allOk) {
-            banner.className = 'banner degraded';
-            icon.textContent = '🟡';
-            title.textContent = 'Minor Issues';
-            desc.textContent = 'Một số dịch vụ đang gặp sự cố nhỏ';
-        } else {
-            banner.className = 'banner ok';
-            icon.textContent = '✅';
-            title.textContent = 'All Systems Operational';
-            desc.textContent = 'Tất cả dịch vụ đang hoạt động bình thường';
-        }
+       if (anyDown) {
+    banner.className = 'banner down';
+    icon.textContent = '🔴';          
+    title.textContent = 'Hệ thống gặp sự cố';
+    desc.textContent = 'Có dịch vụ đang ngoại tuyến';
+} else if (anyDegraded) {
+    banner.className = 'banner degraded';
+    icon.textContent = '🟡';          
+    title.textContent = 'Hoạt động không ổn định';
+    desc.textContent = 'Một số dịch vụ đang bảo trì hoặc kiểm thử';
+} else if (!allOk) {
+    banner.className = 'banner degraded';
+    icon.textContent = '🟣';          
+    title.textContent = 'Có lỗi nhỏ';
+    desc.textContent = 'Một số dịch vụ đang gặp sự cố nhỏ';
+} else {
+    banner.className = 'banner ok';
+    icon.textContent = '✅';         
+    title.textContent = 'Hệ thống hoạt động bình thường';
+    desc.textContent = 'Tất cả dịch vụ đang hoạt động ổn định';
+}
 
         document.getElementById('updated').textContent = new Date().toLocaleTimeString('vi-VN');
     } catch(e) {
@@ -604,7 +580,6 @@ async function loadStatus() {
 
 loadStatus();
 setInterval(loadStatus, 10000);
-
 </script>
 <script>
 // ============ INCIDENTS LOADER (STATUS PAGE) ============

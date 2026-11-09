@@ -627,7 +627,7 @@ setInterval(async () => {
 // ============================================================
 // MANUAL STATUS
 // ============================================================
-const STATUS_ICONS = { stm32: '🔌 NODE', esp32: '📡 GATEWAY', api: '🌐 Web API', system: '🖥️ SYSTEM' };
+const STATUS_ICONS = { stm32: ' NODE', esp32: 'GATEWAY', system: 'SYSTEM' };
 const PRESET_NOTES = { working: 'Hoạt động bình thường', debug: 'Đang debug', attach: 'Đang gắn module/sensor', testing: 'Đang chạy test', maintenance: 'Đang bảo trì', offline: 'Tạm tắt' };
 
 function applyPreset(status) {
@@ -762,7 +762,7 @@ async function updateServiceStatus() {
 async function updateAllServices() {
     const status = document.getElementById('sel-status').value;
     const note = document.getElementById('inp-note').value.trim();
-    const services = ['stm32', 'esp32', 'api', 'system'];
+    const services = ['node', 'gate', 'server'];
     if (!(await customConfirm('Áp dụng trạng thái "' + status + '" cho TẤT CẢ service?\n\n' + services.join(', ')))) return;
     try {
         for (const svc of services) {
@@ -1693,6 +1693,7 @@ function renderUsersTable() {
         <tr>
             <td>${u.id}</td>
             <td><strong>${escapeHtml(u.username)}</strong></td>
+            <td>${u.displayname || u.username}</td>
             <td><span class="type-badge ${u.role === 'head_admin' ? 'edge' : 'manual'}">${escapeHtml(u.role)}</span></td>
             <td>${u.active ? '<span style="color:#3fb950;">✓ Active</span>' : '<span style="color:#f85149;">✗ Disabled</span>'}</td>
             <td>${u.totp_enabled ? '✓' : '—'}</td>
@@ -1743,7 +1744,13 @@ async function submitUser() {
     const errEl = document.getElementById('user-dialog-error');
     errEl.textContent = '';
     if (editingUserId) {
-        const body = { role };
+        // submitUser()
+const body = {
+    username: document.getElementById('user-form-username').value.trim(),
+    displayname: document.getElementById('user-form-displayname').value.trim() || document.getElementById('user-form-username').value.trim(),
+    password: document.getElementById('user-form-password').value,
+    role: document.getElementById('user-form-role').value
+};
         if (password) body.password = password;
         try {
             const r = await fetchWithTOTP(API + '/api/users/' + editingUserId, {
@@ -2244,8 +2251,8 @@ async function loadTrustedIPs() {
                 <td>${x.active ? '✅' : '❌'}</td>
                 <td style="font-size:11px;">${x.added_at || '—'}</td>
                 <td>
-                    <button class="action-btn" onclick="toggleTrustedIP('${x.ip}', ${x.active ? 0 : 1})">${x.active ? '🔒' : '🔓'}</button>
-                    <button class="action-btn del" onclick="deleteTrustedIP('${x.ip}')">🗑️</button>
+                    <button class="action-btn" onclick="toggleTrustedIP('${x.ip_full}', ${x.active ? 0 : 1})">${x.active ? '🔒' : '🔓'}</button>
+                    <button class="action-btn del" onclick="deleteTrustedIP('${x.ip_full}')">🗑️</button>
                 </td>
             </tr>
         `).join('');
@@ -2253,7 +2260,6 @@ async function loadTrustedIPs() {
         tbody.innerHTML = '<tr><td colspan="6" style="color:#f85149;padding:20px;">Lỗi: ' + e.message + '</td></tr>';
     }
 }
-
 async function loadSessions() {
     const tbody = document.getElementById('sessions-tbody');
     if (!tbody) return;
