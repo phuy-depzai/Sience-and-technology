@@ -226,41 +226,41 @@
         </div>
     </div>
 
-    <h3 class="chart-title" style="margin-top:32px; font-size:18px;">Dashboard Preview</h3>
-    <div class="aqi-banner">
-        <div class="aqi-circle-container">
-            <svg class="aqi-circle" width="200" height="200">
-                <circle class="aqi-circle-bg" cx="100" cy="100" r="90" />
-                <circle class="aqi-circle-progress" id="dbg-aqi-progress" cx="100" cy="100" r="90" />
-            </svg>
-            <div class="aqi-circle-text">
-                <div class="aqi-value" id="dbg-aqi" style="font-size:48px; font-weight:700; color:#4CAF50; line-height:1;">--</div>
-                <div class="aqi-label" style="font-size:14px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-top:4px;">AQI</div>
-            </div>
+    <h3 class="chart-title" style="margin-top:32px; font-size:18px;">Dashboard Preview <span style="font-size:11px; color:var(--text-muted); font-weight:400;">(render bằng đúng hàm của dashboard, không phải code riêng)</span></h3>
+<div class="aqi-banner">
+    <div class="aqi-circle-container">
+        <svg class="aqi-circle" width="200" height="200">
+            <circle class="aqi-circle-bg" cx="100" cy="100" r="90" />
+            <circle class="aqi-circle-progress" id="dbg-aqi-progress" cx="100" cy="100" r="90" />
+        </svg>
+        <div class="aqi-circle-text">
+            <div class="aqi-value" id="dbg-aqi" style="font-size:48px; font-weight:700; color:#4CAF50; line-height:1;">--</div>
+            <div class="aqi-label" style="font-size:14px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-top:4px;">AQI</div>
         </div>
-        <div class="aqi-status" id="dbg-aqi-text" style="display:inline-block; margin-top:16px; padding:4px 16px; border-radius:12px; background:#4CAF50; color:#fff; font-weight:600;">--</div>
     </div>
+    <div class="aqi-status" id="dbg-aqi-text" style="display:inline-block; margin-top:16px; padding:4px 16px; border-radius:12px; background:#4CAF50; color:#fff; font-weight:600;">--</div>
+    <div id="dbg-aqi-meta" style="font-size:12px; color:var(--text-muted); margin-top:12px;"></div>
+</div>
 
-    <!-- Cards Preview: thêm CO, VOC%, NOx% -->
-    <div class="grid">
-        <div class="card temp"><div class="label">Nhiệt độ</div><div class="value"><span id="dbg-card-t">--</span><span class="unit">°C</span></div></div>
-        <div class="card hum"><div class="label">Độ ẩm</div><div class="value"><span id="dbg-card-h">--</span><span class="unit">%</span></div></div>
-        <div class="card volt"><div class="label">Điện áp</div><div class="value"><span id="dbg-card-v">--</span><span class="unit">V</span></div></div>
-        <div class="card curr"><div class="label">Dòng điện</div><div class="value"><span id="dbg-card-i">--</span><span class="unit">mA</span></div></div>
-        <div class="card pm1"><div class="label">PM1.0</div><div class="value"><span id="dbg-card-pm1">--</span><span class="unit">µg/m³</span></div></div>
-        <div class="card pm25"><div class="label">PM2.5</div><div class="value"><span id="dbg-card-pm25">--</span><span class="unit">µg/m³</span></div></div>
-        <div class="card pm10"><div class="label">PM10</div><div class="value"><span id="dbg-card-pm10">--</span><span class="unit">µg/m³</span></div></div>
-        <div class="card co"><div class="label">CO</div><div class="value"><span id="dbg-card-co">--</span><span class="unit">ppm</span></div></div>
-        <div class="card voc"><div class="label">VOC</div><div class="value"><span id="dbg-card-voc_pct">--</span><span class="unit">%</span></div></div>
-        <div class="card nox"><div class="label">NOx</div><div class="value"><span id="dbg-card-nox_pct">--</span><span class="unit">%</span></div></div>
-    </div>
+<div class="grid">
+    <div class="card temp"><div class="label">Nhiệt độ</div><div class="value"><span id="dbg-temp">--</span><span class="unit">°C</span></div></div>
+    <div class="card hum"><div class="label">Độ ẩm</div><div class="value"><span id="dbg-hum">--</span><span class="unit">%</span></div></div>
+    <div class="card volt"><div class="label">Điện áp</div><div class="value"><span id="dbg-volt">--</span><span class="unit">V</span></div></div>
+    <div class="card curr"><div class="label">Dòng điện</div><div class="value"><span id="dbg-curr">--</span><span class="unit">mA</span></div></div>
+    <div class="card pm1"><div class="label">PM1.0</div><div class="value"><span id="dbg-pm1">--</span><span class="unit">µg/m³</span></div></div>
+    <div class="card pm25"><div class="label">PM2.5</div><div class="value"><span id="dbg-pm25">--</span><span class="unit">µg/m³</span></div></div>
+    <div class="card pm10"><div class="label">PM10</div><div class="value"><span id="dbg-pm10">--</span><span class="unit">µg/m³</span></div></div>
+    <div class="card co"><div class="label">CO</div><div class="value"><span id="dbg-co">--</span><span class="unit">ppm</span></div></div>
+    <div class="card voc"><div class="label">VOC</div><div class="value"><span id="dbg-voc_pct">--</span><span class="unit">%</span></div></div>
+    <div class="card nox"><div class="label">NOx</div><div class="value"><span id="dbg-nox_pct">--</span><span class="unit">%</span></div></div>
+</div>
 
-    <!-- Charts: thêm CO và Gas -->
-    <div class="chart-container"><h4 class="chart-title" style="font-size:16px;">Môi trường</h4><canvas id="dbg-chart-env"></canvas></div>
-    <div class="chart-container"><h4 class="chart-title" style="font-size:16px;">Bụi mịn</h4><canvas id="dbg-chart-pm"></canvas></div>
-    <div class="chart-container"><h4 class="chart-title" style="font-size:16px;">Mức độ ô nhiễm khí (VOC & NOx)</h4><canvas id="dbg-chart-gas"></canvas></div>
-    <div class="chart-container"><h4 class="chart-title" style="font-size:16px;">Nồng độ CO</h4><canvas id="dbg-chart-co"></canvas></div>
-    <div class="chart-container"><h4 class="chart-title" style="font-size:16px;">Điện áp & Dòng điện</h4><canvas id="dbg-chart-power"></canvas></div>
+<div class="chart-container"><h4 class="chart-title" style="font-size:16px;">Môi trường</h4><canvas id="dbg-chart-env"></canvas></div>
+<div class="chart-container"><h4 class="chart-title" style="font-size:16px;">Bụi mịn</h4><canvas id="dbg-chart-pm"></canvas></div>
+<div class="chart-container"><h4 class="chart-title" style="font-size:16px;">Mức độ ô nhiễm khí (VOC & NOx)</h4><canvas id="dbg-chart-gas"></canvas></div>
+<div class="chart-container"><h4 class="chart-title" style="font-size:16px;">Nồng độ CO</h4><canvas id="dbg-chart-co"></canvas></div>
+<div class="chart-container"><h4 class="chart-title" style="font-size:16px;">Điện áp</h4><canvas id="dbg-chart-volt"></canvas></div>
+<div class="chart-container"><h4 class="chart-title" style="font-size:16px;">Dòng điện</h4><canvas id="dbg-chart-curr"></canvas></div>
 </section>
 
 <!-- TAB 4: LOG -->

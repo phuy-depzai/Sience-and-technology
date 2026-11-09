@@ -111,8 +111,8 @@ function fmtAgo(min) {
     return h > 0 ? d + 'd ' + h + 'h trước' : d + ' ngày trước';
 }
 
-let chartEnv = null, chartVolt = null, chartCurr = null, chartPm = null, chartGas = null, chartCo = null;
-
+const dashCharts  = { env: null, volt: null, curr: null, pm: null, gas: null, co: null };
+const debugCharts = { env: null, volt: null, curr: null, pm: null, gas: null, co: null };
 function getLocalDate() {
     const now = new Date();
     const vnTime = new Date(now.getTime() + (7 * 3600 * 1000));
@@ -256,11 +256,12 @@ async function updateAQIFromServer() {
         }
     } catch(e) { console.error('[AQI]', e); }
 }
-function renderAQIBanner(aqi, level, metaText) {
-    const aqiEl = document.getElementById('aqi');
-    const textEl = document.getElementById('aqi-text');
-    const progress = document.getElementById('aqi-progress');
-    const meta = document.getElementById('aqi-meta');
+function renderAQIBanner(aqi, level, metaText, idPrefix = '') {
+    const $ = (id) => document.getElementById(idPrefix + id);
+    const aqiEl = $('aqi');
+    const textEl = $('aqi-text');
+    const progress = $('aqi-progress');
+    const meta = $('aqi-meta');
     if (!aqiEl) return;
 
     if (!aqi) {
@@ -317,16 +318,21 @@ function updateAQIForDate(data, dateStr) {
 // ============================================================
 // UPDATE CARDS
 // ============================================================
-function updateCards(data) {
+function updateCards(data, idPrefix = '', chartCtx = dashCharts) {
+    const $ = (id) => document.getElementById(idPrefix + id);
+
     if (!data.length) {
-        setStatus(false);
-        ['temp','hum','volt','curr','pm1','pm25','pm10','aqi','co','voc_pct','nox_pct'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '--'; });
+        if (!idPrefix) setStatus(false);
+        ['temp','hum','volt','curr','pm1','pm25','pm10','co','voc_pct','nox_pct'].forEach(id => {
+            const el = $(id);
+            if (el) el.textContent = '--';
+        });
         return;
     }
     const last = data[data.length - 1];
 
     const animateNumber = (id, nv, dec = 0, scale = 1) => {
-        const el = document.getElementById(id); if (!el) return;
+        const el = $(id); if (!el) return;
         if (nv === undefined || nv === null) { el.textContent = '--'; return; }
         const target = nv * scale;
         const cur = el.textContent.replace(/[^0-9.-]+/g, '');
@@ -357,31 +363,24 @@ function updateCards(data) {
     animateNumber('voc_pct', last.voc_pct, 1);
     animateNumber('nox_pct', last.nox_pct, 1);
 
-    applyCardIntensity('pm25', last.pm25, 'pm25');
-    applyCardIntensity('pm10', last.pm10, 'pm10');
-    applyCardIntensity('co', last.co, 'co');
-    applyCardIntensity('voc_pct', last.voc_pct, 'voc_pct');
-    applyCardIntensity('nox_pct', last.nox_pct, 'nox_pct');
+    applyCardIntensity(idPrefix + 'pm25', last.pm25, 'pm25');
+    applyCardIntensity(idPrefix + 'pm10', last.pm10, 'pm10');
+    applyCardIntensity(idPrefix + 'co', last.co, 'co');
+    applyCardIntensity(idPrefix + 'voc_pct', last.voc_pct, 'voc_pct');
+    applyCardIntensity(idPrefix + 'nox_pct', last.nox_pct, 'nox_pct');
 
-    const u = document.getElementById('updated'); if (u) u.textContent = last.ts;
-    renderGasChart(last.voc_pct, last.nox_pct);
-    setStatus(true);
+    if (!idPrefix) {
+        const u = document.getElementById('updated');
+        if (u) u.textContent = last.ts;
+    }
+    renderGasChart(last.voc_pct, last.nox_pct, idPrefix, chartCtx);
+    if (!idPrefix) setStatus(true);
 }
-
-function getTextColor() { return document.body.classList.contains('light') ? '#666' : '#8899a6'; }
-function getGridColor() { return document.body.classList.contains('light') ? '#e0e0e0' : '#2a3040'; }
-function getLegendColor() { return document.body.classList.contains('light') ? '#1a1f2e' : '#e7e9ea'; }
-
-function timeScaleX() { return { type: 'time', time: { unit: 'hour', displayFormats: { hour: 'HH:mm', minute: 'HH:mm' }, tooltipFormat: 'HH:mm:ss dd/MM' }, ticks: { color: getTextColor(), maxTicksLimit: 10, autoSkip: true }, grid: { color: getGridColor() } }; }
-function baseOptions(t, c) { return { responsive: true, maintainAspectRatio: false, animation: { duration: 1500, easing: 'easeOutQuart' }, interaction: { mode: 'index', intersect: false }, plugins: { legend: { labels: { color: getLegendColor() } } }, scales: { x: timeScaleX(), y: { position: 'left', ticks: { color: c }, grid: { color: getGridColor() }, title: { display: true, text: t, color: c } } } }; }
-function downsample(d, m) { if (d.length <= m) return d; const s = (d.length - 1) / (m - 1); const o = []; for (let i = 0; i < m; i++) o.push(d[Math.round(i * s)]); return o; }
-function toPoints(a, k, sc) { sc = sc || 1; return a.map(d => { const v = d[k] !== undefined && d[k] !== null ? Number(d[k]) : null; return { x: tsToMs(d.ts), y: v !== null ? v * sc : null }; }); }
-
 // ============================================================
 // CHART GAS
 // ============================================================
-function renderGasChart(vocPct, noxPct) {
-    const canvas = document.getElementById('chart-gas');
+function renderGasChart(vocPct, noxPct, idPrefix = '', chartCtx = dashCharts) {
+    const canvas = document.getElementById(idPrefix + 'chart-gas');
     if (!canvas || typeof Chart === 'undefined') return;
 
     const vocI = getIntensity(vocPct || 100, 'voc_pct');
@@ -392,13 +391,13 @@ function renderGasChart(vocPct, noxPct) {
     const bgColors = [hexToRgba(vocI.color, vocI.opacity), hexToRgba(noxI.color, noxI.opacity)];
     const borderColors = [vocI.color, noxI.color];
 
-    if (chartGas) {
-        chartGas.data.datasets[0].data = [parseFloat(v.toFixed(1)), parseFloat(n.toFixed(1))];
-        chartGas.data.datasets[0].backgroundColor = bgColors;
-        chartGas.data.datasets[0].borderColor = borderColors;
-        chartGas.update();
+    if (chartCtx.gas) {
+        chartCtx.gas.data.datasets[0].data = [parseFloat(v.toFixed(1)), parseFloat(n.toFixed(1))];
+        chartCtx.gas.data.datasets[0].backgroundColor = bgColors;
+        chartCtx.gas.data.datasets[0].borderColor = borderColors;
+        chartCtx.gas.update();
     } else {
-        chartGas = new Chart(canvas, {
+        chartCtx.gas = new Chart(canvas, {
             type: 'bar',
             data: {
                 labels: ['VOC (%)', 'NOx (%)'],
@@ -407,9 +406,7 @@ function renderGasChart(vocPct, noxPct) {
                     data: [parseFloat(v.toFixed(1)), parseFloat(n.toFixed(1))],
                     backgroundColor: bgColors,
                     borderColor: borderColors,
-                    borderWidth: 2,
-                    borderRadius: 6,
-                    maxBarThickness: 60
+                    borderWidth: 2, borderRadius: 6, maxBarThickness: 60
                 }]
             },
             options: {
@@ -431,86 +428,75 @@ function renderGasChart(vocPct, noxPct) {
 // ============================================================
 // CHART CO
 // ============================================================
-function renderCoChart(data) {
-    const canvas = document.getElementById('chart-co');
+function renderCoChart(data, idPrefix = '', chartCtx = dashCharts) {
+    const canvas = document.getElementById(idPrefix + 'chart-co');
     if (!canvas || typeof Chart === 'undefined') return;
     if (!data || !data.length) {
-        if (chartCo) { chartCo.destroy(); chartCo = null; }
+        if (chartCtx.co) { chartCtx.co.destroy(); chartCtx.co = null; }
         return;
     }
     const s = downsample(data, 80);
-    if (chartCo) chartCo.destroy();
-    chartCo = new Chart(canvas, {
+    if (chartCtx.co) chartCtx.co.destroy();
+    chartCtx.co = new Chart(canvas, {
         type: 'line',
-        data: {
-            datasets: [{
-                label: 'CO (ppm)',
-                data: toPoints(s, 'co'),
-                borderColor: (ctx) => makeValueGradient(ctx, 'co', 'y'),
-                backgroundColor: (ctx) => makeValueGradient(ctx, 'co', 'y'),
-                tension: 0, cubicInterpolationMode: 'monotone',
-                pointRadius: 0, borderWidth: 2, fill: true
-            }]
-        },
-        options: (() => {
-            const o = baseOptions('CO (ppm)', '#FF5722');
-            o.scales.y.suggestedMax = 20;
-            return o;
-        })()
+        data: { datasets: [{
+            label: 'CO (ppm)',
+            data: toPoints(s, 'co'),
+            borderColor: (ctx) => makeValueGradient(ctx, 'co', 'y'),
+            backgroundColor: (ctx) => makeValueGradient(ctx, 'co', 'y'),
+            tension: 0, cubicInterpolationMode: 'monotone',
+            pointRadius: 0, borderWidth: 2, fill: true
+        }] },
+        options: (() => { const o = baseOptions('CO (ppm)', '#FF5722'); o.scales.y.suggestedMax = 20; return o; })()
     });
 }
-
 // ============================================================
 // RENDER ALL CHARTS
 // ============================================================
-function renderCharts(data) {
-    const envCanvas = document.getElementById('chart-env');
+function renderCharts(data, idPrefix = '', chartCtx = dashCharts) {
+    const $ = (id) => document.getElementById(idPrefix + id);
+    const envCanvas = $('chart-env');
     if (!envCanvas) return;
 
     if (!data.length) {
-        if (chartEnv) { chartEnv.destroy(); chartEnv = null; }
-        if (chartPm) { chartPm.destroy(); chartPm = null; }
-        if (chartVolt) { chartVolt.destroy(); chartVolt = null; }
-        if (chartCurr) { chartCurr.destroy(); chartCurr = null; }
-        if (chartCo) { chartCo.destroy(); chartCo = null; }
+        ['env','pm','volt','curr','co'].forEach(k => {
+            if (chartCtx[k]) { chartCtx[k].destroy(); chartCtx[k] = null; }
+        });
         return;
     }
 
     const s = downsample(data, 80);
 
-    if (chartEnv) chartEnv.destroy();
-    chartEnv = new Chart(envCanvas, { type: 'line', data: { datasets: [
+    if (chartCtx.env) chartCtx.env.destroy();
+    chartCtx.env = new Chart(envCanvas, { type: 'line', data: { datasets: [
         { label: 'Nhiệt độ (°C)', data: toPoints(s, 't'), borderColor: '#f44336', backgroundColor: 'rgba(244,67,54,0.1)', tension: 0, cubicInterpolationMode: 'monotone', pointRadius: 0, borderWidth: 2, yAxisID: 'y_temp' },
         { label: 'Độ ẩm (%)', data: toPoints(s, 'h'), borderColor: '#2196F3', backgroundColor: 'rgba(33,150,243,0.1)', tension: 0, cubicInterpolationMode: 'monotone', pointRadius: 0, borderWidth: 2, yAxisID: 'y_hum' }
     ] }, options: { responsive: true, maintainAspectRatio: false, animation: { duration: 1500, easing: 'easeOutQuart' }, interaction: { mode: 'index', intersect: false }, plugins: { legend: { labels: { color: getLegendColor() } } }, scales: { x: timeScaleX(), y_temp: { position: 'left', ticks: { color: '#f44336' }, grid: { color: getGridColor() }, title: { display: true, text: 'Nhiệt độ (°C)', color: '#f44336' } }, y_hum: { position: 'right', ticks: { color: '#2196F3' }, grid: { drawOnChartArea: false }, title: { display: true, text: 'Độ ẩm (%)', color: '#2196F3' } } } } });
 
-    const pmCanvas = document.getElementById('chart-pm');
+    const pmCanvas = $('chart-pm');
     if (pmCanvas) {
-        if (chartPm) chartPm.destroy();
-        chartPm = new Chart(pmCanvas, { type: 'line', data: { datasets: [
+        if (chartCtx.pm) chartCtx.pm.destroy();
+        chartCtx.pm = new Chart(pmCanvas, { type: 'line', data: { datasets: [
             { label: 'PM1.0 (µg/m³)', data: toPoints(s, 'pm1'), borderColor: '#FFC107', backgroundColor: 'rgba(255,193,7,0.1)', tension: 0, cubicInterpolationMode: 'monotone', pointRadius: 0, borderWidth: 2, yAxisID: 'y_pm' },
             { label: 'PM2.5 (µg/m³)', data: toPoints(s, 'pm25'), borderColor: '#FF5722', backgroundColor: 'rgba(255,87,34,0.1)', tension: 0, cubicInterpolationMode: 'monotone', pointRadius: 0, borderWidth: 2, yAxisID: 'y_pm' },
             { label: 'PM10 (µg/m³)', data: toPoints(s, 'pm10'), borderColor: '#FF9800', backgroundColor: 'rgba(255,152,0,0.1)', tension: 0, cubicInterpolationMode: 'monotone', pointRadius: 0, borderWidth: 2, yAxisID: 'y_pm' }
         ] }, options: { responsive: true, maintainAspectRatio: false, animation: { duration: 1500, easing: 'easeOutQuart' }, interaction: { mode: 'index', intersect: false }, plugins: { legend: { labels: { color: getLegendColor() } } }, scales: { x: timeScaleX(), y_pm: { position: 'left', ticks: { color: '#FF5722' }, grid: { color: getGridColor() }, title: { display: true, text: 'Bụi mịn (µg/m³)', color: '#FF5722' } } } } });
     }
 
-    renderCoChart(data);
+    renderCoChart(data, idPrefix, chartCtx);
 
-    if (!isAdmin()) return;
-
-    const voltCanvas = document.getElementById('chart-volt');
+    const voltCanvas = $('chart-volt');
     if (voltCanvas) {
-        if (chartVolt) chartVolt.destroy();
-        chartVolt = new Chart(voltCanvas, { type: 'line', data: { datasets: [{ label: 'Điện áp (V)', data: toPoints(s, 'v'), borderColor: '#FF9800', backgroundColor: 'rgba(255,152,0,0.1)', tension: 0, cubicInterpolationMode: 'monotone', pointRadius: 0, borderWidth: 2, fill: true }] }, options: (() => { const o = baseOptions('Điện áp (V)', '#FF9800'); o.scales.y.min = 2.0; o.scales.y.max = 3.6; return o; })() });
+        if (chartCtx.volt) chartCtx.volt.destroy();
+        chartCtx.volt = new Chart(voltCanvas, { type: 'line', data: { datasets: [{ label: 'Điện áp (V)', data: toPoints(s, 'v'), borderColor: '#FF9800', backgroundColor: 'rgba(255,152,0,0.1)', tension: 0, cubicInterpolationMode: 'monotone', pointRadius: 0, borderWidth: 2, fill: true }] }, options: (() => { const o = baseOptions('Điện áp (V)', '#FF9800'); o.scales.y.min = 2.0; o.scales.y.max = 3.6; return o; })() });
     }
 
-    const currCanvas = document.getElementById('chart-curr');
+    const currCanvas = $('chart-curr');
     if (currCanvas) {
-        if (chartCurr) chartCurr.destroy();
-        chartCurr = new Chart(currCanvas, { type: 'line', data: { datasets: [{ label: 'Dòng điện (mA)', data: toPoints(s, 'i', 1000), borderColor: '#9C27B0', backgroundColor: 'rgba(156,39,176,0.1)', tension: 0, cubicInterpolationMode: 'monotone', pointRadius: 0, borderWidth: 2, fill: true }] }, options: (() => { const o = baseOptions('Dòng điện (mA)', '#9C27B0'); o.scales.y.min = 0; o.scales.y.max = 100; return o; })() });
+        if (chartCtx.curr) chartCtx.curr.destroy();
+        chartCtx.curr = new Chart(currCanvas, { type: 'line', data: { datasets: [{ label: 'Dòng điện (mA)', data: toPoints(s, 'i', 1000), borderColor: '#9C27B0', backgroundColor: 'rgba(156,39,176,0.1)', tension: 0, cubicInterpolationMode: 'monotone', pointRadius: 0, borderWidth: 2, fill: true }] }, options: (() => { const o = baseOptions('Dòng điện (mA)', '#9C27B0'); o.scales.y.min = 0; o.scales.y.max = 100; return o; })() });
     }
 }
-
 // ============================================================
 // LOAD DATA
 // ============================================================
@@ -598,14 +584,13 @@ function updateFromWS(d) {
 
 function addPointToCharts(d) {
     const now = Date.now();
-    if (chartEnv) { chartEnv.data.datasets[0].data.push({ x: now, y: d.t }); chartEnv.data.datasets[1].data.push({ x: now, y: d.h }); if (chartEnv.data.datasets[0].data.length > 200) chartEnv.data.datasets.forEach(ds => ds.data.shift()); chartEnv.update(); }
-    if (chartPm) { chartPm.data.datasets[0].data.push({ x: now, y: d.pm1 || 0 }); chartPm.data.datasets[1].data.push({ x: now, y: d.pm25 || 0 }); chartPm.data.datasets[2].data.push({ x: now, y: d.pm10 || 0 }); if (chartPm.data.datasets[0].data.length > 200) chartPm.data.datasets.forEach(ds => ds.data.shift()); chartPm.update(); }
-    if (chartCo && d.co !== undefined) { chartCo.data.datasets[0].data.push({ x: now, y: d.co }); if (chartCo.data.datasets[0].data.length > 200) chartCo.data.datasets[0].data.shift(); chartCo.update(); }
+    if (dashCharts.env) { dashCharts.env.data.datasets[0].data.push({ x: now, y: d.t }); dashCharts.env.data.datasets[1].data.push({ x: now, y: d.h }); if (dashCharts.env.data.datasets[0].data.length > 200) dashCharts.env.data.datasets.forEach(ds => ds.data.shift()); dashCharts.env.update(); }
+    if (dashCharts.pm) { dashCharts.pm.data.datasets[0].data.push({ x: now, y: d.pm1 || 0 }); dashCharts.pm.data.datasets[1].data.push({ x: now, y: d.pm25 || 0 }); dashCharts.pm.data.datasets[2].data.push({ x: now, y: d.pm10 || 0 }); if (dashCharts.pm.data.datasets[0].data.length > 200) dashCharts.pm.data.datasets.forEach(ds => ds.data.shift()); dashCharts.pm.update(); }
+    if (dashCharts.co && d.co !== undefined) { dashCharts.co.data.datasets[0].data.push({ x: now, y: d.co }); if (dashCharts.co.data.datasets[0].data.length > 200) dashCharts.co.data.datasets[0].data.shift(); dashCharts.co.update(); }
     if (!isAdmin()) return;
-    if (chartVolt) { chartVolt.data.datasets[0].data.push({ x: now, y: d.v }); if (chartVolt.data.datasets[0].data.length > 200) chartVolt.data.datasets[0].data.shift(); chartVolt.update(); }
-    if (chartCurr) { chartCurr.data.datasets[0].data.push({ x: now, y: d.i * 1000 }); if (chartCurr.data.datasets[0].data.length > 200) chartCurr.data.datasets[0].data.shift(); chartCurr.update(); }
+    if (dashCharts.volt) { dashCharts.volt.data.datasets[0].data.push({ x: now, y: d.v }); if (dashCharts.volt.data.datasets[0].data.length > 200) dashCharts.volt.data.datasets[0].data.shift(); dashCharts.volt.update(); }
+    if (dashCharts.curr) { dashCharts.curr.data.datasets[0].data.push({ x: now, y: d.i * 1000 }); if (dashCharts.curr.data.datasets[0].data.length > 200) dashCharts.curr.data.datasets[0].data.shift(); dashCharts.curr.update(); }
 }
-
 setInterval(async () => {
     const di = document.getElementById('date-picker');
     const t = getLocalDate();
@@ -1249,136 +1234,23 @@ async function restoreDebugRecord(id) {
 
 function renderDebugDashboard(data) {
     if (!data || !data.length) {
-        ['dbg-card-t','dbg-card-h','dbg-card-v','dbg-card-i','dbg-card-pm1','dbg-card-pm25','dbg-card-pm10','dbg-card-co','dbg-card-voc_pct','dbg-card-nox_pct'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '--'; });
-        const aqiEl = document.getElementById('dbg-aqi'); if (aqiEl) aqiEl.textContent = '--';
+        updateCards([], 'dbg-', debugCharts);
+        renderCharts([], 'dbg-', debugCharts);
+        renderAQIBanner(null, null, 'Chưa có record', 'dbg-');
         return;
     }
+    // debugData là DESC → reverse để dashboard hiểu (ASC)
+    const ascData = data.slice().reverse();
+    updateCards(ascData, 'dbg-', debugCharts);
+    renderCharts(ascData, 'dbg-', debugCharts);
+
+    // AQI preview tính từ record mới nhất
     const last = data[0];
-    const set = (id, val, dec) => { const el = document.getElementById(id); if (el) el.textContent = (val !== undefined && val !== null) ? Number(val).toFixed(dec) : '--'; };
-    set('dbg-card-t', last.t, 2);
-    set('dbg-card-h', last.h, 2);
-    set('dbg-card-v', last.v, 3);
-    set('dbg-card-i', (last.i||0) * 1000, 2);
-    set('dbg-card-pm1', last.pm1, 0);
-    set('dbg-card-pm25', last.pm25, 0);
-    set('dbg-card-pm10', last.pm10, 0);
-    set('dbg-card-co', last.co, 2);
-    set('dbg-card-voc_pct', last.voc_pct, 1);
-    set('dbg-card-nox_pct', last.nox_pct, 1);
-
-    applyCardIntensity('dbg-card-pm25', last.pm25, 'pm25');
-    applyCardIntensity('dbg-card-pm10', last.pm10, 'pm10');
-    applyCardIntensity('dbg-card-co', last.co, 'co');
-    applyCardIntensity('dbg-card-voc_pct', last.voc_pct, 'voc_pct');
-    applyCardIntensity('dbg-card-nox_pct', last.nox_pct, 'nox_pct');
-
     const aqi = calcAQI(last.pm25 || 0, last.pm10 || 0, last.co || 0);
-    const aqiEl = document.getElementById('dbg-aqi');
-    const aqiText = document.getElementById('dbg-aqi-text');
-    const progress = document.getElementById('dbg-aqi-progress');
-    let text = '', color = '';
-    if (aqi <= 50) { text = 'Tốt'; color = '#4CAF50'; }
-    else if (aqi <= 100) { text = 'Trung bình'; color = '#FFEB3B'; }
-    else if (aqi <= 150) { text = 'Kém'; color = '#FF9800'; }
-    else if (aqi <= 200) { text = 'Xấu'; color = '#F44336'; }
-    else if (aqi <= 300) { text = 'Rất xấu'; color = '#9C27B0'; }
-    else { text = 'Nguy hại'; color = '#7B1FA2'; }
-    if (aqiEl) { aqiEl.textContent = aqi; aqiEl.style.color = color; }
-    if (aqiText) { aqiText.textContent = text; aqiText.style.backgroundColor = color; aqiText.style.color = (color === '#FFEB3B') ? '#000' : '#fff'; }
-    if (progress) { const circ = 2 * Math.PI * 90; const pct = Math.min(aqi / 300, 1); progress.style.strokeDashoffset = circ - (pct * circ); progress.style.stroke = color; }
-    renderDebugCharts(data);
-}
-
-function renderDebugCharts(data) {
-    if (typeof Chart === 'undefined') return;
-    const sorted = data.slice().sort((a,b) => String(a.ts||'').localeCompare(String(b.ts||'')));
-    const maxPts = 80;
-    const step = Math.max(1, Math.ceil(sorted.length / maxPts));
-    const s = sorted.filter((_, i) => i % step === 0);
-
-    if (dbgChartEnv) dbgChartEnv.destroy();
-    const envEl = document.getElementById('dbg-chart-env');
-    if (envEl) {
-        dbgChartEnv = new Chart(envEl, {
-            type: 'line',
-            data: { labels: s.map(d => d.ts || ''), datasets: [
-                { label: 'Nhiệt độ (°C)', data: s.map(d => d.t), borderColor: '#f44336', backgroundColor: 'rgba(244,67,54,0.1)', tension: 0.2, pointRadius: 0, yAxisID: 'y1' },
-                { label: 'Độ ẩm (%)', data: s.map(d => d.h), borderColor: '#2196F3', backgroundColor: 'rgba(33,150,243,0.1)', tension: 0.2, pointRadius: 0, yAxisID: 'y2' }
-            ] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: getLegendColor() } } }, scales: { x: { ticks: { color: getTextColor(), maxTicksLimit: 8 }, grid: { color: getGridColor() } }, y1: { position: 'left', ticks: { color: '#f44336' }, grid: { color: getGridColor() } }, y2: { position: 'right', ticks: { color: '#2196F3' }, grid: { drawOnChartArea: false } } } }
-        });
-    }
-
-    if (dbgChartPm) dbgChartPm.destroy();
-    const pmEl = document.getElementById('dbg-chart-pm');
-    if (pmEl) {
-        dbgChartPm = new Chart(pmEl, {
-            type: 'line',
-            data: { labels: s.map(d => d.ts || ''), datasets: [
-                { label: 'PM1.0', data: s.map(d => d.pm1), borderColor: '#FFC107', backgroundColor: 'rgba(255,193,7,0.1)', tension: 0.2, pointRadius: 0 },
-                { label: 'PM2.5', data: s.map(d => d.pm25), borderColor: '#FF5722', backgroundColor: 'rgba(255,87,34,0.1)', tension: 0.2, pointRadius: 0 },
-                { label: 'PM10', data: s.map(d => d.pm10), borderColor: '#FF9800', backgroundColor: 'rgba(255,152,0,0.1)', tension: 0.2, pointRadius: 0 }
-            ] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: getLegendColor() } } }, scales: { x: { ticks: { color: getTextColor(), maxTicksLimit: 8 }, grid: { color: getGridColor() } }, y: { ticks: { color: '#FF5722' }, grid: { color: getGridColor() } } } }
-        });
-    }
-
-    if (dbgChartGas) dbgChartGas.destroy();
-    const gasEl = document.getElementById('dbg-chart-gas');
-    if (gasEl && s.length > 0) {
-        const last = s[s.length - 1];
-        const vocI = getIntensity(last.voc_pct || 100, 'voc_pct');
-        const noxI = getIntensity(last.nox_pct || 100, 'nox_pct');
-        const v = (last.voc_pct && last.voc_pct > 0) ? last.voc_pct : 100;
-        const n = (last.nox_pct && last.nox_pct > 0) ? last.nox_pct : 100;
-
-        dbgChartGas = new Chart(gasEl, {
-            type: 'bar',
-            data: {
-                labels: ['VOC (%)', 'NOx (%)'],
-                datasets: [{
-                    label: 'So với không khí sạch',
-                    data: [parseFloat(v.toFixed(1)), parseFloat(n.toFixed(1))],
-                    backgroundColor: [hexToRgba(vocI.color, vocI.opacity), hexToRgba(noxI.color, noxI.opacity)],
-                    borderColor: [vocI.color, noxI.color],
-                    borderWidth: 2, borderRadius: 6, maxBarThickness: 60
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, suggestedMax: 130, ticks: { color: getTextColor(), callback: (v) => v + '%' }, grid: { color: getGridColor() } }, x: { barPercentage: 0.5, categoryPercentage: 0.5, ticks: { color: getTextColor() }, grid: { display: false } } } }
-        });
-    }
-
-    if (dbgChartCo) dbgChartCo.destroy();
-    const coEl = document.getElementById('dbg-chart-co');
-    if (coEl) {
-        dbgChartCo = new Chart(coEl, {
-            type: 'line',
-            data: {
-                labels: s.map(d => d.ts || ''),
-                datasets: [{
-                    label: 'CO (ppm)',
-                    data: s.map(d => d.co),
-                    borderColor: (ctx) => makeValueGradient(ctx, 'co', 'y'),
-                    backgroundColor: (ctx) => makeValueGradient(ctx, 'co', 'y'),
-                    tension: 0.2, pointRadius: 0, fill: true
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: getLegendColor() } } }, scales: { x: { ticks: { color: getTextColor(), maxTicksLimit: 8 }, grid: { color: getGridColor() } }, y: { suggestedMax: 20, ticks: { color: '#FF5722' }, grid: { color: getGridColor() } } } }
-        });
-    }
-
-    if (dbgChartPower) dbgChartPower.destroy();
-    const pwEl = document.getElementById('dbg-chart-power');
-    if (pwEl) {
-        dbgChartPower = new Chart(pwEl, {
-            type: 'line',
-            data: { labels: s.map(d => d.ts || ''), datasets: [
-                { label: 'Điện áp (V)', data: s.map(d => d.v), borderColor: '#FF9800', backgroundColor: 'rgba(255,152,0,0.1)', tension: 0.2, pointRadius: 0, yAxisID: 'yv' },
-                { label: 'Dòng (mA)', data: s.map(d => (d.i||0)*1000), borderColor: '#9C27B0', backgroundColor: 'rgba(156,39,176,0.1)', tension: 0.2, pointRadius: 0, yAxisID: 'yi' }
-            ] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: getLegendColor() } } }, scales: { x: { ticks: { color: getTextColor(), maxTicksLimit: 8 }, grid: { color: getGridColor() } }, yv: { position: 'left', ticks: { color: '#FF9800' }, grid: { color: getGridColor() } }, yi: { position: 'right', ticks: { color: '#9C27B0' }, grid: { drawOnChartArea: false } } } }
-        });
-    }
+    const level = aqi <= 50 ? 'Tốt' : aqi <= 100 ? 'Trung bình' :
+                  aqi <= 150 ? 'Kém' : aqi <= 200 ? 'Xấu' :
+                  aqi <= 300 ? 'Rất xấu' : 'Nguy hại';
+    renderAQIBanner(aqi, level, `Tính từ record #${last.id} (1 điểm)`, 'dbg-');
 }
 
 // ============================================================
