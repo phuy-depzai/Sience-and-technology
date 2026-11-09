@@ -1,5 +1,8 @@
 const API = 'https://airwatch.io.vn';
 
+function getTextColor()   { return document.body.classList.contains('light') ? '#666'     : '#8899a6'; }
+function getGridColor()   { return document.body.classList.contains('light') ? '#e0e0e0' : '#2a3040'; }
+function getLegendColor() { return document.body.classList.contains('light') ? '#1a1f2e' : '#e7e9ea'; }
 // ============================================================
 // INTENSITY THRESHOLDS — QCVN 05:2023/BTNMT
 // ============================================================
