@@ -141,12 +141,12 @@ function tsToMs(ts) {
     if (isAdmin()) {
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = '');
         if (btn) btn.textContent = 'Admin ▾';
-        if (action) action.textContent = '🚪 Đăng xuất';
+        if (action) action.textContent = 'Đăng xuất';
         loadSystemData();
     } else {
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
         if (btn) btn.textContent = 'Guest ▾';
-        if (action) action.textContent = '🔑 Đăng nhập';
+        if (action) action.textContent = 'Đăng nhập';
     }
     applyTheme();
     const today = getLocalDate();
@@ -166,7 +166,7 @@ document.addEventListener('click', () => { const m = document.getElementById('dr
 function handleAuthAction() { if (isAdmin()) logout(); else window.location.href = '/'; }
 function toggleTheme() { const isLight = document.body.classList.toggle('light'); localStorage.setItem('theme', isLight ? 'light' : 'dark'); updateThemeLabel(); const di = document.getElementById('date-picker'); if (di && di.value) loadByDate(); }
 function applyTheme() { const s = localStorage.getItem('theme') || 'dark'; if (s === 'light') document.body.classList.add('light'); else document.body.classList.remove('light'); updateThemeLabel(); }
-function updateThemeLabel() { const i = document.getElementById('theme-icon'), l = document.getElementById('theme-label'); if (!i || !l) return; if (document.body.classList.contains('light')) { i.textContent = '☀️'; l.textContent = 'Chế độ sáng'; } else { i.textContent = '🌙'; l.textContent = 'Chế độ tối'; } }
+function updateThemeLabel() { const i = document.getElementById('theme-icon'), l = document.getElementById('theme-label'); if (!i || !l) return; if (document.body.classList.contains('light')) { i.textContent = ''; l.textContent = 'Chế độ sáng'; } else { i.textContent = ''; l.textContent = 'Chế độ tối'; } }
 
 async function loadSystemData() {
     try {
@@ -251,7 +251,7 @@ async function updateAQIFromServer() {
             if (d.components.pm10_avg != null) parts.push(`PM10 TB24h: ${d.components.pm10_avg.toFixed(1)} µg/m³`);
             if (d.components.co_avg != null) parts.push(`CO TB8h: ${d.components.co_avg.toFixed(2)} ppm`);
             let txt = parts.join(' · ');
-            if (d.status === 'partial') txt += ` (${d.hours_count}/24h ⚠ đang cập nhật)`;
+            if (d.status === 'partial') txt += ` (${d.hours_count}/24h đang cập nhật)`;
             meta.textContent = txt;
         }
     } catch(e) { console.error('[AQI]', e); }
@@ -521,15 +521,7 @@ async function loadToday() {
     const d = await fetchDataByDate(t);
     updateCards(d);
     renderCharts(d);
-    async function loadToday() {
-    const t = getLocalDate();
-    const di = document.getElementById('date-picker');
-    if (di) di.value = t;
-    const d = await fetchDataByDate(t);
-    updateCards(d);
-    renderCharts(d);
-    updateAQIFromServer();  // ← Thêm dòng này
-}
+    updateAQIFromServer();
 }
 
 async function loadByDate() {
@@ -627,7 +619,7 @@ setInterval(async () => {
 // ============================================================
 // MANUAL STATUS
 // ============================================================
-const STATUS_ICONS = { stm32: ' NODE', esp32: 'GATEWAY', system: 'SYSTEM' };
+const STATUS_ICONS = { node: 'NODE', gate: 'GATEWAY', server: 'SERVER' };
 const PRESET_NOTES = { working: 'Hoạt động bình thường', debug: 'Đang debug', attach: 'Đang gắn module/sensor', testing: 'Đang chạy test', maintenance: 'Đang bảo trì', offline: 'Tạm tắt' };
 
 function applyPreset(status) {
@@ -656,7 +648,7 @@ function initNodesMap() {
         document.getElementById('node-lat').value = lat;
         document.getElementById('node-lng').value = lng;
         if (window._tempMarker) adminMap.removeLayer(window._tempMarker);
-        window._tempMarker = L.circleMarker([lat, lng], { radius: 8, fillColor: '#58a6ff', color: '#fff', weight: 2, fillOpacity: 0.9 }).addTo(adminMap).bindPopup('📍 ' + lat + ', ' + lng).openPopup();
+        window._tempMarker = L.circleMarker([lat, lng], { radius: 8, fillColor: '#58a6ff', color: '#fff', weight: 2, fillOpacity: 0.9 }).addTo(adminMap).bindPopup(lat + ', ' + lng).openPopup();
     });
     setTimeout(() => adminMap.invalidateSize(), 200);
     loadNodesOnMap();
@@ -714,7 +706,7 @@ async function loadNodes() {
         const lastMs = lastData ? tsToMs(lastData.ts) : 0;
         const diffMin = lastMs ? Math.floor((Date.now() - lastMs) / 60000) : 99999;
         const status = diffMin < 15 ? 'working' : diffMin < 60 ? 'delayed' : 'offline';
-        box.innerHTML = nodes.map(n => `<div class="node-row"><div class="node-info"><div class="node-name">${escapeHtml(n.name || n.id || 'Node')}</div><div class="node-meta">${(n.lat||0).toFixed(4)}, ${(n.lng||0).toFixed(4)}</div></div><div class="node-status"><span class="status-dot ${status}"></span><span class="status-label ${status}">${status}</span></div><div class="node-last">${diffMin < 99999 ? fmtAgo(diffMin) : 'chưa có data'}</div><button class="node-delete" onclick="deleteNode('${n.id}', '${(n.name || n.id).replace(/'/g, "\\'")}')" title="Xóa node">🗑️</button></div>`).join('');
+        box.innerHTML = nodes.map(n => `<div class="node-row"><div class="node-info"><div class="node-name">${escapeHtml(n.name || n.id || 'Node')}</div><div class="node-meta">${(n.lat||0).toFixed(4)}, ${(n.lng||0).toFixed(4)}</div></div><div class="node-status"><span class="status-dot ${status}"></span><span class="status-label ${status}">${status}</span></div><div class="node-last">${diffMin < 99999 ? fmtAgo(diffMin) : 'chưa có data'}</div><button class="node-delete" onclick="deleteNode('${n.id}', '${(n.name || n.id).replace(/'/g, "\\'")}')" title="Xóa node">X</button></div>`).join('');
         const u = document.getElementById('updated'); if (u) u.textContent = new Date().toLocaleTimeString('vi-VN');
     } catch(e) { box.innerHTML = '<div style="color:#f85149; padding:20px;">Lỗi load node: ' + e.message + '</div>'; }
 }
@@ -814,7 +806,6 @@ const FIELD_RULES = {
 };
 
 let debugData = [];
-// === PAGINATION STATE ===
 let debugPage = 1;
 let debugTotal = 0;
 let debugTotalPages = 1;
@@ -859,7 +850,7 @@ function resetDebugForm() {
         const el = document.getElementById('dbg-' + f); if (el) el.classList.remove('invalid');
     });
     document.getElementById('dbg-form-mode').innerHTML = 'Mode: <strong>INSERT</strong> (id trống)';
-    document.getElementById('btn-save-debug').textContent = '💾 Save (Insert)';
+    document.getElementById('btn-save-debug').textContent = 'Lưu (Insert)';
     document.getElementById('btn-cancel-edit').style.display = 'none';
     document.querySelectorAll('.debug-table tbody tr').forEach(tr => tr.classList.remove('edit-mode'));
 }
@@ -948,9 +939,9 @@ function renderDebugTable() {
             <td><span class="type-badge ${type}">${type}</span></td>
             <td title="${(d.note||'').replace(/"/g,'&quot;')}" style="max-width:180px; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(d.note||'—')}</td>
             <td>
-                <button class="action-btn edit" onclick="editDebugRecord(${d.id})" title="Sửa">✏️</button>
-                <button class="action-btn restore" onclick="restoreDebugRecord(${d.id})" title="Restore">↺</button>
-                <button class="action-btn del" onclick="deleteDebugRecord(${d.id})" title="Xóa">🗑️</button>
+                <button class="action-btn edit" onclick="editDebugRecord(${d.id})" title="Sửa">Sửa</button>
+                <button class="action-btn restore" onclick="restoreDebugRecord(${d.id})" title="Restore">Restore</button>
+                <button class="action-btn del" onclick="deleteDebugRecord(${d.id})" title="Xóa">Xóa</button>
             </td>
         </tr>`;
     }).join('');
@@ -1157,7 +1148,7 @@ function editDebugRecord(id) {
     const tt = document.getElementById('dbg-test-type'); if (tt) tt.value = d.test_type || 'manual';
     const note = document.getElementById('dbg-note'); if (note) note.value = d.note || '';
     document.getElementById('dbg-form-mode').innerHTML = 'Mode: <strong>UPDATE</strong> #' + id;
-    document.getElementById('btn-save-debug').textContent = '💾 Update #' + id;
+    document.getElementById('btn-save-debug').textContent = 'Update #' + id;
     document.getElementById('btn-cancel-edit').style.display = '';
     renderDebugTable();
     document.getElementById('dbg-t').scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1183,13 +1174,9 @@ async function deleteSelectedDebug() {
     
     let confirmMsg;
     if (isAll) {
-        confirmMsg = `Đã chọn TẤT CẢ ${ids.length.toLocaleString('vi-VN')} records.
-
-Xóa hết và reset ID về 1?`;
+        confirmMsg = `Đã chọn TẤT CẢ ${ids.length.toLocaleString('vi-VN')} records.\n\nXóa hết và reset ID về 1?`;
     } else {
-        confirmMsg = `Xóa ${ids.length.toLocaleString('vi-VN')} records đã chọn?
-
-ID các records PHÍA SAU sẽ được đánh lại liên tục.`;
+        confirmMsg = `Xóa ${ids.length.toLocaleString('vi-VN')} records đã chọn?\n\nID các records PHÍA SAU sẽ được đánh lại liên tục.`;
     }
     
     if (!(await customConfirm(confirmMsg))) return;
@@ -1209,7 +1196,6 @@ ID các records PHÍA SAU sẽ được đánh lại liên tục.`;
             });
         }
         
-        // Parse JSON an toàn — tránh crash nếu response không phải JSON
         let d = {};
         try { d = await r.json(); } catch(_) {}
         
@@ -1217,7 +1203,6 @@ ID các records PHÍA SAU sẽ được đánh lại liên tục.`;
             throw new Error(d.error || ('HTTP ' + r.status));
         }
         
-        // Safe fallbacks — không bao giờ crash
         const deleted = (typeof d.deleted === 'number') ? d.deleted : ids.length;
         const remaining = (typeof d.remaining === 'number') ? d.remaining : 0;
         const maxId = (typeof d.max_id === 'number') ? d.max_id : 0;
@@ -1230,13 +1215,11 @@ ID các records PHÍA SAU sẽ được đánh lại liên tục.`;
         if (isAll) {
             msg = `Đã xóa hết ${deleted.toLocaleString('vi-VN')} records. ID reset về 1.`;
         } else {
-            msg = `Đã xóa ${deleted.toLocaleString('vi-VN')} records. ` +
-                  `Còn ${remaining.toLocaleString('vi-VN')} records (ID 1-${maxId}).`;
+            msg = `Đã xóa ${deleted.toLocaleString('vi-VN')} records. Còn ${remaining.toLocaleString('vi-VN')} records (ID 1-${maxId}).`;
         }
         customNotify(msg, 'success');
     } catch(e) {
         customNotify('Xóa thất bại: ' + (e.message || 'Lỗi không xác định'), 'error');
-        // Reload để hiển thị trạng thái thực tế của DB
         try { await loadDebugData(1); } catch(_) {}
     }
 }
@@ -1428,21 +1411,20 @@ function renderLogs() {
     if (!box) return;
     if (count) count.textContent = logsFiltered.length + ' logs';
     if (!logsFiltered.length) { box.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-muted);">Chưa có log nào.</div>'; return; }
-    const sevIcon = { info: 'ℹ️', warn: '⚠️', error: '🔴' };
     box.innerHTML = logsFiltered.map(l => `
         <div class="log-entry severity-${l.severity || 'info'}">
             <div class="log-header">
                 <div>
                     <span class="log-action">${escapeHtml(l.action)}</span>
-                    <span class="log-severity-badge ${l.severity || 'info'}">${sevIcon[l.severity] || ''} ${l.severity || 'info'}</span>
+                    <span class="log-severity-badge ${l.severity || 'info'}">${l.severity || 'info'}</span>
                 </div>
-                <button class="log-delete-btn" onclick="deleteLog(${l.id})" title="Xóa log">🗑️</button>
+                <button class="log-delete-btn" onclick="deleteLog(${l.id})" title="Xóa log">Xóa</button>
             </div>
             <div class="log-meta">
-                <span>🕐 ${l.ts || '--'}</span>
-                <span>👤 ${l.author || 'admin'}</span>
-                ${l.target ? '<span>🎯 ' + escapeHtml(l.target) + '</span>' : ''}
-                ${l.ip && l.ip !== 'unknown' ? '<span>🌐 ' + l.ip + '</span>' : ''}
+                <span>${l.ts || '--'}</span>
+                <span>${l.author || 'admin'}</span>
+                ${l.target ? '<span>Target: ' + escapeHtml(l.target) + '</span>' : ''}
+                ${l.ip && l.ip !== 'unknown' ? '<span>IP: ' + l.ip + '</span>' : ''}
             </div>
             ${l.details ? '<div class="log-details">' + escapeHtml(l.details) + '</div>' : ''}
         </div>
@@ -1560,29 +1542,28 @@ function renderNoteList() {
     if (!box) return;
     if (count) count.textContent = notesFiltered.length + ' notes';
     if (!notesFiltered.length) { box.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-muted);">Chưa có ghi chú. Bấm "Ghi chú mới" để tạo.</div>'; return; }
-    const tagIcon = { note: '📝', todo: '✅', bug: '🐛', maint: '🔧', idea: '💡', fatal: '💀' };
     box.innerHTML = notesFiltered.map(n => `
         <div class="note-card ${n.pinned ? 'pinned' : ''}" data-id="${n.id}">
             <div class="note-header">
                 <div class="note-title-wrap">
-                    ${n.pinned ? '<span class="note-pin">📌</span>' : ''}
-                    <span class="note-tag tag-${n.tag}">${tagIcon[n.tag] || '📝'} ${n.tag}</span>
+                    ${n.pinned ? '<span class="note-pin">PIN</span>' : ''}
+                    <span class="note-tag tag-${n.tag}">${n.tag}</span>
                     <h3 class="note-title">${escapeHtml(n.title)}</h3>
                 </div>
                 <div class="note-actions">
-                    <button class="note-btn" onclick="togglePinNote(${n.id}, ${n.pinned ? 0 : 1})" title="${n.pinned ? 'Bỏ pin' : 'Pin'}">${n.pinned ? '📌' : '📍'}</button>
-                    <button class="note-btn" onclick="openEditNoteDialog(${n.id})" title="Sửa">✏️</button>
-                    <button class="note-btn note-btn-del" onclick="deleteNote(${n.id})" title="Xóa">🗑️</button>
+                    <button class="note-btn" onclick="togglePinNote(${n.id}, ${n.pinned ? 0 : 1})" title="${n.pinned ? 'Bỏ pin' : 'Pin'}">${n.pinned ? 'Unpin' : 'Pin'}</button>
+                    <button class="note-btn" onclick="openEditNoteDialog(${n.id})" title="Sửa">Sửa</button>
+                    <button class="note-btn note-btn-del" onclick="deleteNote(${n.id})" title="Xóa">Xóa</button>
                 </div>
             </div>
             <div class="note-content">${escapeHtml(n.content)}</div>
             <div class="note-footer">
-                <span>👤 <strong>${n.author}</strong></span>
-                <span>🕐 ${n.ts || '--'}</span>
-                ${n.updated_at ? '<span>✏️ sửa: ' + n.updated_at + '</span>' : ''}
+                <span>Author: <strong>${n.author}</strong></span>
+                <span>Time: ${n.ts || '--'}</span>
+                ${n.updated_at ? '<span>Edited: ' + n.updated_at + '</span>' : ''}
             </div>
             <div class="note-comments">
-                <button class="note-comments-toggle" onclick="toggleNoteComments(${n.id})">💬 Bình luận</button>
+                <button class="note-comments-toggle" onclick="toggleNoteComments(${n.id})">Bình luận</button>
                 <div id="nc-wrap-${n.id}" style="display:none;"></div>
             </div>
         </div>
@@ -1598,7 +1579,7 @@ function filterNoteList() {
 
 function openNewNoteDialog() {
     editingNoteId = null;
-    document.getElementById('note-dialog-title').textContent = '✏️ Ghi chú mới';
+    document.getElementById('note-dialog-title').textContent = 'Ghi chú mới';
     document.getElementById('note-form-title').value = '';
     document.getElementById('note-form-content').value = '';
     document.getElementById('note-form-tag').value = 'note';
@@ -1611,7 +1592,7 @@ function openEditNoteDialog(id) {
     const n = notesData.find(x => x.id === id);
     if (!n) return;
     editingNoteId = id;
-    document.getElementById('note-dialog-title').textContent = '✏️ Sửa ghi chú #' + id;
+    document.getElementById('note-dialog-title').textContent = 'Sửa ghi chú #' + id;
     document.getElementById('note-form-title').value = n.title;
     document.getElementById('note-form-content').value = n.content;
     document.getElementById('note-form-tag').value = n.tag || 'note';
@@ -1676,33 +1657,33 @@ let editingUserId = null;
 async function loadUsers() {
     const tbody = document.getElementById('users-tbody');
     if (!tbody) return;
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:var(--text-muted);">Đang tải...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:var(--text-muted);">Đang tải...</td></tr>';
     try {
         const r = await fetch(API + '/api/users', { headers: { 'X-Auth-Token': getToken() } });
         if (!r.ok) throw new Error('HTTP ' + r.status);
         usersData = await r.json();
         renderUsersTable();
-    } catch(e) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:#f85149;">Lỗi: ' + e.message + '</td></tr>'; }
+    } catch(e) { tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#f85149;">Lỗi: ' + e.message + '</td></tr>'; }
 }
 
 function renderUsersTable() {
     const tbody = document.getElementById('users-tbody');
     if (!tbody) return;
-    if (!usersData.length) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:var(--text-muted);">Chưa có user</td></tr>'; return; }
+    if (!usersData.length) { tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:var(--text-muted);">Chưa có user</td></tr>'; return; }
     tbody.innerHTML = usersData.map(u => `
         <tr>
             <td>${u.id}</td>
             <td><strong>${escapeHtml(u.username)}</strong></td>
-            <td>${u.displayname || u.username}</td>
+            <td>${escapeHtml(u.displayname || u.username)}</td>
             <td><span class="type-badge ${u.role === 'head_admin' ? 'edge' : 'manual'}">${escapeHtml(u.role)}</span></td>
-            <td>${u.active ? '<span style="color:#3fb950;">✓ Active</span>' : '<span style="color:#f85149;">✗ Disabled</span>'}</td>
-            <td>${u.totp_enabled ? '✓' : '—'}</td>
+            <td>${u.active ? '<span style="color:#3fb950;">Active</span>' : '<span style="color:#f85149;">Disabled</span>'}</td>
+            <td>${u.totp_enabled ? 'ON' : 'OFF'}</td>
             <td style="font-size:11px;">${u.last_login || '—'}</td>
             <td style="font-size:11px;">${u.created_at || '—'}</td>
             <td>
-                <button class="action-btn edit" onclick="editUser(${u.id})" title="Sửa pass/role">✏️</button>
-                <button class="action-btn ${u.active ? 'del' : 'restore'}" onclick="toggleUserActive(${u.id}, ${u.active ? 0 : 1})" title="${u.active ? 'Disable' : 'Enable'}">${u.active ? '🔒' : '🔓'}</button>
-                <button class="action-btn del" onclick="deleteUser(${u.id}, '${u.username}')" title="Xóa">🗑️</button>
+                <button class="action-btn edit" onclick="editUser(${u.id})" title="Sửa pass/role">Sửa</button>
+                <button class="action-btn ${u.active ? 'del' : 'restore'}" onclick="toggleUserActive(${u.id}, ${u.active ? 0 : 1})" title="${u.active ? 'Disable' : 'Enable'}">${u.active ? 'Khóa' : 'Mở'}</button>
+                <button class="action-btn del" onclick="deleteUser(${u.id}, '${escapeHtml(u.username).replace(/'/g, "\\'")}')" title="Xóa">Xóa</button>
             </td>
         </tr>
     `).join('');
@@ -1713,6 +1694,8 @@ function openNewUserDialog() {
     document.getElementById('user-dialog-title').textContent = 'Thêm user mới';
     document.getElementById('user-form-username').value = '';
     document.getElementById('user-form-username').disabled = false;
+    const dnEl = document.getElementById('user-form-displayname');
+    if (dnEl) dnEl.value = '';
     document.getElementById('user-form-password').value = '';
     document.getElementById('user-form-role').value = 'admin';
     document.getElementById('user-dialog-submit').textContent = 'Thêm';
@@ -1728,6 +1711,8 @@ function editUser(id) {
     document.getElementById('user-dialog-title').textContent = 'Sửa user: ' + u.username;
     document.getElementById('user-form-username').value = u.username;
     document.getElementById('user-form-username').disabled = true;
+    const dnEl = document.getElementById('user-form-displayname');
+    if (dnEl) dnEl.value = u.displayname || u.username;
     document.getElementById('user-form-password').value = '';
     document.getElementById('user-form-role').value = u.role;
     document.getElementById('user-dialog-submit').textContent = 'Lưu';
@@ -1739,18 +1724,13 @@ function closeUserDialog() { document.getElementById('user-dialog').style.displa
 
 async function submitUser() {
     const username = document.getElementById('user-form-username').value.trim();
+    const displayname = (document.getElementById('user-form-displayname')?.value || '').trim() || username;
     const password = document.getElementById('user-form-password').value;
     const role = document.getElementById('user-form-role').value;
     const errEl = document.getElementById('user-dialog-error');
     errEl.textContent = '';
     if (editingUserId) {
-        // submitUser()
-const body = {
-    username: document.getElementById('user-form-username').value.trim(),
-    displayname: document.getElementById('user-form-displayname').value.trim() || document.getElementById('user-form-username').value.trim(),
-    password: document.getElementById('user-form-password').value,
-    role: document.getElementById('user-form-role').value
-};
+        const body = { displayname, role };
         if (password) body.password = password;
         try {
             const r = await fetchWithTOTP(API + '/api/users/' + editingUserId, {
@@ -1769,7 +1749,7 @@ const body = {
             const r = await fetchWithTOTP(API + '/api/users', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'X-Auth-Token': getToken() },
-                body: JSON.stringify({ username, password, role })
+                body: JSON.stringify({ username, displayname, password, role })
             });
             const d = await r.json();
             if (!r.ok) throw new Error(d.error || 'HTTP ' + r.status);
@@ -1885,7 +1865,7 @@ function renderNoteComments(noteId, container, list) {
                     <div class="comment-header">
                         <span class="comment-user">${c.username}</span>
                         <span class="comment-time">${c.created_at || '--'}</span>
-                        ${canDel ? `<button class="comment-del" onclick="delNoteComment(${c.id}, ${noteId}, this)" title="Xóa">🗑️</button>` : ''}
+                        ${canDel ? `<button class="comment-del" onclick="delNoteComment(${c.id}, ${noteId}, this)" title="Xóa">Xóa</button>` : ''}
                     </div>
                     <div class="comment-content">${escapeHtml(c.content)}</div>
                 </div>
@@ -1964,8 +1944,8 @@ async function loadIncidents() {
                 <td style="font-size:11px; color:#3fb950;">${i.resolved_at || '—'}</td>
                 <td>${escapeHtml(i.note || '—')}</td>
                 <td>
-                    <button class="action-btn edit" onclick="editIncident(${i.id})" title="Sửa">✏️</button>
-                    <button class="action-btn del" onclick="deleteIncident(${i.id})" title="Xóa">🗑️</button>
+                    <button class="action-btn edit" onclick="editIncident(${i.id})" title="Sửa">Sửa</button>
+                    <button class="action-btn del" onclick="deleteIncident(${i.id})" title="Xóa">Xóa</button>
                 </td>
             </tr>
         `).join('');
@@ -1992,7 +1972,7 @@ function editIncident(id) {
     editingIncidentId = id;
     const ttl = document.getElementById('inc-dialog-title');
     if (ttl) ttl.textContent = 'Sửa sự cố #' + id;
-    document.getElementById('inc-service').value = inc.service || 'stm32';
+    document.getElementById('inc-service').value = inc.service || 'node';
     document.getElementById('inc-status').value = inc.status || 'offline';
     document.getElementById('inc-started').value = (inc.started_at || '').replace(' ', 'T').slice(0, 16);
     document.getElementById('inc-eta').value = inc.eta ? inc.eta.replace(' ', 'T').slice(0, 16) : '';
@@ -2045,6 +2025,7 @@ async function deleteIncident(id) {
         await loadIncidents();
     } catch(e) { customNotify('Lỗi: ' + e.message, 'error'); }
 }
+
 // ============================================================
 // NOTIFICATION: auto-notify khi có log warn/error mới
 // ============================================================
@@ -2058,13 +2039,11 @@ async function checkNewNotifications() {
         const logs = await r.json();
         if (!Array.isArray(logs) || !logs.length) return;
 
-        // Tìm log mới + warn/error
         const newWarns = logs.filter(l => l.id > lastSeenLogId && (l.severity === 'warn' || l.severity === 'error'));
         const maxId = Math.max(...logs.map(l => l.id), lastSeenLogId);
 
         if (newWarns.length > 0) {
             newWarns.forEach(l => showToast(l));
-            // Update badge
             const badge = document.getElementById('log-badge');
             if (badge) {
                 const current = parseInt(badge.textContent) || 0;
@@ -2073,7 +2052,6 @@ async function checkNewNotifications() {
             }
         }
 
-        // Update last seen
         if (maxId > lastSeenLogId) {
             lastSeenLogId = maxId;
             localStorage.setItem('last_seen_log_id', String(maxId));
@@ -2085,7 +2063,7 @@ function showToast(log) {
     if (!container) return;
 
     const color = log.severity === 'error' ? '#f85149' : '#d29922';
-    const icon = log.severity === 'error' ? '🔴' : '⚠️';
+    const icon = log.severity === 'error' ? '[ERROR]' : '[WARN]';
 
     const toast = document.createElement('div');
     toast.setAttribute('data-toast', '1');
@@ -2108,7 +2086,7 @@ function showToast(log) {
         <div style="font-weight:700; color:${color}; margin-bottom:6px;">${icon} ${log.action}</div>
         <div style="font-size:12px; color:var(--text); margin-bottom:4px;">${log.details || ''}</div>
         <div style="font-size:11px; color:var(--text-muted);">
-            🕐 ${log.ts || ''} ${log.target ? '· 🎯 ' + log.target : ''}
+            ${log.ts || ''} ${log.target ? '· ' + log.target : ''}
         </div>
     `;
 
@@ -2144,11 +2122,12 @@ function updateToastClearBtn() {
             };
             container.prepend(btn);
         }
-        btn.textContent = `✕ Đóng tất cả (${count})`;
+        btn.textContent = 'Đóng tất cả (' + count + ')';
     } else if (btn) {
         btn.remove();
     }
 }
+
 // ============================================================
 // STEP-UP AUTH — Yêu cầu TOTP khi backend trả 403
 // ============================================================
@@ -2191,7 +2170,7 @@ function promptTOTP(reason, hint) {
         modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
         modal.innerHTML = `
             <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:28px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.5);">
-                <h3 style="color:var(--text);margin:0 0 8px;font-size:20px;">🔐 Xác thực 2 lớp</h3>
+                <h3 style="color:var(--text);margin:0 0 8px;font-size:20px;">Xác thực 2 lớp</h3>
                 <p style="color:var(--text-muted);font-size:13px;margin:0 0 6px;">${labels[reason] || reason}</p>
                 <p style="color:#d29922;font-size:12px;margin:0 0 20px;">${hint || ''}</p>
                 <label style="display:block;margin-bottom:16px;">
@@ -2246,13 +2225,13 @@ async function loadTrustedIPs() {
         tbody.innerHTML = rows.map(x => `
             <tr>
                 <td><code>${x.ip}</code>${x.ip === d.current_ip ? ' <span style="color:#3fb950;">(bạn)</span>' : ''}</td>
-                <td>${x.name}</td>
+                <td>${escapeHtml(x.name)}</td>
                 <td>${x.session_days || 365}</td>
-                <td>${x.active ? '✅' : '❌'}</td>
+                <td>${x.active ? 'Yes' : 'No'}</td>
                 <td style="font-size:11px;">${x.added_at || '—'}</td>
                 <td>
-                    <button class="action-btn" onclick="toggleTrustedIP('${x.ip_full}', ${x.active ? 0 : 1})">${x.active ? '🔒' : '🔓'}</button>
-                    <button class="action-btn del" onclick="deleteTrustedIP('${x.ip_full}')">🗑️</button>
+                    <button class="action-btn" onclick="toggleTrustedIP('${x.ip_full}', ${x.active ? 0 : 1})">${x.active ? 'Khóa' : 'Mở'}</button>
+                    <button class="action-btn del" onclick="deleteTrustedIP('${x.ip_full}')">Xóa</button>
                 </td>
             </tr>
         `).join('');
@@ -2280,7 +2259,7 @@ async function loadSessions() {
                 <td>${s.role}</td>
                 <td style="font-size:11px;">${s.ip || '—'}</td>
                 <td>${s.hours_left}h</td>
-                <td>${isMe ? '<span style="color:#3fb950;font-size:11px;">Session này</span>' : `<button class="action-btn del" onclick="revokeToken('${s.token}')">🚫</button>`}</td>
+                <td>${isMe ? '<span style="color:#3fb950;font-size:11px;">Session này</span>' : `<button class="action-btn del" onclick="revokeToken('${s.token}')">Revoke</button>`}</td>
             </tr>`;
         }).join('');
     } catch(e) {
@@ -2372,7 +2351,7 @@ async function revokeToken(token) {
 }
 
 async function revokeAllSessions() {
-    if (!await customConfirm('⚠️ Revoke TẤT CẢ session (BAO GỒM session hiện tại)?')) return;
+    if (!await customConfirm('Revoke TẤT CẢ session (BAO GỒM session hiện tại)?')) return;
     if (!(await customConfirm('Xác nhận lần 2: BẠN SẼ BỊ ĐĂNG XUẤT NGAY LẬP TỨC sau khi bấm OK.'))) return;
     try {
         const r = await fetch(API + '/api/revoke', {
@@ -2390,7 +2369,6 @@ async function revokeAllSessions() {
         window.location.href = '/';
     } catch(e) { customNotify('Lỗi: ' + e.message, 'error'); }
 }
-
 
 // === DEBUG PAGINATION ===
 function renderDebugPagination() {
@@ -2415,21 +2393,18 @@ function renderDebugPagination() {
         if (end < debugTotalPages - 1) pageButtons += '<span class="page-dots">...</span>';
         pageButtons += '<button class="page-btn" onclick="loadDebugData(' + debugTotalPages + ')">' + debugTotalPages + '</button>';
     }
-    container.innerHTML = '<button class="page-btn page-nav" ' + prevDisabled + ' onclick="loadDebugData(' + (debugPage - 1) + ')">‹ Trước</button>' + pageButtons + '<button class="page-btn page-nav" ' + nextDisabled + ' onclick="loadDebugData(' + (debugPage + 1) + ')">Sau ›</button>';
+    container.innerHTML = '<button class="page-btn page-nav" ' + prevDisabled + ' onclick="loadDebugData(' + (debugPage - 1) + ')">Trước</button>' + pageButtons + '<button class="page-btn page-nav" ' + nextDisabled + ' onclick="loadDebugData(' + (debugPage + 1) + ')">Sau</button>';
 }
 
-
 // ============================================================
-// CUSTOM CONFIRM MODAL (thay thế await customConfirm() mặc định)
+// CUSTOM CONFIRM MODAL
 // ============================================================
-function customConfirm(message, options = {}
-
-) {
+function customConfirm(message, options = {}) {
     return new Promise((resolve) => {
         const title = options.title || 'Xác nhận';
         const okText = options.okText || 'Đồng ý';
         const cancelText = options.cancelText || 'Hủy';
-        const danger = options.danger !== false; // mặc định đỏ nếu là xóa
+        const danger = options.danger !== false;
 
         const overlay = document.createElement('div');
         overlay.className = 'custom-confirm-overlay';
@@ -2461,10 +2436,10 @@ function customConfirm(message, options = {}
 }
 
 // ============================================================
-// CUSTOM NOTIFY (thay thế customNotify(, 'info') mặc định)
+// CUSTOM NOTIFY
 // ============================================================
 function customNotify(message, type = 'info', duration = 3500) {
-    const icons = { success: '✅', error: '❌', warn: '⚠️', info: 'ℹ️' };
+    const icons = { success: '[OK]', error: '[ERR]', warn: '[!]', info: '[i]' };
     const colors = { success: '#4CAF50', error: '#f85149', warn: '#ff9800', info: '#2196F3' };
 
     const toast = document.createElement('div');
