@@ -51,7 +51,10 @@ async function login(user, pass, otp) {
 }
 
 async function logout() {
-    localStorage.removeItem('auth_token');
+    localStorage.removeItem('admin_token');
     localStorage.removeItem('admin_user');
-    window.location.href = '/';
+    localStorage.removeItem('admin_role');
+    localStorage.removeItem('admin_tab');
+    localStorage.removeItem('terms_agreed_version');   // ← THÊM: buộc tick lại khi login
+    // ...
 }

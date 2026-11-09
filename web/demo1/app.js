@@ -1,5 +1,56 @@
 const API = 'https://airwatch.io.vn';
 
+const TERMS_VERSION = '1';
+
+function checkTermsAgreement() {
+    const agreed = localStorage.getItem('terms_agreed_version');
+    if (agreed !== TERMS_VERSION) {
+        showTermsModal();
+        return false;
+    }
+    return true;
+}
+
+function showTermsModal() {
+    let overlay = document.getElementById('terms-overlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'terms-overlay';
+        overlay.className = 'terms-overlay';
+        overlay.innerHTML = `
+            <div class="terms-modal">
+                <h2>Điều khoản sử dụng</h2>
+                <div class="terms-subtitle">Vui lòng đọc và đồng ý để tiếp tục sử dụng AirWatch</div>
+                <div class="terms-content">
+                    <p><strong>1. Mục đích:</strong> AirWatch cung cấp dữ liệu chất lượng không khí cho mục đích tham khảo và nghiên cứu. Dữ liệu được cung cấp "nguyên trạng", không đảm bảo chính xác tuyệt đối.</p>
+                    <p><strong>2. Giới hạn trách nhiệm:</strong> Không sử dụng dữ liệu cho mục đích y tế, pháp lý, hoặc quyết định quan trọng ảnh hưởng đến tính mạng/tài sản.</p>
+                    <p><strong>3. Tính khả dụng:</strong> Hệ thống có thể tạm ngưng để bảo trì, nâng cấp mà không báo trước.</p>
+                    <p><strong>4. Quyền riêng tư:</strong> Chúng tôi ghi nhận IP, session, thời gian truy cập để vận hành hệ thống. Dữ liệu lưu cục bộ, không chia sẻ bên thứ 3.</p>
+                    <p><strong>5. Quyền của bạn:</strong> Yêu cầu xóa dữ liệu cá nhân, ngừng sử dụng dịch vụ bất kỳ lúc nào.</p>
+                    <p>Xem đầy đủ tại <a href="/terms" target="_blank">/terms</a>.</p>
+                </div>
+                <label class="terms-checkbox">
+                    <input type="checkbox" id="terms-check">
+                    <span>Tôi đã đọc và đồng ý với <strong>Điều khoản sử dụng</strong> của AirWatch</span>
+                </label>
+                <button id="terms-accept" class="terms-accept-btn" disabled>Tiếp tục</button>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+        document.getElementById('terms-check').onchange = (e) => {
+            document.getElementById('terms-accept').disabled = !e.target.checked;
+        };
+        document.getElementById('terms-accept').onclick = acceptTerms;
+    }
+    overlay.style.display = 'flex';
+}
+
+function acceptTerms() {
+    localStorage.setItem('terms_agreed_version', TERMS_VERSION);
+    const overlay = document.getElementById('terms-overlay');
+    if (overlay) overlay.style.display = 'none';
+}
+
 // ===== HELPERS (bị mất khi replace updateCards) =====
 function getTextColor()   { return document.body.classList.contains('light') ? '#666'    : '#8899a6'; }
 function getGridColor()   { return document.body.classList.contains('light') ? '#e0e0e0' : '#2a3040'; }
@@ -183,6 +234,7 @@ function tsToMs(ts) {
 // ============================================================
 (async () => {
     await checkAuth();
+    checkTermsAgreement();
     const btn = document.getElementById('auth-btn');
     const action = document.getElementById('auth-action');
     if (typeof isHeadAdmin === 'function' && isHeadAdmin()) {
