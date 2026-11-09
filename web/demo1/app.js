@@ -370,8 +370,9 @@ function updateAQIForDate(data, dateStr) {
 // ============================================================
 // UPDATE CARDS
 // ============================================================
-function updateCards(data, idPrefix = '', chartCtx = dashCharts) {
-    const $ = (id) => document.getElementById(idPrefix + id);
+function updateCards(data, idPrefix = '', chartCtx = dashCharts, cardPrefix = null) {
+    const cp = cardPrefix !== null ? cardPrefix : idPrefix;
+    const $ = (id) => document.getElementById(cp + id);
 
     if (!data.length) {
         if (!idPrefix) setStatus(false);
@@ -414,13 +415,11 @@ function updateCards(data, idPrefix = '', chartCtx = dashCharts) {
     animateNumber('co', last.co, 2);
     animateNumber('voc_pct', last.voc_pct, 1);
     animateNumber('nox_pct', last.nox_pct, 1);
-
-    applyCardIntensity(idPrefix + 'pm25', last.pm25, 'pm25');
-    applyCardIntensity(idPrefix + 'pm10', last.pm10, 'pm10');
-    applyCardIntensity(idPrefix + 'co', last.co, 'co');
-    applyCardIntensity(idPrefix + 'voc_pct', last.voc_pct, 'voc_pct');
-    applyCardIntensity(idPrefix + 'nox_pct', last.nox_pct, 'nox_pct');
-
+applyCardIntensity(cp + 'pm25', last.pm25, 'pm25');
+applyCardIntensity(cp + 'pm10', last.pm10, 'pm10');
+applyCardIntensity(cp + 'co', last.co, 'co');
+applyCardIntensity(cp + 'voc_pct', last.voc_pct, 'voc_pct');
+applyCardIntensity(cp + 'nox_pct', last.nox_pct, 'nox_pct');
     if (!idPrefix) {
         const u = document.getElementById('updated');
         if (u) u.textContent = last.ts;
@@ -1293,7 +1292,7 @@ function renderDebugDashboard(data) {
     }
     // debugData là DESC → reverse để dashboard hiểu (ASC)
     const ascData = data.slice().reverse();
-    updateCards(ascData, 'dbg-', debugCharts);
+    updateCards(ascData, 'dbg-', debugCharts, 'dbg-card-');
     renderCharts(ascData, 'dbg-', debugCharts);
 
     // AQI preview tính từ record mới nhất
