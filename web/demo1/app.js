@@ -326,12 +326,31 @@ async function updateAQIFromServer() {
         const meta = document.getElementById('aqi-meta');
 
         if (!d.aqi) {
-            aqiEl.textContent = '--'; aqiEl.style.color = '#8899a6';
-            if (textEl) { textEl.textContent = 'Đang thu thập'; textEl.style.background = '#8899a6'; }
-            if (progress) { progress.style.strokeDashoffset = 565.48; progress.style.stroke = '#8899a6'; }
-            if (meta) meta.textContent = 'Chưa đủ dữ liệu 24h';
-            return;
+    aqiEl.textContent = '--';
+    aqiEl.style.color = '#8899a6';
+    
+    if (textEl) {
+        textEl.textContent = d.status === 'stale' ? 'Mất kết nối' : 'Đang thu thập';
+        textEl.style.background = d.status === 'stale' ? '#f85149' : '#8899a6';
+        textEl.style.color = '#fff';
+    }
+    
+    if (progress) { 
+        progress.style.strokeDashoffset = 565.48; 
+        progress.style.stroke = d.status === 'stale' ? '#f85149' : '#8899a6'; 
+    }
+    
+    if (meta) {
+        if (d.status === 'stale') {
+            meta.textContent = `⚠ ${d.message || 'Dữ liệu cũ'}`;
+            meta.style.color = '#f85149';
+        } else {
+            meta.textContent = 'Chưa đủ dữ liệu 24h';
+            meta.style.color = '';
         }
+    }
+    return;
+}
 
         let color = d.aqi <= 50 ? '#4CAF50' : d.aqi <= 100 ? '#FFEB3B' :
                     d.aqi <= 150 ? '#FF9800' : d.aqi <= 200 ? '#F44336' :
