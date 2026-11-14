@@ -10,7 +10,8 @@ function checkTermsAgreement() {
     }
     return true;
 }
-
+const dashCharts  = { env: null, volt: null, curr: null, pm: null, gas: null, co: null, minmax: null };
+const debugCharts = { env: null, volt: null, curr: null, pm: null, gas: null, co: null, minmax: null };
 function showTermsModal() {
     let overlay = document.getElementById('terms-overlay');
     if (!overlay) {
@@ -546,7 +547,78 @@ function renderGasChart(vocPct, noxPct, idPrefix = '', chartCtx = dashCharts) {
         });
     }
 }
+// ============================================================
+// CHART MIN/MAX (Voltage & Current)
+// ============================================================
+function renderMinMaxChart(d, idPrefix = '', chartCtx = dashCharts) {
+    const canvas = document.getElementById(idPrefix + 'chart-minmax');
+    if (!canvas || typeof Chart === 'undefined') return;
 
+    const maxv = parseFloat(d.maxv) || 0;
+    const minv = parseFloat(d.minv) || 0;
+    const maxi = (parseFloat(d.maxi) || 0) * 1000;
+    const mini = (parseFloat(d.mini) || 0) * 1000;
+
+    if (chartCtx.minmax) chartCtx.minmax.destroy();
+
+    chartCtx.minmax = new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: ['Max V', 'Min V', 'Max I', 'Min I'],
+            datasets: [
+                {
+                    label: 'Điện áp (V)',
+                    data: [maxv, minv, null, null],
+                    backgroundColor: ['rgba(255,152,0,0.6)', 'rgba(255,193,7,0.6)', null, null],
+                    borderColor: ['#FF9800', '#FFC107', null, null],
+                    borderWidth: 2, borderRadius: 6, maxBarThickness: 50,
+                    yAxisID: 'yV'
+                },
+                {
+                    label: 'Dòng điện (mA)',
+                    data: [null, null, maxi, mini],
+                    backgroundColor: [null, null, 'rgba(156,39,176,0.6)', 'rgba(33,150,243,0.6)'],
+                    borderColor: [null, null, '#9C27B0', '#2196F3'],
+                    borderWidth: 2, borderRadius: 6, maxBarThickness: 50,
+                    yAxisID: 'yI'
+                }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            animation: { duration: 800 },
+            plugins: {
+                legend: { labels: { color: getLegendColor() } },
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => {
+                            if (ctx.parsed.y === null) return '';
+                            const unit = ctx.dataset.yAxisID === 'yV' ? ' V' : ' mA';
+                            return ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(3) + unit;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: { ticks: { color: getTextColor() }, grid: { display: false } },
+                yV: {
+                    position: 'left',
+                    beginAtZero: true, min: 0, max: 6,
+                    ticks: { color: '#FF9800', stepSize: 1, precision: 1 },
+                    grid: { color: getGridColor() },
+                    title: { display: true, text: 'Điện áp (V)', color: '#FF9800' }
+                },
+                yI: {
+                    position: 'right',
+                    beginAtZero: true, min: 0, max: 300,
+                    ticks: { color: '#9C27B0', stepSize: 50, precision: 0 },
+                    grid: { drawOnChartArea: false },
+                    title: { display: true, text: 'Dòng (mA)', color: '#9C27B0' }
+                }
+            }
+        }
+    });
+}
 // ============================================================
 // CHART CO
 // ============================================================
@@ -697,6 +769,7 @@ function renderCharts(data, idPrefix = '', chartCtx = dashCharts) {
             })() 
         });
     }
+    renderMinMaxChart(data[data.length - 1] || {}, idPrefix, chartCtx);
 }
 // ============================================================
 // LOAD DATA
