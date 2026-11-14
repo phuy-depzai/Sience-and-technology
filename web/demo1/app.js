@@ -589,34 +589,113 @@ function renderCharts(data, idPrefix = '', chartCtx = dashCharts) {
 
     const s = downsample(data, 80);
 
+    // ==========================================
+    // 1. CHART MÔI TRƯỜNG (NHIỆT ĐỘ & ĐỘ ẨM)
+    // ==========================================
     if (chartCtx.env) chartCtx.env.destroy();
-    chartCtx.env = new Chart(envCanvas, { type: 'line', data: { datasets: [
-        { label: 'Nhiệt độ (°C)', data: toPoints(s, 't'), borderColor: '#f44336', backgroundColor: 'rgba(244,67,54,0.1)', tension: 0, cubicInterpolationMode: 'monotone', pointRadius: 0, borderWidth: 2, yAxisID: 'y_temp' },
-        { label: 'Độ ẩm (%)', data: toPoints(s, 'h'), borderColor: '#2196F3', backgroundColor: 'rgba(33,150,243,0.1)', tension: 0, cubicInterpolationMode: 'monotone', pointRadius: 0, borderWidth: 2, yAxisID: 'y_hum' }
-    ] }, options: { responsive: true, maintainAspectRatio: false, animation: { duration: 1500, easing: 'easeOutQuart' }, interaction: { mode: 'index', intersect: false }, plugins: { legend: { labels: { color: getLegendColor() } } }, scales: { x: timeScaleX(), y_temp: { position: 'left', ticks: { color: '#f44336' }, grid: { color: getGridColor() }, title: { display: true, text: 'Nhiệt độ (°C)', color: '#f44336' } }, y_hum: { position: 'right', ticks: { color: '#2196F3' }, grid: { drawOnChartArea: false }, title: { display: true, text: 'Độ ẩm (%)', color: '#2196F3' } } } } });
+    chartCtx.env = new Chart(envCanvas, { 
+        type: 'line', 
+        data: { datasets: [
+            { label: 'Nhiệt độ (°C)', data: toPoints(s, 't'), borderColor: '#f44336', backgroundColor: 'rgba(244,67,54,0.1)', tension: 0, pointRadius: 0, borderWidth: 2, yAxisID: 'y_temp' },
+            { label: 'Độ ẩm (%)', data: toPoints(s, 'h'), borderColor: '#2196F3', backgroundColor: 'rgba(33,150,243,0.1)', tension: 0, pointRadius: 0, borderWidth: 2, yAxisID: 'y_hum' }
+        ] }, 
+        options: { 
+            responsive: true, maintainAspectRatio: false, 
+            interaction: { mode: 'index', intersect: false }, 
+            plugins: { legend: { labels: { color: getLegendColor() } } }, 
+            scales: { 
+                x: timeScaleX(), 
+                y_temp: { 
+                    position: 'left', 
+                    min: 15, max: 50,               // Fix cứng 15-50 độ
+                    ticks: { color: '#f44336', stepSize: 5, precision: 0 }, // Bước nhảy 5 độ, số nguyên
+                    grid: { color: getGridColor() }, 
+                    title: { display: true, text: 'Nhiệt độ (°C)', color: '#f44336' } 
+                }, 
+                y_hum: { 
+                    position: 'right', 
+                    min: 0, max: 100,               // Fix cứng 0-100%
+                    ticks: { color: '#2196F3', stepSize: 10, precision: 0 }, // Bước nhảy 10%, số nguyên
+                    grid: { drawOnChartArea: false }, 
+                    title: { display: true, text: 'Độ ẩm (%)', color: '#2196F3' } 
+                } 
+            } 
+        } 
+    });
 
+    // ==========================================
+    // 2. CHART BỤI MỊN (PM1, PM2.5, PM10)
+    // ==========================================
     const pmCanvas = $('chart-pm');
     if (pmCanvas) {
         if (chartCtx.pm) chartCtx.pm.destroy();
-        chartCtx.pm = new Chart(pmCanvas, { type: 'line', data: { datasets: [
-            { label: 'PM1.0 (µg/m³)', data: toPoints(s, 'pm1'), borderColor: '#FFC107', backgroundColor: 'rgba(255,193,7,0.1)', tension: 0, cubicInterpolationMode: 'monotone', pointRadius: 0, borderWidth: 2, yAxisID: 'y_pm' },
-            { label: 'PM2.5 (µg/m³)', data: toPoints(s, 'pm25'), borderColor: '#FF5722', backgroundColor: 'rgba(255,87,34,0.1)', tension: 0, cubicInterpolationMode: 'monotone', pointRadius: 0, borderWidth: 2, yAxisID: 'y_pm' },
-            { label: 'PM10 (µg/m³)', data: toPoints(s, 'pm10'), borderColor: '#FF9800', backgroundColor: 'rgba(255,152,0,0.1)', tension: 0, cubicInterpolationMode: 'monotone', pointRadius: 0, borderWidth: 2, yAxisID: 'y_pm' }
-        ] }, options: { responsive: true, maintainAspectRatio: false, animation: { duration: 1500, easing: 'easeOutQuart' }, interaction: { mode: 'index', intersect: false }, plugins: { legend: { labels: { color: getLegendColor() } } }, scales: { x: timeScaleX(), y_pm: { position: 'left', ticks: { color: '#FF5722' }, grid: { color: getGridColor() }, title: { display: true, text: 'Bụi mịn (µg/m³)', color: '#FF5722' } } } } });
+        chartCtx.pm = new Chart(pmCanvas, { 
+            type: 'line', 
+            data: { datasets: [
+                { label: 'PM1.0 (µg/m³)', data: toPoints(s, 'pm1'), borderColor: '#FFC107', backgroundColor: 'rgba(255,193,7,0.1)', tension: 0, pointRadius: 0, borderWidth: 2, yAxisID: 'y_pm' },
+                { label: 'PM2.5 (µg/m³)', data: toPoints(s, 'pm25'), borderColor: '#FF5722', backgroundColor: 'rgba(255,87,34,0.1)', tension: 0, pointRadius: 0, borderWidth: 2, yAxisID: 'y_pm' },
+                { label: 'PM10 (µg/m³)', data: toPoints(s, 'pm10'), borderColor: '#FF9800', backgroundColor: 'rgba(255,152,0,0.1)', tension: 0, pointRadius: 0, borderWidth: 2, yAxisID: 'y_pm' }
+            ] }, 
+            options: { 
+                responsive: true, maintainAspectRatio: false, 
+                interaction: { mode: 'index', intersect: false }, 
+                plugins: { legend: { labels: { color: getLegendColor() } } }, 
+                scales: { 
+                    x: timeScaleX(), 
+                    y_pm: { 
+                        position: 'left', 
+                        beginAtZero: true, min: 0,       // Bắt đầu từ 0
+                        ticks: { color: '#FF5722', stepSize: 20, precision: 0 }, // Bước nhảy 20, số nguyên
+                        grid: { color: getGridColor() }, 
+                        title: { display: true, text: 'Bụi mịn (µg/m³)', color: '#FF5722' } 
+                    } 
+                } 
+            } 
+        });
     }
 
+    // ==========================================
+    // 3. CHART CO (NẾU CÓ)
+    // ==========================================
     renderCoChart(data, idPrefix, chartCtx);
+
+    // ==========================================
+    // 4. CHART ĐIỆN ÁP & DÒNG ĐIỆN (CHỈ ADMIN)
+    // ==========================================
+    if (!isAdmin() && !idPrefix) return; // Debug tab thì luôn hiện
 
     const voltCanvas = $('chart-volt');
     if (voltCanvas) {
         if (chartCtx.volt) chartCtx.volt.destroy();
-        chartCtx.volt = new Chart(voltCanvas, { type: 'line', data: { datasets: [{ label: 'Điện áp (V)', data: toPoints(s, 'v'), borderColor: '#FF9800', backgroundColor: 'rgba(255,152,0,0.1)', tension: 0, cubicInterpolationMode: 'monotone', pointRadius: 0, borderWidth: 2, fill: true }] }, options: (() => { const o = baseOptions('Điện áp (V)', '#FF9800'); o.scales.y.min = 2.0; o.scales.y.max = 3.6; return o; })() });
+        chartCtx.volt = new Chart(voltCanvas, { 
+            type: 'line', 
+            data: { datasets: [{ label: 'Điện áp (V)', data: toPoints(s, 'v'), borderColor: '#FF9800', backgroundColor: 'rgba(255,152,0,0.1)', tension: 0, pointRadius: 0, borderWidth: 2, fill: true }] }, 
+            options: (() => { 
+                const o = baseOptions('Điện áp (V)', '#FF9800'); 
+                o.scales.y.min = 0; 
+                o.scales.y.max = 6;              // Nâng lên 6V cho dư dả (thay vì 3.6)
+                o.scales.y.ticks.stepSize = 1; 
+                o.scales.y.ticks.precision = 0;  // Số nguyên
+                return o; 
+            })() 
+        });
     }
 
     const currCanvas = $('chart-curr');
     if (currCanvas) {
         if (chartCtx.curr) chartCtx.curr.destroy();
-        chartCtx.curr = new Chart(currCanvas, { type: 'line', data: { datasets: [{ label: 'Dòng điện (mA)', data: toPoints(s, 'i', 1000), borderColor: '#9C27B0', backgroundColor: 'rgba(156,39,176,0.1)', tension: 0, cubicInterpolationMode: 'monotone', pointRadius: 0, borderWidth: 2, fill: true }] }, options: (() => { const o = baseOptions('Dòng điện (mA)', '#9C27B0'); o.scales.y.min = 0; o.scales.y.max = 100; return o; })() });
+        chartCtx.curr = new Chart(currCanvas, { 
+            type: 'line', 
+            data: { datasets: [{ label: 'Dòng điện (mA)', data: toPoints(s, 'i', 1000), borderColor: '#9C27B0', backgroundColor: 'rgba(156,39,176,0.1)', tension: 0, pointRadius: 0, borderWidth: 2, fill: true }] }, 
+            options: (() => { 
+                const o = baseOptions('Dòng điện (mA)', '#9C27B0'); 
+                o.scales.y.min = 0; 
+                o.scales.y.max = 300;            // Peak tầm 200mA, set max 300mA cho đẹp
+                o.scales.y.ticks.stepSize = 50; 
+                o.scales.y.ticks.precision = 0;  // Số nguyên
+                return o; 
+            })() 
+        });
     }
 }
 // ============================================================
