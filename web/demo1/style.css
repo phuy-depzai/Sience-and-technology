@@ -3665,3 +3665,25 @@ body.light .live-aqi-card > span:first-child {
     width: 100%;
     white-space: nowrap; /* Ép các cột giãn ra theo nội dung, đéo bị bóp méo */
 }
+/* Ép mọi thẻ div/section bọc ngoài cái bảng phải bung full */
+main, section, article {
+    max-width: 100% !important;
+    width: 100% !important;
+}
+
+/* Nếu bảng có ID cụ thể (ví dụ id="db-table"), ép thẳng mặt nó */
+table#db-table, 
+table[id*="db"], 
+table[class*="db"] {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* Ép luôn cái thẻ div chứa table nếu nó dùng flex/grid */
+div:has(> table),
+div:has(> .table-responsive),
+div:has(> .db-table-wrapper) {
+    max-width: 100vw !important;
+    width: 100% !important;
+    overflow-x: auto;
+}
