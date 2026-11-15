@@ -215,8 +215,8 @@ function fmtAgo(min) {
     return h > 0 ? d + 'd ' + h + 'h trước' : d + ' ngày trước';
 }
 
-const dashCharts  = { env: null, volt: null, curr: null, pm: null, gas: null, co: null };
-const debugCharts = { env: null, volt: null, curr: null, pm: null, gas: null, co: null };
+const dashCharts  = { env: null, volt: null, curr: null, pm: null, gas: null, co: null, minmax: null };
+const debugCharts = { env: null, volt: null, curr: null, pm: null, gas: null, co: null, minmax: null };
 function getLocalDate() {
     const now = new Date();
     const vnTime = new Date(now.getTime() + (7 * 3600 * 1000));
@@ -447,13 +447,11 @@ function updateCards(data, idPrefix = '', chartCtx = dashCharts, cardPrefix = nu
     const $ = (id) => document.getElementById(cp + id);
 
     if (!data.length) {
-        if (!idPrefix) setStatus(false);
-        ['temp','hum','volt','curr','pm1','pm25','pm10','co','voc_pct','nox_pct'].forEach(id => {
-            const el = $(id);
-            if (el) el.textContent = '--';
-        });
-        return;
-    }
+    ['env','pm','volt','curr','co','minmax'].forEach(k => {  // <-- thêm 'minmax'
+        if (chartCtx[k]) { chartCtx[k].destroy(); chartCtx[k] = null; }
+    });
+    return;
+}
     const last = data[data.length - 1];
 
     const animateNumber = (id, nv, dec = 0, scale = 1) => {
