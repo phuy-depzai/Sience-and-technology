@@ -423,7 +423,7 @@ body {
 
    <div class="section-title">Past Incidents</div>
 <div class="incidents" id="incidents-list">
-    <span class="incidents-icon">🎉</span>
+    <span class="incidents-icon"></span>
     Không có sự cố nào trong 30 ngày qua
 </div>
 
@@ -610,7 +610,7 @@ setInterval(loadStatus, 10000);
             const list = await r.json();
             
             if (!list || !list.length) {
-                el.innerHTML = '<span class="incidents-icon">🎉</span>Không có sự cố nào trong 30 ngày qua';
+                el.innerHTML = '<span class="incidents-icon"></span>Không có sự cố nào trong 30 ngày qua';
                 return;
             }
             
@@ -618,7 +618,7 @@ setInterval(loadStatus, 10000);
                 list.map(i => {
                     const isResolved = i.resolved_at != null;
                     const statusColor = isResolved ? 'var(--green)' : 'var(--red)';
-                    const statusText = isResolved ? '✓ Đã khắc phục' : '⚠ Chưa xử lý';
+                    const statusText = isResolved ? ' Đã khắc phục' : ' Chưa xử lý';
                     const timeText = isResolved ? ` lúc ${i.resolved_at.slice(0, 16)}` : '';
                     const serviceName = (typeof SERVICES !== 'undefined' && SERVICES[i.service]) 
                         ? SERVICES[i.service].name 
@@ -636,7 +636,7 @@ setInterval(loadStatus, 10000);
         <div style="font-size:13px; color:var(--text-muted); line-height:1.6;">
             <span class="badge ${i.status}" style="display:inline-block; margin-right:8px; padding:2px 10px; font-size:11px;">${statusLabel}</span>
             ${i.note ? '<span>' + i.note + '</span><br>' : ''}
-            ${i.eta && !isResolved ? '<span style="color:#d29922; font-size:12px;">⏳ Dự kiến khắc phục lúc: ' + i.eta.slice(0, 16) + '</span><br>' : ''}
+            ${i.eta && !isResolved ? '<span style="color:#d29922; font-size:12px;"> Dự kiến khắc phục lúc: ' + i.eta.slice(0, 16) + '</span><br>' : ''}
             <span style="color:${statusColor}; font-size:12px; font-weight:600;">${statusText}${timeText}</span>
         </div>
     </div>
@@ -646,7 +646,7 @@ setInterval(loadStatus, 10000);
             
         } catch(e) {
             console.error('[INCIDENTS STATUS]', e);
-            el.innerHTML = '<span class="incidents-icon">⚠️</span>Lỗi tải danh sách sự cố';
+            el.innerHTML = '<span class="incidents-icon"></span>Lỗi tải danh sách sự cố';
         }
     }
     
