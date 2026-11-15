@@ -28,7 +28,7 @@ function showTermsModal() {
                     <p><strong>3. Tính khả dụng:</strong> Hệ thống có thể tạm ngưng để bảo trì, nâng cấp mà không báo trước.</p>
                     <p><strong>4. Quyền riêng tư:</strong> Chúng tôi ghi nhận IP, session, thời gian truy cập để vận hành hệ thống. Dữ liệu lưu cục bộ, không chia sẻ bên thứ 3.</p>
                     <p><strong>5. Quyền của bạn:</strong> Yêu cầu xóa dữ liệu cá nhân, ngừng sử dụng dịch vụ bất kỳ lúc nào.</p>
-                    <p>Xem đầy đủ tại <a href="/terms" target="_blank">/terms</a>.</p>
+                    <p>Xem đầy đủ tại <a href="/terms" target="_blank">Điều khoản sử dụng</a>.</p>
                 </div>
                 <label class="terms-checkbox">
                     <input type="checkbox" id="terms-check">

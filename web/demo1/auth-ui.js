@@ -131,7 +131,7 @@ if (loginForm) {
                 otpWrap.style.display = 'block';
                 if (otpEl) otpEl.focus();
             }
-            errEl.textContent = 'Nhập mã 6 số từ Google Authenticator';
+            errEl.textContent = 'Nhập mã 6 số từ Authenticator';
             errEl.style.color = '#d29922';
             return;
         }
