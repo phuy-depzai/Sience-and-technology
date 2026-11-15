@@ -459,31 +459,48 @@ function dateKey(offsetDays) {
     return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
 
-// Vẽ 30 ô bar (29 ngày trước → hôm nay)
+// Vẽ 30 ô bar (29 ngày trước → hôm nay) ÁP DỤNG FILL FORWARD
 function renderBars(history) {
     let bars = '';
+    let lastStatus = 'unknown'; // Mặc định ban đầu nếu chưa có bất kỳ data nào
+
     for (let i = 29; i >= 0; i--) {
         const dk = dateKey(i);
         const d = new Date(Date.now() - i * DAY_MS);
         const dd = String(d.getDate()).padStart(2,'0');
         const mm = String(d.getMonth()+1).padStart(2,'0');
-        const st = history[dk] || 'unknown';
-        const tooltip = dd + '/' + mm + ': ' + LABEL[st];
-        bars += '<div class="bar ' + st + '" title="' + tooltip + '"></div>';
+        
+        // FILL FORWARD: Nếu ngày này có data mới, cập nhật lại trạng thái
+        if (history[dk]) {
+            lastStatus = history[dk];
+        }
+        // Nếu không có data, lastStatus giữ nguyên của ngày hôm trước
+        
+        const tooltip = dd + '/' + mm + ': ' + LABEL[lastStatus];
+        bars += '<div class="bar ' + lastStatus + '" title="' + tooltip + '"></div>';
     }
     return bars;
 }
 
-// Tính uptime dựa trên history từ DB
+// Tính uptime dựa trên history từ DB ÁP DỤNG FILL FORWARD
 function calcUptime(history) {
     let ok = 0, total = 0;
+    let lastStatus = null;
+
     for (let i = 29; i >= 0; i--) {
         const dk = dateKey(i);
-        const s = history[dk];
-        if (!s || s === 'unknown') continue;
-        total++;
-        if (s === 'working' || s === 'attach' || s === 'testing') ok++;
+        
+        if (history[dk]) {
+            lastStatus = history[dk];
+        }
+        
+        // Nếu đã có trạng thái để kế thừa (từ hôm qua hoặc hôm nay) thì mới bắt đầu tính
+        if (lastStatus) {
+            total++;
+            if (lastStatus === 'working' || lastStatus === 'attach' || lastStatus === 'testing') ok++;
+        }
     }
+    
     if (total === 0) return null;
     return (ok / total * 100).toFixed(2);
 }
@@ -509,9 +526,7 @@ async function loadStatus() {
             const svc  = services[key] || { status: 'offline', note: '', history: {} };
             const status = svc.status || 'offline';
 
-            // 👇 HISTORY TỪ API (backend query DB)
             const history = svc.history || {};
-
             const uptime = calcUptime(history);
 
             if (status !== 'working') allOk = false;
@@ -550,26 +565,26 @@ async function loadStatus() {
         const desc   = document.getElementById('banner-desc');
 
        if (anyDown) {
-    banner.className = 'banner down';
-    icon.textContent = '🔴';          
-    title.textContent = 'Hệ thống gặp sự cố';
-    desc.textContent = 'Có dịch vụ đang ngoại tuyến';
-} else if (anyDegraded) {
-    banner.className = 'banner degraded';
-    icon.textContent = '🟡';          
-    title.textContent = 'Hoạt động không ổn định';
-    desc.textContent = 'Một số dịch vụ đang bảo trì hoặc kiểm thử';
-} else if (!allOk) {
-    banner.className = 'banner degraded';
-    icon.textContent = '🟣';          
-    title.textContent = 'Có lỗi nhỏ';
-    desc.textContent = 'Một số dịch vụ đang gặp sự cố nhỏ';
-} else {
-    banner.className = 'banner ok';
-    icon.textContent = '✅';         
-    title.textContent = 'Hệ thống hoạt động bình thường';
-    desc.textContent = 'Tất cả dịch vụ đang hoạt động ổn định';
-}
+            banner.className = 'banner down';
+            icon.textContent = '🔴';          
+            title.textContent = 'Hệ thống gặp sự cố';
+            desc.textContent = 'Có dịch vụ đang ngoại tuyến';
+        } else if (anyDegraded) {
+            banner.className = 'banner degraded';
+            icon.textContent = '🟡';          
+            title.textContent = 'Hoạt động không ổn định';
+            desc.textContent = 'Một số dịch vụ đang bảo trì hoặc kiểm thử';
+        } else if (!allOk) {
+            banner.className = 'banner degraded';
+            icon.textContent = '🟣';          
+            title.textContent = 'Có lỗi nhỏ';
+            desc.textContent = 'Một số dịch vụ đang gặp sự cố nhỏ';
+        } else {
+            banner.className = 'banner ok';
+            icon.textContent = '✅';         
+            title.textContent = 'Hệ thống hoạt động bình thường';
+            desc.textContent = 'Tất cả dịch vụ đang hoạt động ổn định';
+        }
 
         document.getElementById('updated').textContent = new Date().toLocaleTimeString('vi-VN');
     } catch(e) {
