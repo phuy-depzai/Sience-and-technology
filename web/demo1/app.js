@@ -446,12 +446,15 @@ function updateCards(data, idPrefix = '', chartCtx = dashCharts, cardPrefix = nu
     const cp = cardPrefix !== null ? cardPrefix : idPrefix;
     const $ = (id) => document.getElementById(cp + id);
 
+    // Nếu không có data -> reset tất cả về '--'
     if (!data.length) {
-    ['env','pm','volt','curr','co','minmax'].forEach(k => {  // <-- thêm 'minmax'
-        if (chartCtx[k]) { chartCtx[k].destroy(); chartCtx[k] = null; }
-    });
-    return;
-}
+        ['temp','hum','volt','curr','pm1','pm25','pm10','co','voc_pct','nox_pct','maxv','minv','maxi','mini'].forEach(id => {
+            const el = $(id);
+            if (el) el.textContent = '--';
+        });
+        return;
+    }
+    
     const last = data[data.length - 1];
 
     const animateNumber = (id, nv, dec = 0, scale = 1) => {
@@ -485,15 +488,24 @@ function updateCards(data, idPrefix = '', chartCtx = dashCharts, cardPrefix = nu
     animateNumber('co', last.co, 2);
     animateNumber('voc_pct', last.voc_pct, 1);
     animateNumber('nox_pct', last.nox_pct, 1);
-applyCardIntensity(cp + 'pm25', last.pm25, 'pm25');
-applyCardIntensity(cp + 'pm10', last.pm10, 'pm10');
-applyCardIntensity(cp + 'co', last.co, 'co');
-applyCardIntensity(cp + 'voc_pct', last.voc_pct, 'voc_pct');
-applyCardIntensity(cp + 'nox_pct', last.nox_pct, 'nox_pct');
+    
+    // THÊM 4 DÒNG NÀY ĐỂ BƠM DATA MAX/MIN:
+    animateNumber('maxv', last.maxv, 3);
+    animateNumber('minv', last.minv, 3);
+    animateNumber('maxi', last.maxi, 3, 1000);
+    animateNumber('mini', last.mini, 3, 1000);
+
+    applyCardIntensity(cp + 'pm25', last.pm25, 'pm25');
+    applyCardIntensity(cp + 'pm10', last.pm10, 'pm10');
+    applyCardIntensity(cp + 'co', last.co, 'co');
+    applyCardIntensity(cp + 'voc_pct', last.voc_pct, 'voc_pct');
+    applyCardIntensity(cp + 'nox_pct', last.nox_pct, 'nox_pct');
+    
     if (!idPrefix) {
         const u = document.getElementById('updated');
         if (u) u.textContent = last.ts;
     }
+    
     renderGasChart(last.voc_pct, last.nox_pct, idPrefix, chartCtx);
     if (!idPrefix) setStatus(true);
 }
