@@ -10,8 +10,8 @@ function checkTermsAgreement() {
     }
     return true;
 }
-const dashCharts  = { env: null, volt: null, curr: null, pm: null, gas: null, co: null, minmax: null };
-const debugCharts = { env: null, volt: null, curr: null, pm: null, gas: null, co: null, minmax: null };
+
+
 function showTermsModal() {
     let overlay = document.getElementById('terms-overlay');
     if (!overlay) {
