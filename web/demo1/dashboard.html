@@ -35,29 +35,28 @@
     </section>
 
     <section class="aqi-banner">
-    <div class="aqi-circle-container">
-        <svg class="aqi-circle" width="200" height="200">
-            <circle class="aqi-circle-bg" cx="100" cy="100" r="90" />
-            <circle class="aqi-circle-progress" id="aqi-progress" cx="100" cy="100" r="90" />
-        </svg>
-        <div class="aqi-circle-text">
-            <div class="aqi-value" id="aqi" style="font-size:48px; font-weight:700; color:#4CAF50; line-height:1;">--</div>
-            <div class="aqi-label" style="font-size:14px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-top:4px;">AQI</div>
+        <div class="aqi-circle-container">
+            <svg class="aqi-circle" width="200" height="200">
+                <circle class="aqi-circle-bg" cx="100" cy="100" r="90" />
+                <circle class="aqi-circle-progress" id="aqi-progress" cx="100" cy="100" r="90" />
+            </svg>
+            <div class="aqi-circle-text">
+                <div class="aqi-value" id="aqi" style="font-size:48px; font-weight:700; color:#4CAF50; line-height:1;">--</div>
+                <div class="aqi-label" style="font-size:14px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-top:4px;">AQI</div>
+            </div>
         </div>
-    </div>
-    <div class="aqi-status" id="aqi-text" style="display:inline-block; margin-top:16px; padding:4px 16px; border-radius:12px; background:#4CAF50; color:#fff; font-weight:600;">--</div>
+        <div class="aqi-status" id="aqi-text" style="display:inline-block; margin-top:16px; padding:4px 16px; border-radius:12px; background:#4CAF50; color:#fff; font-weight:600;">--</div>
 
-    <!-- THÊM DÒNG NÀY -->
-    <div class="aqi-meta" id="aqi-meta" style="font-size:12px; color:var(--text-muted); margin-top:8px; line-height:1.5;">
-        Đang tải...
-    </div>
+        <div class="aqi-meta" id="aqi-meta" style="font-size:12px; color:var(--text-muted); margin-top:8px; line-height:1.5;">
+            Đang tải...
+        </div>
 
-    <div class="aqi-desc" style="font-size:12px; color:var(--text-muted); margin-top:12px;">
-        Nguồn công thức: <a href="https://cem.gov.vn/storage/news_file_attach/QD%201459%20TCMT%20ngay%2012.11.2019%20AQI.pdf" target="_blank" rel="noopener" style="color:var(--accent); text-decoration:underline;">QĐ 1459/TCMT (12/11/2019)</a>
-    </div>
-</section>
+        <div class="aqi-desc" style="font-size:12px; color:var(--text-muted); margin-top:12px;">
+            Nguồn công thức: <a href="https://cem.gov.vn/storage/news_file_attach/QD%201459%20TCMT%20ngay%2012.11.2019%20AQI.pdf" target="_blank" rel="noopener" style="color:var(--accent); text-decoration:underline;">QĐ 1459/TCMT (12/11/2019)</a>
+        </div>
+    </section>
 
-       <section class="grid">
+    <section class="grid">
         <div class="card temp">
             <div class="label">Nhiệt độ</div>
             <div class="value"><span id="temp">--</span><span class="unit">°C</span></div>
@@ -98,7 +97,24 @@
             <div class="label">NOx</div>
             <div class="value"><span id="nox_pct">--</span><span class="unit">%</span></div>
         </div>
-    </section>
+        
+        <!-- THÊM 4 KHỐI MAX/MIN VÀO ĐÂY -->
+        <div class="card maxv admin-only" style="display:none;">
+            <div class="label">Max V</div>
+            <div class="value" style="color: #FF9800;"><span id="maxv">--</span><span class="unit">V</span></div>
+        </div>
+        <div class="card minv admin-only" style="display:none;">
+            <div class="label">Min V</div>
+            <div class="value" style="color: #FFC107;"><span id="minv">--</span><span class="unit">V</span></div>
+        </div>
+        <div class="card maxi admin-only" style="display:none;">
+            <div class="label">Max I</div>
+            <div class="value" style="color: #9C27B0;"><span id="maxi">--</span><span class="unit">mA</span></div>
+        </div>
+        <div class="card mini admin-only" style="display:none;">
+            <div class="label">Min I</div>
+            <div class="value" style="color: #2196F3;"><span id="mini">--</span><span class="unit">mA</span></div>
+        </div>
     </section>
 
     <section class="chart-container">
@@ -130,10 +146,12 @@
         <h2 class="chart-title">Dòng điện</h2>
         <canvas id="chart-curr"></canvas>
     </section>
-    <div class="chart-container">
-    <h4 class="chart-title" style="font-size:16px;">Min / Max (V & mA)</h4>
-    <canvas id="chart-minmax"></canvas>
-</div>
+
+    <!-- SỬA LẠI CHO THẲNG HÀNG -->
+    <section class="chart-container admin-only" style="display:none;">
+        <h2 class="chart-title">Min / Max (V & mA)</h2>
+        <canvas id="chart-minmax"></canvas>
+    </section>
 
     <section class="chart-container admin-only" style="display:none;">
         <h2 class="chart-title">Dữ liệu hệ thống (Admin)</h2>
@@ -162,15 +180,15 @@
         </div>
     </section>
 
-   <footer>
-    <a href="/terms" style="color: var(--accent); text-decoration: none;">Điều khoản sử dụng</a>
-    <span style="color: var(--text-muted); margin: 0 8px;">·</span>
-    <span>© 2026 AirWatch</span>
-</footer>
+    <footer>
+        <a href="/terms" style="color: var(--accent); text-decoration: none;">Điều khoản sử dụng</a>
+        <span style="color: var(--text-muted); margin: 0 8px;">·</span>
+        <span>© 2026 AirWatch</span>
+    </footer>
 
-   <script src="/chart.min.js"></script>
-<script src="/chartjs-adapter-date-fns.bundle.min.js"></script>
-<script src="/auth-check.js"></script>
+    <script src="/chart.min.js"></script>
+    <script src="/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="/auth-check.js"></script>
     <script>
         function toggleMenu(e) { e.stopPropagation(); document.getElementById('dropdown-menu').classList.toggle('open'); }
         document.addEventListener('click', () => { const m = document.getElementById('dropdown-menu'); if (m) m.classList.remove('open'); });
