@@ -51,10 +51,32 @@ async function login(user, pass, otp) {
 }
 
 async function logout() {
-    localStorage.removeItem('admin_token');
+    const token = localStorage.getItem('auth_token'); // Lấy token đúng tên
+    
+    try {
+        // 1. Gọi API báo Backend xóa session trong DB (Node-RED của mày đã có sẵn API này)
+        if (token) {
+            await fetch(API_AUTH + '/api/logout', {
+                method: 'POST',
+                headers: { 'X-Auth-Token': token }
+            });
+        }
+    } catch (e) {
+        console.error('Lỗi gọi API logout:', e);
+    }
+    
+    // 2. Xóa sạch mọi dấu vết dưới máy
+    localStorage.removeItem('auth_token');
     localStorage.removeItem('admin_user');
+    localStorage.removeItem('admin_displayname');
     localStorage.removeItem('admin_role');
     localStorage.removeItem('admin_tab');
-    localStorage.removeItem('terms_agreed_version');   // ← THÊM: buộc tick lại khi login
-    // ...
+    localStorage.removeItem('terms_agreed_version'); // Bắt tick lại điều khoản
+    
+    // 3. Reset biến toàn cục
+    currentRole = 'guest';
+    currentUsername = '';
+    
+    // 4. Đá văng về trang chủ (Guest)
+    window.location.href = '/';
 }
