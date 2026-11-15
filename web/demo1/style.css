@@ -3642,3 +3642,26 @@ body.light .live-aqi-card > span:first-child {
     .terms-modal { padding: 24px 20px; }
     .terms-modal h2 { font-size: 18px; }
 }
+/* Kéo rộng container chứa bảng DB */
+.db-viewer-container, .main-content, .admin-container {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 0 20px; /* Chừa lề 2 bên một chút */
+    box-sizing: border-box;
+}
+
+/* Cho bảng cuộn dọc mượt mà, chừa khoảng trống cho header/footer */
+.db-table-wrapper, 
+.table-responsive {
+    width: 100%;
+    overflow-x: auto; /* Cho phép cuộn ngang nếu nhiều cột */
+    overflow-y: auto; 
+    max-height: calc(100vh - 250px); /* Chiều cao vừa vặn màn hình, tự tính toán dựa trên khoảng trống */
+    border-radius: 8px;
+}
+
+/* Fix cho bảng hiển thị gọn gàng hơn */
+.db-table-wrapper table {
+    width: 100%;
+    white-space: nowrap; /* Ép các cột giãn ra theo nội dung, đéo bị bóp méo */
+}

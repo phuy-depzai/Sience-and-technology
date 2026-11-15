@@ -2618,3 +2618,16 @@ function customNotify(message, type = 'info', duration = 3500) {
     toast.querySelector('.custom-toast-close').onclick = remove;
     if (duration > 0) setTimeout(remove, duration);
 }
+function dbFirstPage() { 
+    if (dbState.offset === 0) return; 
+    dbState.offset = 0; 
+    loadDBTable(); 
+}
+
+function dbLastPage() { 
+    // Tính offset của trang cuối cùng
+    const lastOffset = Math.floor((dbState.total - 1) / dbState.limit) * dbState.limit;
+    if (dbState.offset === lastOffset) return; 
+    dbState.offset = lastOffset; 
+    loadDBTable(); 
+}

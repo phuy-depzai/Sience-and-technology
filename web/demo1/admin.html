@@ -421,11 +421,18 @@
             </tbody>
         </table>
     </div>
-    <div class="table-toolbar" style="justify-content:space-between;">
-        <button onclick="dbPrevPage()" class="btn-mini" id="db-prev">← Trang trước</button>
-        <span class="table-count" id="db-pagination">0 / 0</span>
-        <button onclick="dbNextPage()" class="btn-mini" id="db-next">Trang sau →</button>
+    <!-- Tìm phần <div class="db-pagination-controls"> hoặc tương tự -->
+<div class="db-pagination-controls" style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+    <div>
+        <button class="btn-secondary" onclick="dbFirstPage()" style="padding: 6px 12px;">⏮ Trang đầu</button>
+        <button class="btn-secondary" id="db-prev" onclick="dbPrevPage()" style="padding: 6px 12px;">← Trang trước</button>
     </div>
+    <span id="db-pagination" style="font-weight: 600; color: var(--text-muted);">1–100 / 3015</span>
+    <div>
+        <button class="btn-secondary" id="db-next" onclick="dbNextPage()" style="padding: 6px 12px;">Trang sau →</button>
+        <button class="btn-secondary" onclick="dbLastPage()" style="padding: 6px 12px;">Trang cuối ⏭</button>
+    </div>
+</div>
 </section>
 
 <section class="admin-panel" id="tab-security" style="display:none;">
