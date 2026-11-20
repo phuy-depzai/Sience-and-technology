@@ -3687,3 +3687,141 @@ div:has(> .db-table-wrapper) {
     width: 100% !important;
     overflow-x: auto;
 }
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 20px 24px;
+  background: #fff;
+  border-bottom: 3px solid #4CAF50;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.dashboard-header__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #2e2e2e;
+  margin: 0;
+}
+
+.dashboard-header__logo {
+  font-size: 24px;
+}
+
+.dashboard-header__subtitle {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #777;
+}
+
+.dashboard-header__right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* node selector */
+.node-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.node-selector label {
+  font-weight: 600;
+  font-size: 14px;
+  color: #333;
+}
+
+.select-wrapper {
+  position: relative;
+}
+
+.select-wrapper::after {
+  content: "▾";
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #4CAF50;
+  pointer-events: none;
+  font-size: 12px;
+}
+
+#node-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: #fff;
+  border: 2px solid #4CAF50;
+  border-radius: 8px;
+  padding: 8px 32px 8px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #2e2e2e;
+  cursor: pointer;
+  min-width: 140px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#node-select:hover {
+  border-color: #388E3C;
+}
+
+#node-select:focus {
+  outline: none;
+  border-color: #388E3C;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+}
+
+#node-select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* responsive: stack trên mobile */
+@media (max-width: 480px) {
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .dashboard-header__right {
+    width: 100%;
+  }
+  .node-selector {
+    width: 100%;
+  }
+  .select-wrapper,
+  #node-select {
+    width: 100%;
+  }
+}
+
+/* dark mode */
+@media (prefers-color-scheme: dark) {
+  .dashboard-header {
+    background: #1a1a1a;
+    border-bottom-color: #4CAF50;
+  }
+  .dashboard-header__title,
+  .node-selector label {
+    color: #f0f0f0;
+  }
+  .dashboard-header__subtitle {
+    color: #aaa;
+  }
+  #node-select {
+    background-color: #1e1e1e;
+    color: #f0f0f0;
+    border-color: #4CAF50;
+  }
+  #node-select:hover,
+  #node-select:focus {
+    border-color: #66BB6A;
+  }
+}

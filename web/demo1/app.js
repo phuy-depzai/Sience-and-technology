@@ -737,7 +737,7 @@ function renderCharts(data, idPrefix = '', chartCtx = dashCharts) {
     }
 
     // ==========================================
-    // 3. CHART CO (NẾU CÓ)
+    // 3. CHART CO 
     // ==========================================
     renderCoChart(data, idPrefix, chartCtx);
 
@@ -2644,3 +2644,98 @@ function dbLastPage() {
     dbState.offset = lastOffset; 
     loadDBTable(); 
 }
+let currentNodeId =
+    new URLSearchParams(location.search).get('node') ||
+    localStorage.getItem('selected_node') ||
+    '001';
+
+function pad3(v) {
+    return String(v ?? '').padStart(3, '0');
+}
+
+async function loadNodeMenu() {
+    const select = document.getElementById('node-select');
+    if (!select) return;
+
+    try {
+        const res = await fetch('/api/nodes');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const data = await res.json();
+
+        select.innerHTML = '';
+
+        (Array.isArray(data) ? data : []).forEach(n => {
+            const id = pad3(n.node_id);
+            const opt = document.createElement('option');
+            opt.value = id;
+            opt.textContent = n.name ? `${id} - ${n.name}` : `Node ${id}`;
+            if (id === currentNodeId) opt.selected = true;
+            select.appendChild(opt);
+        });
+
+        if (!select.options.length) {
+            const opt = document.createElement('option');
+            opt.value = currentNodeId;
+            opt.textContent = `Node ${currentNodeId}`;
+            opt.selected = true;
+            select.appendChild(opt);
+        }
+
+        select.addEventListener('change', async () => {
+            currentNodeId = pad3(select.value);
+            localStorage.setItem('selected_node', currentNodeId);
+            history.replaceState(null, '', `?node=${currentNodeId}`);
+            await loadDashboardData();
+        });
+    } catch (err) {
+        console.error('loadNodeMenu error:', err);
+    }
+}
+
+async function loadDashboardData() {
+    try {
+        const url = `/api/data?node_id=${encodeURIComponent(currentNodeId)}&limit=100`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const data = await res.json();
+
+        const rows = Array.isArray(data) ? data : (data.rows || []);
+        if (!rows.length) {
+            console.warn('No data for node', currentNodeId);
+            return;
+        }
+
+        const latest = rows[0];
+
+        // ===== cập nhật card =====
+        document.getElementById('temp').textContent = latest.t ?? '--';
+        document.getElementById('hum').textContent = latest.h ?? '--';
+        document.getElementById('pm1').textContent = latest.pm1 ?? '--';
+        document.getElementById('pm25').textContent = latest.pm25 ?? '--';
+        document.getElementById('pm10').textContent = latest.pm10 ?? '--';
+        document.getElementById('co').textContent = latest.co ?? '--';
+        document.getElementById('voc_pct').textContent = latest.voc_pct ?? '--';
+        document.getElementById('nox_pct').textContent = latest.nox_pct ?? '--';
+
+        const aqiEl = document.getElementById('aqi');
+        if (aqiEl && latest.aqi != null) aqiEl.textContent = latest.aqi;
+
+        const statusEl = document.getElementById('status');
+        if (statusEl) statusEl.textContent = `NODE ${currentNodeId}`;
+
+        // ===== nếu mày đã có hàm vẽ chart sẵn thì gọi ở đây =====
+        // renderCharts(rows);
+        // updateAqi(latest);
+        // updateMinMax(latest);
+
+    } catch (err) {
+        console.error('loadDashboardData error:', err);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadNodeMenu();
+    await loadDashboardData();
+});
