@@ -3742,17 +3742,30 @@ div:has(> .db-table-wrapper) {
   position: relative;
 }
 
-.select-wrapper::after {
-  content: "▾";
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #4CAF50;
-  pointer-events: none;
-  font-size: 12px;
+.select-wrapper {
+  position: relative;
+  display: inline-block;
 }
 
+.select-wrapper::after {
+  content: "";
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid #4CAF50;   /* màu xanh chủ đạo */
+  pointer-events: none;
+}
+
+/* Khi focus/hover đổi màu mũi tên (tùy chọn) */
+#node-select:hover + .select-wrapper::after,
+#node-select:focus + .select-wrapper::after {
+  border-top-color: #388E3C;
+}
 #node-select {
   appearance: none;
   -webkit-appearance: none;
