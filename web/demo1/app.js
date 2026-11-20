@@ -827,8 +827,9 @@ ws.onmessage = (e) => {
     if (e.data === 'pong') return;
     try {
         const d = JSON.parse(e.data);
+        console.log('[WS RECV]', d.node_id, 'currentNodeId:', currentNodeId, d);
         if (d.t === undefined) return;
-        if (d.node_id !== currentNodeId) return; // bỏ qua nếu không phải node đang xem
+        if (d.node_id !== undefined && d.node_id !== currentNodeId) return;
         updateFromWS(d);
     } catch(err) {}
 };
