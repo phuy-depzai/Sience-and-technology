@@ -823,16 +823,25 @@ let ws = null, wsPingInterval = null;
 function connectWebSocket() {
     ws = new WebSocket('wss://airwatch.io.vn/ws/data');
     ws.onopen = () => { console.log('[WS] connected'); wsPingInterval = setInterval(() => { if (ws.readyState === WebSocket.OPEN) ws.send('ping'); }, 30000); };
-    ws.onmessage = (e) => { if (e.data === 'pong') return; try { const d = JSON.parse(e.data); if (d.t !== undefined) updateFromWS(d); } catch(err) {} };
+ws.onmessage = (e) => {
+    if (e.data === 'pong') return;
+    try {
+        const d = JSON.parse(e.data);
+        if (d.t === undefined) return;
+        if (d.node_id !== currentNodeId) return; // bỏ qua nếu không phải node đang xem
+        updateFromWS(d);
+    } catch(err) {}
+};
     ws.onclose = () => { console.log('[WS] disconnected, retry 3s'); clearInterval(wsPingInterval); setTimeout(connectWebSocket, 3000); };
     ws.onerror = () => console.error('[WS] error');
 }
 
 function updateFromWS(d) {
     if (d.t === undefined) return;
+    if (d.node_id !== undefined && d.node_id !== currentNodeId) return; // bỏ qua nếu không phải node đang xem
+
     const di = document.getElementById('date-picker'); const t = getLocalDate();
     if (di && di.value !== t) return;
-
     if (d.t !== undefined) document.getElementById('temp') && (document.getElementById('temp').textContent = d.t.toFixed(2));
     if (d.h !== undefined) document.getElementById('hum') && (document.getElementById('hum').textContent = d.h.toFixed(2));
     if (d.v !== undefined) document.getElementById('volt') && (document.getElementById('volt').textContent = d.v.toFixed(3));
