@@ -2644,29 +2644,18 @@ function dbLastPage() {
     dbState.offset = lastOffset; 
     loadDBTable(); 
 }
-let currentNodeId =
+let currentNodeId = pad3(
     new URLSearchParams(location.search).get('node') ||
     localStorage.getItem('selected_node') ||
-    '001';
+    '001'
+);
 
 function pad3(v) {
     return String(v ?? '').padStart(3, '0');
 }
 
 
-// ===== Node selection state =====
-let currentNodeId = getCurrentNodeId();
-
-function getCurrentNodeId() {
-    const params = new URLSearchParams(window.location.search);
-    const fromUrl = params.get('node');
-    if (fromUrl) return fromUrl.padStart(3, '0');
-
-    const fromStorage = localStorage.getItem('currentNodeId');
-    if (fromStorage) return fromStorage;
-
-    return '001'; // default
-}
+// ===== (KHÔNG khai báo lại currentNodeId — dùng biến đã có sẵn ở trên) =====
 
 // ===== Load danh sách node vào dropdown =====
 async function loadNodeMenu() {
@@ -2691,7 +2680,6 @@ async function loadNodeMenu() {
             select.appendChild(opt);
         });
 
-        // nếu currentNodeId không có trong danh sách thực tế, fallback về node đầu tiên
         if (!nodes.some(n => n.node_id === currentNodeId)) {
             currentNodeId = nodes[0].node_id;
             select.value = currentNodeId;
@@ -2706,8 +2694,8 @@ async function loadNodeMenu() {
 
 // ===== Khi người dùng đổi node =====
 function onNodeChange(newNodeId) {
-    currentNodeId = newNodeId;
-    localStorage.setItem('currentNodeId', currentNodeId);
+    currentNodeId = pad3(newNodeId);
+    localStorage.setItem('selected_node', currentNodeId); // dùng đúng key cũ
 
     const url = new URL(window.location);
     url.searchParams.set('node', currentNodeId);
@@ -2720,10 +2708,9 @@ function onNodeChange(newNodeId) {
 async function loadDashboardData() {
     try {
         const res = await fetch(`/api/data?node_id=${currentNodeId}&limit=100`);
-        const data = await res.json(); // array rows từ sensor
+        const data = await res.json();
 
         if (!Array.isArray(data) || data.length === 0) {
-            // node chưa có data — clear UI thay vì giữ data node cũ
             clearDashboard();
             return;
         }
@@ -2736,10 +2723,7 @@ async function loadDashboardData() {
     }
 }
 
-// ===== Clear UI khi node không có data =====
 function clearDashboard() {
-    // TODO: gọi lại hàm update card/chart với mảng rỗng,
-    // hoặc show thông báo "Node chưa có dữ liệu"
     updateCards([]);
     renderCharts([]);
 }
