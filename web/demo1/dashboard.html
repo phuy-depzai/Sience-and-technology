@@ -33,9 +33,25 @@
         <button onclick="loadByDate()" class="btn-primary" style="padding: 8px 16px;">Xem</button>
         <button onclick="loadToday()" class="btn-secondary" style="padding: 8px 16px;">Hôm nay</button>
     </section>
-<section class="node-selector">
-    <label for="node-select">Chọn node:</label>
-    <select id="node-select"></select>
+<section class="dashboard-header">
+  <div class="dashboard-header__left">
+    <h1 class="dashboard-header__title">
+      <span class="dashboard-header__logo">🌿</span>
+      AirWatch Dashboard
+    </h1>
+    <p class="dashboard-header__subtitle">Hệ thống quan trắc không khí realtime</p>
+  </div>
+
+  <div class="dashboard-header__right">
+    <div class="node-selector">
+      <label for="node-select">Node</label>
+      <div class="select-wrapper">
+        <select id="node-select">
+          <option value="" disabled selected>Đang tải...</option>
+        </select>
+      </div>
+    </div>
+  </div>
 </section>
     <section class="aqi-banner">
         <div class="aqi-circle-container">

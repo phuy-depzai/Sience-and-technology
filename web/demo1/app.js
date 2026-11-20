@@ -888,7 +888,7 @@ setInterval(async () => {
 // ============================================================
 // MANUAL STATUS
 // ============================================================
-const STATUS_ICONS = { node: '🔌 NODE', gate: '📡 GATEWAY', server: '🖥️ SERVER' };
+const STATUS_ICONS = { node: ' NODE', gate: ' GATEWAY', server: ' SERVER' };
 const PRESET_NOTES = { working: 'Hoạt động bình thường', debug: 'Đang debug', attach: 'Đang gắn module/sensor', testing: 'Đang chạy test', maintenance: 'Đang bảo trì', offline: 'Tạm tắt' };
 
 function applyPreset(status) {
@@ -2737,5 +2737,105 @@ async function loadDashboardData() {
 
 document.addEventListener('DOMContentLoaded', async () => {
     await loadNodeMenu();
+    await loadDashboardData();
+});
+// ===== Node selection state =====
+let currentNodeId = getCurrentNodeId();
+
+function getCurrentNodeId() {
+    const params = new URLSearchParams(window.location.search);
+    const fromUrl = params.get('node');
+    if (fromUrl) return fromUrl.padStart(3, '0');
+
+    const fromStorage = localStorage.getItem('currentNodeId');
+    if (fromStorage) return fromStorage;
+
+    return '001'; // default
+}
+
+// ===== Load danh sách node vào dropdown =====
+async function loadNodeMenu() {
+    const select = document.getElementById('node-select');
+    select.disabled = true;
+
+    try {
+        const res = await fetch('/api/nodes');
+        const nodes = await res.json(); // [{node_id, name}]
+
+        if (!Array.isArray(nodes) || nodes.length === 0) {
+            select.innerHTML = '<option value="">Không có node</option>';
+            return;
+        }
+
+        select.innerHTML = '';
+        nodes.forEach(n => {
+            const opt = document.createElement('option');
+            opt.value = n.node_id;
+            opt.textContent = n.name;
+            if (n.node_id === currentNodeId) opt.selected = true;
+            select.appendChild(opt);
+        });
+
+        // nếu currentNodeId không có trong danh sách thực tế, fallback về node đầu tiên
+        if (!nodes.some(n => n.node_id === currentNodeId)) {
+            currentNodeId = nodes[0].node_id;
+            select.value = currentNodeId;
+        }
+    } catch (err) {
+        console.error('Lỗi load danh sách node:', err);
+        select.innerHTML = '<option value="">Lỗi tải node</option>';
+    } finally {
+        select.disabled = false;
+    }
+}
+
+// ===== Khi người dùng đổi node =====
+function onNodeChange(newNodeId) {
+    currentNodeId = newNodeId;
+    localStorage.setItem('currentNodeId', currentNodeId);
+
+    const url = new URL(window.location);
+    url.searchParams.set('node', currentNodeId);
+    window.history.replaceState({}, '', url);
+
+    loadDashboardData();
+}
+
+// ===== Load data của node hiện tại =====
+async function loadDashboardData() {
+    try {
+        const res = await fetch(`/api/data?node_id=${currentNodeId}&limit=100`);
+        const data = await res.json(); // array rows từ sensor
+
+        if (!Array.isArray(data) || data.length === 0) {
+            // node chưa có data — clear UI thay vì giữ data node cũ
+            clearDashboard();
+            return;
+        }
+
+        updateCards(data);
+        renderCharts(data);
+    } catch (err) {
+        console.error('Lỗi load dữ liệu dashboard:', err);
+        clearDashboard();
+    }
+}
+
+// ===== Clear UI khi node không có data =====
+function clearDashboard() {
+    // TODO: gọi lại hàm update card/chart với mảng rỗng,
+    // hoặc show thông báo "Node chưa có dữ liệu"
+    updateCards([]);
+    renderCharts([]);
+}
+
+// ===== Khởi tạo =====
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadNodeMenu();
+
+    document.getElementById('node-select').addEventListener('change', (e) => {
+        onNodeChange(e.target.value);
+    });
+
     await loadDashboardData();
 });
