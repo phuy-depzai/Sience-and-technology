@@ -2725,16 +2725,12 @@ async function loadDashboardData() {
         const res = await fetch(`/api/data?node_id=${currentNodeId}&limit=100`);
         const data = await res.json();
 
-        if (!Array.isArray(data) || data.length === 0) {
-            clearDashboard();
-            return;
-        }
-
         updateCards(data);
         renderCharts(data);
     } catch (err) {
         console.error('Lỗi load dữ liệu dashboard:', err);
-        clearDashboard();
+        updateCards([]);
+        renderCharts([]);
     }
 }
 
