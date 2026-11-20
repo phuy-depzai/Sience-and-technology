@@ -938,12 +938,26 @@ async function loadNodesOnMap() {
     } catch(e) { console.error('[MAP]', e); }
 }
 
-async function addNode() {
-    const id = document.getElementById('node-id').value.trim();
+aasync function addNode() {
+    let id = document.getElementById('node-id').value.trim();
     const name = document.getElementById('node-name').value.trim();
     const lat = document.getElementById('node-lat').value.trim();
     const lng = document.getElementById('node-lng').value.trim();
-    if (!id || !name || !lat || !lng) { customNotify('Vui lòng điền đầy đủ + click bản đồ', 'warn'); return; }
+
+    if (!id || !name || !lat || !lng) {
+        customNotify('Vui lòng điền đầy đủ + click bản đồ', 'warn');
+        return;
+    }
+
+    // validate: chỉ cho nhập số, tối đa 3 chữ số
+    if (!/^\d{1,3}$/.test(id)) {
+        customNotify('ID Node phải là số, tối đa 3 chữ số (vd: 1, 01, 001)', 'warn');
+        return;
+    }
+
+    // chuẩn hóa về đúng 3 chữ số, khớp format bên sensor.node_id
+    id = id.padStart(3, '0');
+
     try {
         const r = await fetch(API + '/api/nodes', {
             method: 'POST',
@@ -959,9 +973,10 @@ async function addNode() {
         if (window._tempMarker) { adminMap.removeLayer(window._tempMarker); window._tempMarker = null; }
         loadNodesOnMap();
         loadNodes();
-    } catch(e) { customNotify('Thêm node thất bại: ' + e.message, 'error'); }
+    } catch(e) {
+        customNotify('Thêm node thất bại: ' + e.message, 'error');
+    }
 }
-
 async function loadNodes() {
     const box = document.getElementById('nodes-list');
     if (!box) return;
