@@ -1985,52 +1985,112 @@ function debouncedDBSearch() {
         loadDBTable();
     }, 300);
 }
+function escapeHTML(value) {
+    return String(value ?? '').replace(/[&<>"']/g, char => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    })[char]);
+}
 
 async function loadDBTable() {
     const sel = document.getElementById('db-table-select');
     if (!sel) return;
+
     dbState.table = sel.value;
+
     const thead = document.getElementById('db-thead');
     const tbody = document.getElementById('db-tbody');
+
     tbody.innerHTML = '<tr><td style="text-align:center; padding:20px; color:var(--text-muted);">Đang tải...</td></tr>';
+
     try {
-        const params = new URLSearchParams({ limit: dbState.limit, offset: dbState.offset, q: dbState.q });
-        const r = await fetch(API + '/api/db/' + dbState.table + '?' + params.toString(), { headers: { 'X-Auth-Token': getToken() } });
+        const params = new URLSearchParams({
+            limit: dbState.limit,
+            offset: dbState.offset,
+            q: dbState.q
+        });
+
+        const r = await fetch(
+            API + '/api/db/' + dbState.table + '?' + params.toString(),
+            { headers: { 'X-Auth-Token': getToken() } }
+        );
+
         if (!r.ok) throw new Error('HTTP ' + r.status);
+
         const d = await r.json();
+
+        if (d.error) throw new Error(d.error);
+
         dbState.total = d.total || 0;
-        
-        // Đổi tên cột 'id' thành 'STT' trên Header
-        thead.innerHTML = '<tr>' + d.columns.map(c => '<th>' + (c === 'id' ? 'STT' : c) + '</th>').join('') + '</tr>';
-        
+
+        // ===== HEADER =====
+        thead.innerHTML = '<tr>' + d.columns.map(c =>
+            '<th>' + escapeHTML(c === 'id' ? 'STT' : c) + '</th>'
+        ).join('') + '</tr>';
+
+        // ===== BODY =====
         if (!d.rows || !d.rows.length) {
-            tbody.innerHTML = '<tr><td colspan="' + d.columns.length + '" style="text-align:center; padding:20px; color:var(--text-muted);">Không có data</td></tr>';
+            tbody.innerHTML =
+                '<tr><td colspan="' + d.columns.length +
+                '" style="text-align:center; padding:20px; color:var(--text-muted);">' +
+                'Không có data</td></tr>';
         } else {
             tbody.innerHTML = d.rows.map((row, index) => {
-                // 🔥 ĐÁNH SỐ NGƯỢC TỪ DƯỚI LÊN (Thằng mới nhất có STT cao nhất)
+
+                // Đánh số ngược từ dưới lên
                 const stt = dbState.total - (dbState.offset + index);
-                
+
                 return '<tr>' + d.columns.map(c => {
-                    // Nếu là cột ID thì hiển thị STT ảo
+
+                    // ID hiển thị thành STT ảo
                     if (c === 'id') {
                         return '<td>' + stt + '</td>';
                     }
-                    let v = row[c];
-                    if (v === null || v === undefined) v = '—';
-                    else if (typeof v === 'string' && v.length > 60) v = v.substring(0, 60) + '...';
-                    const title = String(row[c] === null ? '' : row[c]).replace(/"/g, '&quot;');
-                    return '<td title="' + title + '">' + v + '</td>';
+
+                    const raw = row[c];
+
+                    let v = raw;
+
+                    if (v === null || v === undefined) {
+                        v = '—';
+                    } else if (typeof v === 'string' && v.length > 60) {
+                        v = v.substring(0, 60) + '...';
+                    }
+
+                    // Escape nội dung và tooltip
+                    const safeValue = escapeHTML(v);
+                    const safeTitle = escapeHTML(raw ?? '');
+
+                    return '<td title="' + safeTitle + '">' + safeValue + '</td>';
+
                 }).join('') + '</tr>';
+
             }).join('');
         }
-        
+
+        // ===== PAGINATION =====
         const start = dbState.total === 0 ? 0 : dbState.offset + 1;
         const end = Math.min(dbState.offset + dbState.limit, dbState.total);
-        document.getElementById('db-pagination').textContent = start + '–' + end + ' / ' + dbState.total;
-        document.getElementById('db-prev').disabled = dbState.offset === 0;
-        document.getElementById('db-next').disabled = end >= dbState.total;
-    } catch(e) { 
-        tbody.innerHTML = '<tr><td style="text-align:center; padding:20px; color:#f85149;">Lỗi: ' + e.message + '</td></tr>'; 
+
+        document.getElementById('db-pagination').textContent =
+            start + '–' + end + ' / ' + dbState.total;
+
+        document.getElementById('db-prev').disabled =
+            dbState.offset === 0;
+
+        document.getElementById('db-next').disabled =
+            end >= dbState.total;
+
+    } catch (e) {
+        console.error('[DB Viewer]', e);
+
+        tbody.innerHTML =
+            '<tr><td style="text-align:center; padding:20px; color:#f85149;">' +
+            'Lỗi: ' + escapeHTML(e.message) +
+            '</td></tr>';
     }
 }
 
