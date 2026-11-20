@@ -938,7 +938,7 @@ async function loadNodesOnMap() {
     } catch(e) { console.error('[MAP]', e); }
 }
 
-aasync function addNode() {
+async function addNode() {
     let id = document.getElementById('node-id').value.trim();
     const name = document.getElementById('node-name').value.trim();
     const lat = document.getElementById('node-lat').value.trim();
