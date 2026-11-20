@@ -1974,26 +1974,39 @@ async function loadDBTable() {
         if (!r.ok) throw new Error('HTTP ' + r.status);
         const d = await r.json();
         dbState.total = d.total || 0;
-        thead.innerHTML = '<tr>' + d.columns.map(c => '<th>' + c + '</th>').join('') + '</tr>';
+        
+        // Đổi tên cột 'id' thành 'STT' trên Header
+        thead.innerHTML = '<tr>' + d.columns.map(c => '<th>' + (c === 'id' ? 'STT' : c) + '</th>').join('') + '</tr>';
+        
         if (!d.rows || !d.rows.length) {
             tbody.innerHTML = '<tr><td colspan="' + d.columns.length + '" style="text-align:center; padding:20px; color:var(--text-muted);">Không có data</td></tr>';
         } else {
-            tbody.innerHTML = d.rows.map(row =>
-                '<tr>' + d.columns.map(c => {
+            tbody.innerHTML = d.rows.map((row, index) => {
+                // 🔥 TỰ ĐÁNH SỐ TỪ 1 TỚI N (Dựa vào offset của trang hiện tại)
+                const stt = dbState.offset + index + 1;
+                
+                return '<tr>' + d.columns.map(c => {
+                    // Nếu là cột ID thì hiển thị STT ảo
+                    if (c === 'id') {
+                        return '<td>' + stt + '</td>';
+                    }
                     let v = row[c];
                     if (v === null || v === undefined) v = '—';
                     else if (typeof v === 'string' && v.length > 60) v = v.substring(0, 60) + '...';
                     const title = String(row[c] === null ? '' : row[c]).replace(/"/g, '&quot;');
                     return '<td title="' + title + '">' + v + '</td>';
-                }).join('') + '</tr>'
-            ).join('');
+                }).join('') + '</tr>';
+            }).join('');
         }
+        
         const start = dbState.total === 0 ? 0 : dbState.offset + 1;
         const end = Math.min(dbState.offset + dbState.limit, dbState.total);
         document.getElementById('db-pagination').textContent = start + '–' + end + ' / ' + dbState.total;
         document.getElementById('db-prev').disabled = dbState.offset === 0;
         document.getElementById('db-next').disabled = end >= dbState.total;
-    } catch(e) { tbody.innerHTML = '<tr><td style="text-align:center; padding:20px; color:#f85149;">Lỗi: ' + e.message + '</td></tr>'; }
+    } catch(e) { 
+        tbody.innerHTML = '<tr><td style="text-align:center; padding:20px; color:#f85149;">Lỗi: ' + e.message + '</td></tr>'; 
+    }
 }
 
 function dbPrevPage() { if (dbState.offset === 0) return; dbState.offset = Math.max(0, dbState.offset - dbState.limit); loadDBTable(); }
