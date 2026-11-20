@@ -1982,8 +1982,8 @@ async function loadDBTable() {
             tbody.innerHTML = '<tr><td colspan="' + d.columns.length + '" style="text-align:center; padding:20px; color:var(--text-muted);">Không có data</td></tr>';
         } else {
             tbody.innerHTML = d.rows.map((row, index) => {
-                // 🔥 TỰ ĐÁNH SỐ TỪ 1 TỚI N (Dựa vào offset của trang hiện tại)
-                const stt = dbState.offset + index + 1;
+                // 🔥 ĐÁNH SỐ NGƯỢC TỪ DƯỚI LÊN (Thằng mới nhất có STT cao nhất)
+                const stt = dbState.total - (dbState.offset + index);
                 
                 return '<tr>' + d.columns.map(c => {
                     // Nếu là cột ID thì hiển thị STT ảo
