@@ -2679,7 +2679,7 @@ async function loadNodeMenu() {
 
     try {
         const res = await fetch('/api/nodes');
-        const nodes = await res.json(); // [{node_id, name}]
+        const nodes = await res.json(); // [{id, name}]
 
         if (!Array.isArray(nodes) || nodes.length === 0) {
             select.innerHTML = '<option value="">Không có node</option>';
@@ -2689,14 +2689,14 @@ async function loadNodeMenu() {
         select.innerHTML = '';
         nodes.forEach(n => {
             const opt = document.createElement('option');
-            opt.value = n.node_id;
+            opt.value = n.id;
             opt.textContent = n.name;
-            if (n.node_id === currentNodeId) opt.selected = true;
+            if (n.id === currentNodeId) opt.selected = true;
             select.appendChild(opt);
         });
 
-        if (!nodes.some(n => n.node_id === currentNodeId)) {
-            currentNodeId = nodes[0].node_id;
+        if (!nodes.some(n => n.id === currentNodeId)) {
+            currentNodeId = nodes[0].id;
             select.value = currentNodeId;
         }
     } catch (err) {
