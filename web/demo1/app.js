@@ -2916,46 +2916,16 @@ function clearDashboard() {
 }
 
 // ===== Khởi tạo =====
-document.addEventListener('DOMContentLoaded', async () => {
-    await loadNodeMenu();
+// ============ DB VIEWER STATE ============
+const dbState = {
+    table: '',
+    offset: 0,
+    limit: 100,
+    q: '',
+    total: 0
+};
 
-    const nodeSelect = document.getElementById('node-select');
-    if (nodeSelect) {
-        nodeSelect.addEventListener('change', (e) => {
-            onNodeChange(e.target.value);
-        });
-    }
-
-    await loadDashboardData();
-});
-async function loadDBTable() {
-    const sel = document.getElementById('db-table-select');
-    if (!sel || !sel.value) return;
-
-    dbState.table = sel.value;
-
-    try {
-        const r = await fetch(API + '/api/db/tables', {
-            headers: { 'X-Auth-Token': getToken() }
-        });
-
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-
-        const tables = await r.json();
-
-        sel.innerHTML = tables.map(t =>
-            `<option value="${escapeHTML(t)}">${escapeHTML(t)}</option>`
-        ).join('');
-
-        if (tables.length) {
-            sel.value = tables[0];
-            loadDBTable();
-        }
-    } catch (e) {
-        sel.innerHTML = '<option value="">Lỗi load table</option>';
-        console.error('[DB tables]', e);
-    }
-}
+// ============ LOAD DANH SÁCH BẢNG (chỉ 1 lần khi vào tab) ============
 async function loadDBTableOptions() {
     const sel = document.getElementById('db-table-select');
     if (!sel) return;
@@ -2964,7 +2934,6 @@ async function loadDBTableOptions() {
         const r = await fetch(API + '/api/db/tables', {
             headers: { 'X-Auth-Token': getToken() }
         });
-
         if (!r.ok) throw new Error('HTTP ' + r.status);
 
         const tables = await r.json();
@@ -2978,17 +2947,167 @@ async function loadDBTableOptions() {
             `<option value="${escapeHTML(t)}">${escapeHTML(t)}</option>`
         ).join('');
 
-        dbState.table = sel.value;
+        // Gắn change handler 1 lần duy nhất (dùng .onchange để không bị stack)
+        sel.onchange = () => {
+            dbState.offset = 0;
+            dbState.q = '';
+            const search = document.getElementById('db-search');
+            if (search) search.value = '';
+            loadDBTable();
+        };
+
+        // Chọn bảng đầu và load data
+        sel.value = tables[0];
+        dbState.table = tables[0];
         dbState.offset = 0;
+
         await loadDBTable();
+
     } catch (e) {
         console.error('[DB tables]', e);
         sel.innerHTML = '<option value="">Lỗi load table</option>';
     }
 }
+
+// ============ LOAD DỮ LIỆU CỦA BẢNG ĐANG CHỌN ============
+async function loadDBTable() {
+    const sel = document.getElementById('db-table-select');
+    if (!sel) return;
+
+    const table = sel.value || dbState.table;
+    if (!table) return;
+
+    dbState.table = table;
+
+    try {
+        const params = new URLSearchParams({
+            limit: String(dbState.limit),
+            offset: String(dbState.offset),
+            q: dbState.q || ''
+        });
+
+        const r = await fetch(
+            API + '/api/db/table/' + encodeURIComponent(table) + '?' + params.toString(),
+            { headers: { 'X-Auth-Token': getToken() } }
+        );
+
+        if (!r.ok) {
+            const txt = await r.text();
+            throw new Error(`HTTP ${r.status}: ${txt}`);
+        }
+
+        const data = await r.json();
+        // data = { table, columns, rows, total, limit, offset, q }
+
+        dbState.total = data.total || 0;
+
+        renderDBTable(data);
+        updateDBPagination();
+    } catch (e) {
+        console.error('[DB table]', e);
+        const tbody = document.getElementById('db-tbody');
+        if (tbody) tbody.innerHTML =
+            `<tr><td colspan="99" style="text-align:center; padding:20px; color:#e55;">
+                Lỗi: ${escapeHTML(e.message)}
+            </td></tr>`;
+    }
+}
+
+// ============ RENDER BẢNG ============
+function renderDBTable(data) {
+    const thead = document.getElementById('db-thead');
+    const tbody = document.getElementById('db-tbody');
+    if (!thead || !tbody) return;
+
+    const cols = data.columns || [];
+    const rows = data.rows || [];
+
+    thead.innerHTML = '<tr>' + cols.map(c =>
+        `<th>${escapeHTML(c)}</th>`
+    ).join('') + '</tr>';
+
+    if (!rows.length) {
+        tbody.innerHTML =
+            `<tr><td colspan="${Math.max(cols.length, 1)}"
+                 style="text-align:center; padding:20px;">Không có dữ liệu</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = rows.map(row =>
+        '<tr>' + cols.map(c => {
+            const v = row[c];
+            const s = v === null || v === undefined ? '' :
+                      (typeof v === 'object' ? JSON.stringify(v) : String(v));
+            return `<td>${escapeHTML(s)}</td>`;
+        }).join('') + '</tr>'
+    ).join('');
+}
+
+// ============ PAGINATION UI ============
+function updateDBPagination() {
+    const info = document.getElementById('db-pagination');
+    const prev = document.getElementById('db-prev');
+    const next = document.getElementById('db-next');
+    if (!info) return;
+
+    const { total, offset, limit } = dbState;
+    const from = total === 0 ? 0 : offset + 1;
+    const to = Math.min(offset + limit, total);
+
+    info.textContent = `${from}–${to} / ${total} dòng`;
+
+    if (prev) prev.disabled = offset <= 0;
+    if (next) next.disabled = offset + limit >= total;
+}
+
+// ============ PAGINATION BUTTONS ============
+function dbPrevPage() {
+    if (dbState.offset <= 0) return;
+    dbState.offset = Math.max(0, dbState.offset - dbState.limit);
+    loadDBTable();
+}
+
+function dbNextPage() {
+    if (dbState.offset + dbState.limit >= dbState.total) return;
+    dbState.offset += dbState.limit;
+    loadDBTable();
+}
+
+function dbFirstPage() {
+    if (dbState.offset === 0) return;
+    dbState.offset = 0;
+    loadDBTable();
+}
+
+function dbLastPage() {
+    const lastOffset = Math.floor((dbState.total - 1) / dbState.limit) * dbState.limit;
+    if (dbState.offset === lastOffset) return;
+    dbState.offset = Math.max(0, lastOffset);
+    loadDBTable();
+}
+
+// ============ SEARCH DEBOUNCE ============
+let dbSearchTimer = null;
+function debouncedDBSearch(val) {
+    clearTimeout(dbSearchTimer);
+    dbSearchTimer = setTimeout(() => {
+        dbState.q = String(val || '').trim();
+        dbState.offset = 0;
+        loadDBTable();
+    }, 300);
+}
+
+// ============ INIT ============
 function initDBViewer() {
     const sel = document.getElementById('db-table-select');
     if (!sel) return;
+
+    // Gắn search handler 1 lần
+    const search = document.getElementById('db-search');
+    if (search && !search._dbBound) {
+        search.addEventListener('input', e => debouncedDBSearch(e.target.value));
+        search._dbBound = true;
+    }
 
     loadDBTableOptions();
 }
