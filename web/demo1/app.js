@@ -705,15 +705,16 @@ function renderCharts(data, idPrefix = '', chartCtx = dashCharts) {
     // ===== 2. DOWNSAMPLE =====
     const s = downsample(clean, 150);
 
-    // ===== 3. TẠO POINTS CÓ CHÈN NULL GAP =====
-    const tPoints   = insertGapNulls(toPoints(s, 't'));
-    const hPoints   = insertGapNulls(toPoints(s, 'h'));
-    const pm1Points = insertGapNulls(toPoints(s, 'pm1'));
-    const pm25Points= insertGapNulls(toPoints(s, 'pm25'));
-    const pm10Points= insertGapNulls(toPoints(s, 'pm10'));
-    const vPoints   = insertGapNulls(toPoints(s, 'v'));
-    const iPoints   = insertGapNulls(toPoints(s, 'i', 1000)); // i -> mA
+// ===== 3. TẠO POINTS CÓ CHÈN NULL GAP (ngưỡng 30 phút) =====
+const GAP_MS = 30 * 60 * 1000; // 30 phút
 
+const tPoints   = insertGapNulls(toPoints(s, 't'),       GAP_MS);
+const hPoints   = insertGapNulls(toPoints(s, 'h'),       GAP_MS);
+const pm1Points = insertGapNulls(toPoints(s, 'pm1'),     GAP_MS);
+const pm25Points= insertGapNulls(toPoints(s, 'pm25'),    GAP_MS);
+const pm10Points= insertGapNulls(toPoints(s, 'pm10'),    GAP_MS);
+const vPoints   = insertGapNulls(toPoints(s, 'v'),       GAP_MS);
+const iPoints   = insertGapNulls(toPoints(s, 'i', 1000), GAP_MS);
     // ===== 4. CHART MÔI TRƯỜNG =====
     if (chartCtx.env) chartCtx.env.destroy();
     chartCtx.env = new Chart(envCanvas, {
