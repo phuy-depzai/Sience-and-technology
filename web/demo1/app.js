@@ -3078,7 +3078,7 @@ function dbLastPage() {
 }
 
 // ============ SEARCH DEBOUNCE ============
-let dbSearchTimer = null;
+//let dbSearchTimer = null;
 function debouncedDBSearch(val) {
     clearTimeout(dbSearchTimer);
     dbSearchTimer = setTimeout(() => {
