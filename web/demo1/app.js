@@ -97,12 +97,34 @@ function downsample(d, m) {
     return o;
 }
 
-function toPoints(a, k, sc) {
-    sc = sc || 1;
-    return a.map(d => {
-        const v = d[k] !== undefined && d[k] !== null ? Number(d[k]) : null;
-        return { x: tsToMs(d.ts), y: v !== null ? v * sc : null };
-    });
+function toPointsSafe(data, field, scale = 1) {
+    if (!data || !data.length) return [];
+
+    // 1. Map ra {x, y} với x = timestamp (ms)
+    const raw = [];
+    for (const d of data) {
+        const rawX = d.recorded_at || d.ts;
+        if (!rawX) continue;
+        const x = new Date(rawX).getTime();
+        if (isNaN(x)) continue;
+        const yVal = d[field];
+        if (yVal == null || isNaN(yVal)) continue;
+        raw.push({ x, y: yVal * scale });
+    }
+
+    // 2. Sort theo x
+    raw.sort((a, b) => a.x - b.x);
+
+    // 3. Dedup theo x — giữ giá trị CUỐI (mới nhất)
+    const map = new Map();
+    for (const p of raw) {
+        map.set(p.x, p.y);
+    }
+
+    // 4. Trả về mảng sorted, unique x
+    return Array.from(map.entries())
+        .sort((a, b) => a[0] - b[0])
+        .map(([x, y]) => ({ x, y }));
 }
 // ============================================================
 // INTENSITY THRESHOLDS — QCVN 05:2023/BTNMT
@@ -678,7 +700,6 @@ function renderCharts(data, idPrefix = '', chartCtx = dashCharts) {
     const envCanvas = $('chart-env');
     if (!envCanvas) return;
 
-    // Xóa chart cũ nếu không có data
     if (!data.length) {
         ['env','pm','volt','curr','co','minmax'].forEach(k => {
             if (chartCtx[k]) { chartCtx[k].destroy(); chartCtx[k] = null; }
@@ -686,51 +707,51 @@ function renderCharts(data, idPrefix = '', chartCtx = dashCharts) {
         return;
     }
 
-    // ===== 1. LỌC TRÙNG & SORT THEO THỜI GIAN =====
+    // ===== 1. LỌC TRÙNG RECORD (theo id hoặc recorded_at) =====
     const seen = new Set();
     const clean = [];
     for (const d of data) {
-        const key = d.id || d.recorded_at || (d.node_id + '_' + d.ts + '_' + d.recorded_at);
+        const key = d.id || d.recorded_at || (d.node_id + '_' + d.ts);
         if (!key || seen.has(key)) continue;
         seen.add(key);
         clean.push(d);
     }
 
+    // ===== 2. SORT THEO THỜI GIAN =====
     clean.sort((a, b) => {
         const ax = new Date(a.recorded_at || a.ts).getTime();
         const bx = new Date(b.recorded_at || b.ts).getTime();
         return ax - bx;
     });
 
-    // ===== 2. DOWNSAMPLE =====
+    // ===== 3. DOWNSAMPLE =====
     const s = downsample(clean, 150);
 
-// ===== 3. TẠO POINTS CÓ CHÈN NULL GAP (ngưỡng 30 phút) =====
-const GAP_MS = 30 * 60 * 1000; // 30 phút
+    // ===== 4. TẠO POINTS (KHÔNG chèn null — nối liền mạch) =====
+    const tPoints   = toPointsSafe(s, 't');
+    const hPoints   = toPointsSafe(s, 'h');
+    const pm1Points = toPointsSafe(s, 'pm1');
+    const pm25Points= toPointsSafe(s, 'pm25');
+    const pm10Points= toPointsSafe(s, 'pm10');
+    const vPoints   = toPointsSafe(s, 'v');
+    const iPoints   = toPointsSafe(s, 'i', 1000);
 
-const tPoints   = insertGapNulls(toPoints(s, 't'),       GAP_MS);
-const hPoints   = insertGapNulls(toPoints(s, 'h'),       GAP_MS);
-const pm1Points = insertGapNulls(toPoints(s, 'pm1'),     GAP_MS);
-const pm25Points= insertGapNulls(toPoints(s, 'pm25'),    GAP_MS);
-const pm10Points= insertGapNulls(toPoints(s, 'pm10'),    GAP_MS);
-const vPoints   = insertGapNulls(toPoints(s, 'v'),       GAP_MS);
-const iPoints   = insertGapNulls(toPoints(s, 'i', 1000), GAP_MS);
-    // ===== 4. CHART MÔI TRƯỜNG =====
+    // ===== 5. CHART MÔI TRƯỜNG =====
     if (chartCtx.env) chartCtx.env.destroy();
     chartCtx.env = new Chart(envCanvas, {
         type: 'line',
         data: { datasets: [
             { label: 'Nhiệt độ (°C)', data: tPoints, borderColor: '#f44336',
               backgroundColor: 'rgba(244,67,54,0.1)', tension: 0.2, pointRadius: 0,
-              borderWidth: 2, yAxisID: 'y_temp', spanGaps: false },
+              borderWidth: 2, yAxisID: 'y_temp', spanGaps: true },
             { label: 'Độ ẩm (%)', data: hPoints, borderColor: '#2196F3',
               backgroundColor: 'rgba(33,150,243,0.1)', tension: 0.2, pointRadius: 0,
-              borderWidth: 2, yAxisID: 'y_hum', spanGaps: false }
+              borderWidth: 2, yAxisID: 'y_hum', spanGaps: true }
         ]},
         options: {
             responsive: true, maintainAspectRatio: false,
             interaction: { mode: 'index', intersect: false },
-            spanGaps: false,
+            spanGaps: true,
             plugins: { legend: { labels: { color: getLegendColor() } } },
             scales: {
                 x: timeScaleX(),
@@ -750,7 +771,7 @@ const iPoints   = insertGapNulls(toPoints(s, 'i', 1000), GAP_MS);
         }
     });
 
-    // ===== 5. CHART BỤI MỊN =====
+    // ===== 6. CHART BỤI MỊN =====
     const pmCanvas = $('chart-pm');
     if (pmCanvas) {
         if (chartCtx.pm) chartCtx.pm.destroy();
@@ -759,18 +780,18 @@ const iPoints   = insertGapNulls(toPoints(s, 'i', 1000), GAP_MS);
             data: { datasets: [
                 { label: 'PM1.0 (µg/m³)', data: pm1Points, borderColor: '#FFC107',
                   backgroundColor: 'rgba(255,193,7,0.1)', tension: 0.2, pointRadius: 0,
-                  borderWidth: 2, yAxisID: 'y_pm', spanGaps: false },
+                  borderWidth: 2, yAxisID: 'y_pm', spanGaps: true },
                 { label: 'PM2.5 (µg/m³)', data: pm25Points, borderColor: '#FF5722',
                   backgroundColor: 'rgba(255,87,34,0.1)', tension: 0.2, pointRadius: 0,
-                  borderWidth: 2, yAxisID: 'y_pm', spanGaps: false },
+                  borderWidth: 2, yAxisID: 'y_pm', spanGaps: true },
                 { label: 'PM10 (µg/m³)', data: pm10Points, borderColor: '#FF9800',
                   backgroundColor: 'rgba(255,152,0,0.1)', tension: 0.2, pointRadius: 0,
-                  borderWidth: 2, yAxisID: 'y_pm', spanGaps: false }
+                  borderWidth: 2, yAxisID: 'y_pm', spanGaps: true }
             ]},
             options: {
                 responsive: true, maintainAspectRatio: false,
                 interaction: { mode: 'index', intersect: false },
-                spanGaps: false,
+                spanGaps: true,
                 plugins: { legend: { labels: { color: getLegendColor() } } },
                 scales: {
                     x: timeScaleX(),
@@ -785,10 +806,10 @@ const iPoints   = insertGapNulls(toPoints(s, 'i', 1000), GAP_MS);
         });
     }
 
-    // ===== 6. CHART CO =====
+    // ===== 7. CHART CO =====
     renderCoChart(s, idPrefix, chartCtx);
 
-    // ===== 7. CHART ĐIỆN ÁP & DÒNG (chỉ admin) =====
+    // ===== 8. CHART ĐIỆN ÁP & DÒNG (admin) =====
     if (!isAdmin() && !idPrefix) return;
 
     const voltCanvas = $('chart-volt');
@@ -799,10 +820,10 @@ const iPoints   = insertGapNulls(toPoints(s, 'i', 1000), GAP_MS);
             data: { datasets: [{ label: 'Điện áp (V)', data: vPoints,
                 borderColor: '#FF9800', backgroundColor: 'rgba(255,152,0,0.1)',
                 tension: 0.2, pointRadius: 0, borderWidth: 2,
-                fill: false, spanGaps: false }]},
+                fill: false, spanGaps: true }]},
             options: (() => {
                 const o = baseOptions('Điện áp (V)', '#FF9800');
-                o.spanGaps = false;
+                o.spanGaps = true;
                 o.scales.y.min = 0;
                 o.scales.y.max = 6;
                 o.scales.y.ticks.stepSize = 1;
@@ -820,10 +841,10 @@ const iPoints   = insertGapNulls(toPoints(s, 'i', 1000), GAP_MS);
             data: { datasets: [{ label: 'Dòng điện (mA)', data: iPoints,
                 borderColor: '#9C27B0', backgroundColor: 'rgba(156,39,176,0.1)',
                 tension: 0.2, pointRadius: 0, borderWidth: 2,
-                fill: false, spanGaps: false }]},
+                fill: false, spanGaps: true }]},
             options: (() => {
                 const o = baseOptions('Dòng điện (mA)', '#9C27B0');
-                o.spanGaps = false;
+                o.spanGaps = true;
                 o.scales.y.min = 0;
                 o.scales.y.max = 300;
                 o.scales.y.ticks.stepSize = 50;
@@ -833,7 +854,6 @@ const iPoints   = insertGapNulls(toPoints(s, 'i', 1000), GAP_MS);
         });
     }
 
-    // ===== 8. CHART MIN/MAX (nếu có) =====
     renderMinMaxChart(clean[clean.length - 1] || {}, idPrefix, chartCtx);
 }
 // ============================================================
