@@ -2915,15 +2915,6 @@ function clearDashboard() {
     renderCharts([]);
 }
 
-// ===== Khởi tạo =====
-// ============ DB VIEWER STATE ============
-const dbState = {
-    table: '',
-    offset: 0,
-    limit: 100,
-    q: '',
-    total: 0
-};
 
 // ============ LOAD DANH SÁCH BẢNG (chỉ 1 lần khi vào tab) ============
 async function loadDBTableOptions() {
