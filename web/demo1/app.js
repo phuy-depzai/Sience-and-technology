@@ -2956,3 +2956,45 @@ async function loadDBTable() {
         console.error('[DB tables]', e);
     }
 }
+async function loadDBTableOptions() {
+    const sel = document.getElementById('db-table-select');
+    if (!sel) return;
+
+    try {
+        const r = await fetch(API + '/api/db/tables', {
+            headers: { 'X-Auth-Token': getToken() }
+        });
+
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+
+        const tables = await r.json();
+
+        if (!Array.isArray(tables) || !tables.length) {
+            sel.innerHTML = '<option value="">Không có table</option>';
+            return;
+        }
+
+        sel.innerHTML = tables.map(t =>
+            `<option value="${escapeHTML(t)}">${escapeHTML(t)}</option>`
+        ).join('');
+
+        dbState.table = sel.value;
+        dbState.offset = 0;
+        await loadDBTable();
+    } catch (e) {
+        console.error('[DB tables]', e);
+        sel.innerHTML = '<option value="">Lỗi load table</option>';
+    }
+}
+function initDBViewer() {
+    const sel = document.getElementById('db-table-select');
+    if (!sel) return;
+
+    loadDBTableOptions();
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initDBViewer);
+} else {
+    initDBViewer();
+}
