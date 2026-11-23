@@ -2919,15 +2919,20 @@ function clearDashboard() {
 document.addEventListener('DOMContentLoaded', async () => {
     await loadNodeMenu();
 
-    document.getElementById('node-select').addEventListener('change', (e) => {
-        onNodeChange(e.target.value);
-    });
+    const nodeSelect = document.getElementById('node-select');
+    if (nodeSelect) {
+        nodeSelect.addEventListener('change', (e) => {
+            onNodeChange(e.target.value);
+        });
+    }
 
     await loadDashboardData();
 });
-async function loadDBTableOptions() {
+async function loadDBTable() {
     const sel = document.getElementById('db-table-select');
-    if (!sel) return;
+    if (!sel || !sel.value) return;
+
+    dbState.table = sel.value;
 
     try {
         const r = await fetch(API + '/api/db/tables', {
