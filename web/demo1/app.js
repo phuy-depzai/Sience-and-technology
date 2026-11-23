@@ -534,148 +534,7 @@ function updateCards(data, idPrefix = '', chartCtx = dashCharts, cardPrefix = nu
 // ============================================================
 // CHART GAS
 // ============================================================
-function renderGasChart(vocPct, noxPct, idPrefix = '', chartCtx = dashCharts) {
-    const canvas = document.getElementById(idPrefix + 'chart-gas');
-    if (!canvas || typeof Chart === 'undefined') return;
 
-    const vocI = getIntensity(vocPct || 100, 'voc_pct');
-    const noxI = getIntensity(noxPct || 100, 'nox_pct');
-    const v = (vocPct && vocPct > 0) ? vocPct : 100;
-    const n = (noxPct && noxPct > 0) ? noxPct : 100;
-
-    const bgColors = [hexToRgba(vocI.color, vocI.opacity), hexToRgba(noxI.color, noxI.opacity)];
-    const borderColors = [vocI.color, noxI.color];
-
-    if (chartCtx.gas) {
-        chartCtx.gas.data.datasets[0].data = [parseFloat(v.toFixed(1)), parseFloat(n.toFixed(1))];
-        chartCtx.gas.data.datasets[0].backgroundColor = bgColors;
-        chartCtx.gas.data.datasets[0].borderColor = borderColors;
-        chartCtx.gas.update();
-    } else {
-        chartCtx.gas = new Chart(canvas, {
-            type: 'bar',
-            data: {
-                labels: ['VOC (%)', 'NOx (%)'],
-                datasets: [{
-                    label: 'So với không khí sạch',
-                    data: [parseFloat(v.toFixed(1)), parseFloat(n.toFixed(1))],
-                    backgroundColor: bgColors,
-                    borderColor: borderColors,
-                    borderWidth: 2, borderRadius: 6, maxBarThickness: 60
-                }]
-            },
-            options: {
-                responsive: true, maintainAspectRatio: false,
-                animation: { duration: 800 },
-                plugins: {
-                    legend: { display: false },
-                    tooltip: { callbacks: { label: (ctx) => ctx.parsed.y + '% so với nền' } }
-                },
-                scales: {
-                    y: { beginAtZero: true, suggestedMax: 130, ticks: { color: getTextColor(), callback: (v) => v + '%' }, grid: { color: getGridColor() } },
-                    x: { barPercentage: 0.5, categoryPercentage: 0.5, ticks: { color: getTextColor() }, grid: { display: false } }
-                }
-            }
-        });
-    }
-}
-// ============================================================
-// CHART MIN/MAX (Voltage & Current)
-// ============================================================
-function renderMinMaxChart(d, idPrefix = '', chartCtx = dashCharts) {
-    const canvas = document.getElementById(idPrefix + 'chart-minmax');
-    if (!canvas || typeof Chart === 'undefined') return;
-
-    const maxv = parseFloat(d.maxv) || 0;
-    const minv = parseFloat(d.minv) || 0;
-    const maxi = (parseFloat(d.maxi) || 0) * 1000;
-    const mini = (parseFloat(d.mini) || 0) * 1000;
-
-    if (chartCtx.minmax) chartCtx.minmax.destroy();
-
-    chartCtx.minmax = new Chart(canvas, {
-        type: 'bar',
-        data: {
-            labels: ['Max V', 'Min V', 'Max I', 'Min I'],
-            datasets: [
-                {
-                    label: 'Điện áp (V)',
-                    data: [maxv, minv, null, null],
-                    backgroundColor: ['rgba(255,152,0,0.6)', 'rgba(255,193,7,0.6)', null, null],
-                    borderColor: ['#FF9800', '#FFC107', null, null],
-                    borderWidth: 2, borderRadius: 6, maxBarThickness: 50,
-                    yAxisID: 'yV'
-                },
-                {
-                    label: 'Dòng điện (mA)',
-                    data: [null, null, maxi, mini],
-                    backgroundColor: [null, null, 'rgba(156,39,176,0.6)', 'rgba(33,150,243,0.6)'],
-                    borderColor: [null, null, '#9C27B0', '#2196F3'],
-                    borderWidth: 2, borderRadius: 6, maxBarThickness: 50,
-                    yAxisID: 'yI'
-                }
-            ]
-        },
-        options: {
-            responsive: true, maintainAspectRatio: false,
-            animation: { duration: 800 },
-            plugins: {
-                legend: { labels: { color: getLegendColor() } },
-                tooltip: {
-                    callbacks: {
-                        label: (ctx) => {
-                            if (ctx.parsed.y === null) return '';
-                            const unit = ctx.dataset.yAxisID === 'yV' ? ' V' : ' mA';
-                            return ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(3) + unit;
-                        }
-                    }
-                }
-            },
-            scales: {
-                x: { ticks: { color: getTextColor() }, grid: { display: false } },
-                yV: {
-                    position: 'left',
-                    beginAtZero: true, min: 0, max: 6,
-                    ticks: { color: '#FF9800', stepSize: 1, precision: 1 },
-                    grid: { color: getGridColor() },
-                    title: { display: true, text: 'Điện áp (V)', color: '#FF9800' }
-                },
-                yI: {
-                    position: 'right',
-                    beginAtZero: true, min: 0, max: 300,
-                    ticks: { color: '#9C27B0', stepSize: 50, precision: 0 },
-                    grid: { drawOnChartArea: false },
-                    title: { display: true, text: 'Dòng (mA)', color: '#9C27B0' }
-                }
-            }
-        }
-    });
-}
-// ============================================================
-// CHART CO
-// ============================================================
-function renderCoChart(data, idPrefix = '', chartCtx = dashCharts) {
-    const canvas = document.getElementById(idPrefix + 'chart-co');
-    if (!canvas || typeof Chart === 'undefined') return;
-    if (!data || !data.length) {
-        if (chartCtx.co) { chartCtx.co.destroy(); chartCtx.co = null; }
-        return;
-    }
-    const s = downsample(data, 80);
-    if (chartCtx.co) chartCtx.co.destroy();
-    chartCtx.co = new Chart(canvas, {
-        type: 'line',
-        data: { datasets: [{
-            label: 'CO (ppm)',
-            data: toPoints(s, 'co'),
-            borderColor: (ctx) => makeValueGradient(ctx, 'co', 'y'),
-            backgroundColor: (ctx) => makeValueGradient(ctx, 'co', 'y'),
-            tension: 0, cubicInterpolationMode: 'monotone',
-            pointRadius: 0, borderWidth: 2, fill: true
-        }] },
-        options: (() => { const o = baseOptions('CO (ppm)', '#FF5722'); o.scales.y.suggestedMax = 20; return o; })()
-    });
-}
 // ============================================================
 // RENDER ALL CHARTS
 // ============================================================
@@ -700,14 +559,15 @@ function renderCharts(data, idPrefix = '', chartCtx = dashCharts) {
     const envCanvas = $('chart-env');
     if (!envCanvas) return;
 
+    // Xóa chart cũ nếu không có data
     if (!data.length) {
-        ['env','pm','volt','curr','co','minmax'].forEach(k => {
+        ['env','pm','volt','curr','co','gas','minmax'].forEach(k => {
             if (chartCtx[k]) { chartCtx[k].destroy(); chartCtx[k] = null; }
         });
         return;
     }
 
-    // ===== 1. LỌC TRÙNG RECORD (theo id hoặc recorded_at) =====
+    // ===== 1. LỌC TRÙNG RECORD =====
     const seen = new Set();
     const clean = [];
     for (const d of data) {
@@ -724,10 +584,9 @@ function renderCharts(data, idPrefix = '', chartCtx = dashCharts) {
         return ax - bx;
     });
 
-    // ===== 3. DOWNSAMPLE =====
     const s = downsample(clean, 150);
 
-    // ===== 4. TẠO POINTS (KHÔNG chèn null — nối liền mạch) =====
+    // ===== 3. TẠO POINTS (nối liền, không gap-null) =====
     const tPoints   = toPointsSafe(s, 't');
     const hPoints   = toPointsSafe(s, 'h');
     const pm1Points = toPointsSafe(s, 'pm1');
@@ -735,8 +594,9 @@ function renderCharts(data, idPrefix = '', chartCtx = dashCharts) {
     const pm10Points= toPointsSafe(s, 'pm10');
     const vPoints   = toPointsSafe(s, 'v');
     const iPoints   = toPointsSafe(s, 'i', 1000);
+    const coPoints  = toPointsSafe(s, 'co');
 
-    // ===== 5. CHART MÔI TRƯỜNG =====
+    // ===== 4. CHART MÔI TRƯỜNG =====
     if (chartCtx.env) chartCtx.env.destroy();
     chartCtx.env = new Chart(envCanvas, {
         type: 'line',
@@ -771,7 +631,7 @@ function renderCharts(data, idPrefix = '', chartCtx = dashCharts) {
         }
     });
 
-    // ===== 6. CHART BỤI MỊN =====
+    // ===== 5. CHART BỤI MỊN =====
     const pmCanvas = $('chart-pm');
     if (pmCanvas) {
         if (chartCtx.pm) chartCtx.pm.destroy();
@@ -806,8 +666,75 @@ function renderCharts(data, idPrefix = '', chartCtx = dashCharts) {
         });
     }
 
-    // ===== 7. CHART CO =====
-    renderCoChart(s, idPrefix, chartCtx);
+    // ===== 6. CHART CO (inline từ renderCoChart) =====
+    const coCanvas = $('chart-co');
+    if (coCanvas && coPoints.length) {
+        if (chartCtx.co) chartCtx.co.destroy();
+        chartCtx.co = new Chart(coCanvas, {
+            type: 'line',
+            data: { datasets: [{
+                label: 'CO (ppm)',
+                data: coPoints,
+                borderColor: (ctx) => makeValueGradient(ctx, 'co', 'y'),
+                backgroundColor: (ctx) => makeValueGradient(ctx, 'co', 'y'),
+                tension: 0.2, pointRadius: 0, borderWidth: 2,
+                fill: true, spanGaps: true
+            }]},
+            options: (() => {
+                const o = baseOptions('CO (ppm)', '#FF5722');
+                o.spanGaps = true;
+                o.scales.y.suggestedMax = 20;
+                return o;
+            })()
+        });
+    } else if (coCanvas && chartCtx.co) {
+        chartCtx.co.destroy();
+        chartCtx.co = null;
+    }
+
+    // ===== 7. CHART GAS (VOC/NOx — bar, inline từ renderGasChart) =====
+    const last = clean[clean.length - 1] || {};
+    const gasCanvas = $('chart-gas');
+    if (gasCanvas && typeof Chart !== 'undefined') {
+        const vocPct = parseFloat(last.voc_pct) || 100;
+        const noxPct = parseFloat(last.nox_pct) || 100;
+        const vocI = getIntensity(vocPct || 100, 'voc_pct');
+        const noxI = getIntensity(noxPct || 100, 'nox_pct');
+        const v = (vocPct && vocPct > 0) ? vocPct : 100;
+        const n = (noxPct && noxPct > 0) ? noxPct : 100;
+        const bgColors = [hexToRgba(vocI.color, vocI.opacity), hexToRgba(noxI.color, noxI.opacity)];
+        const borderColors = [vocI.color, noxI.color];
+
+        if (chartCtx.gas) chartCtx.gas.destroy();
+        chartCtx.gas = new Chart(gasCanvas, {
+            type: 'bar',
+            data: {
+                labels: ['VOC (%)', 'NOx (%)'],
+                datasets: [{
+                    label: 'So với không khí sạch',
+                    data: [parseFloat(v.toFixed(1)), parseFloat(n.toFixed(1))],
+                    backgroundColor: bgColors,
+                    borderColor: borderColors,
+                    borderWidth: 2, borderRadius: 6, maxBarThickness: 60
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                animation: { duration: 800 },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: (ctx) => ctx.parsed.y + '% so với nền' } }
+                },
+                scales: {
+                    y: { beginAtZero: true, suggestedMax: 130,
+                         ticks: { color: getTextColor(), callback: (v) => v + '%' },
+                         grid: { color: getGridColor() } },
+                    x: { barPercentage: 0.5, categoryPercentage: 0.5,
+                         ticks: { color: getTextColor() }, grid: { display: false } }
+                }
+            }
+        });
+    }
 
     // ===== 8. CHART ĐIỆN ÁP & DÒNG (admin) =====
     if (!isAdmin() && !idPrefix) return;
@@ -854,7 +781,63 @@ function renderCharts(data, idPrefix = '', chartCtx = dashCharts) {
         });
     }
 
-    renderMinMaxChart(clean[clean.length - 1] || {}, idPrefix, chartCtx);
+    // ===== 9. CHART MIN/MAX (inline từ renderMinMaxChart) =====
+    const minmaxCanvas = $('chart-minmax');
+    if (minmaxCanvas && typeof Chart !== 'undefined') {
+        const maxv = parseFloat(last.maxv) || 0;
+        const minv = parseFloat(last.minv) || 0;
+        const maxi = (parseFloat(last.maxi) || 0) * 1000;
+        const mini = (parseFloat(last.mini) || 0) * 1000;
+
+        if (chartCtx.minmax) chartCtx.minmax.destroy();
+        chartCtx.minmax = new Chart(minmaxCanvas, {
+            type: 'bar',
+            data: {
+                labels: ['Max V', 'Min V', 'Max I', 'Min I'],
+                datasets: [
+                    { label: 'Điện áp (V)', data: [maxv, minv, null, null],
+                      backgroundColor: ['rgba(255,152,0,0.6)','rgba(255,193,7,0.6)', null, null],
+                      borderColor: ['#FF9800','#FFC107', null, null],
+                      borderWidth: 2, borderRadius: 6, maxBarThickness: 50, yAxisID: 'yV' },
+                    { label: 'Dòng điện (mA)', data: [null, null, maxi, mini],
+                      backgroundColor: [null, null, 'rgba(156,39,176,0.6)','rgba(33,150,243,0.6)'],
+                      borderColor: [null, null, '#9C27B0','#2196F3'],
+                      borderWidth: 2, borderRadius: 6, maxBarThickness: 50, yAxisID: 'yI' }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                animation: { duration: 800 },
+                plugins: {
+                    legend: { labels: { color: getLegendColor() } },
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => {
+                                if (ctx.parsed.y === null) return '';
+                                const unit = ctx.dataset.yAxisID === 'yV' ? ' V' : ' mA';
+                                return ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(3) + unit;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { ticks: { color: getTextColor() }, grid: { display: false } },
+                    yV: {
+                        position: 'left', beginAtZero: true, min: 0, max: 6,
+                        ticks: { color: '#FF9800', stepSize: 1, precision: 1 },
+                        grid: { color: getGridColor() },
+                        title: { display: true, text: 'Điện áp (V)', color: '#FF9800' }
+                    },
+                    yI: {
+                        position: 'right', beginAtZero: true, min: 0, max: 300,
+                        ticks: { color: '#9C27B0', stepSize: 50, precision: 0 },
+                        grid: { drawOnChartArea: false },
+                        title: { display: true, text: 'Dòng (mA)', color: '#9C27B0' }
+                    }
+                }
+            }
+        });
+    }
 }
 // ============================================================
 // LOAD DATA
