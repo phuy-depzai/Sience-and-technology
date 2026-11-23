@@ -2082,14 +2082,14 @@ document.addEventListener('DOMContentLoaded', () => {
 let dbState = { table: 'sensor', offset: 0, limit: 100, total: 0, q: '' };
 let dbSearchTimer = null;
 
-//function debouncedDBSearch() {
+function debouncedDBSearch() {
     clearTimeout(dbSearchTimer);
     dbSearchTimer = setTimeout(() => {
         dbState.q = document.getElementById('db-search').value.trim();
         dbState.offset = 0;
         loadDBTable();
     }, 300);
-//}
+}
 function escapeHTML(value) {
     return String(value ?? '').replace(/[&<>"']/g, char => ({
         '&': '&amp;',
@@ -3078,7 +3078,6 @@ function dbLastPage() {
 }
 
 // ============ SEARCH DEBOUNCE ============
-//let dbSearchTimer = null;
 function debouncedDBSearch(val) {
     clearTimeout(dbSearchTimer);
     dbSearchTimer = setTimeout(() => {
