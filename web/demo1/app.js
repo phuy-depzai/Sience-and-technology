@@ -510,8 +510,6 @@ function updateCards(data, idPrefix = '', chartCtx = dashCharts, cardPrefix = nu
     animateNumber('co', last.co, 2);
     animateNumber('voc_pct', last.voc_pct, 1);
     animateNumber('nox_pct', last.nox_pct, 1);
-    
-    // THÊM 4 DÒNG NÀY ĐỂ BƠM DATA MAX/MIN:
     animateNumber('maxv', last.maxv, 3);
     animateNumber('minv', last.minv, 3);
     animateNumber('maxi', last.maxi, 3, 1000);
@@ -528,13 +526,9 @@ function updateCards(data, idPrefix = '', chartCtx = dashCharts, cardPrefix = nu
         if (u) u.textContent = last.ts;
     }
     
-    renderGasChart(last.voc_pct, last.nox_pct, idPrefix, chartCtx);
+    renderCharts(data, idPrefix, chartCtx);
     if (!idPrefix) setStatus(true);
 }
-// ============================================================
-// CHART GAS
-// ============================================================
-
 // ============================================================
 // RENDER ALL CHARTS
 // ============================================================
