@@ -2079,17 +2079,17 @@ document.addEventListener('DOMContentLoaded', () => {
 // ============================================================
 // DB VIEWER
 // ============================================================
-let dbState = { table: 'sensor', offset: 0, limit: 100, total: 0, q: '' };
-let dbSearchTimer = null;
+//let dbState = { table: 'sensor', offset: 0, limit: 100, total: 0, q: '' };
+//let dbSearchTimer = null;
 
-function debouncedDBSearch() {
+//function debouncedDBSearch() {
     clearTimeout(dbSearchTimer);
     dbSearchTimer = setTimeout(() => {
         dbState.q = document.getElementById('db-search').value.trim();
         dbState.offset = 0;
         loadDBTable();
     }, 300);
-}
+//}
 function escapeHTML(value) {
     return String(value ?? '').replace(/[&<>"']/g, char => ({
         '&': '&amp;',
@@ -2199,8 +2199,8 @@ async function loadDBTable() {
     }
 }
 
-function dbPrevPage() { if (dbState.offset === 0) return; dbState.offset = Math.max(0, dbState.offset - dbState.limit); loadDBTable(); }
-function dbNextPage() { if (dbState.offset + dbState.limit >= dbState.total) return; dbState.offset += dbState.limit; loadDBTable(); }
+//function dbPrevPage() { if (dbState.offset === 0) return; dbState.offset = Math.max(0, dbState.offset - dbState.limit); loadDBTable(); }
+//function dbNextPage() { if (dbState.offset + dbState.limit >= dbState.total) return; dbState.offset += dbState.limit; loadDBTable(); }
 
 // ============================================================
 // NOTE COMMENTS
