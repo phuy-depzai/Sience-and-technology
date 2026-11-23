@@ -2850,11 +2850,13 @@ function pad3(v) {
 // ===== Load danh sách node vào dropdown =====
 async function loadNodeMenu() {
     const select = document.getElementById('node-select');
+    if (!select) return;
+
     select.disabled = true;
 
     try {
         const res = await fetch('/api/nodes');
-        const nodes = await res.json(); // [{id, name}]
+        const nodes = await res.json();
 
         if (!Array.isArray(nodes) || nodes.length === 0) {
             select.innerHTML = '<option value="">Không có node</option>';
@@ -2881,7 +2883,6 @@ async function loadNodeMenu() {
         select.disabled = false;
     }
 }
-
 // ===== Khi người dùng đổi node =====
 function onNodeChange(newNodeId) {
     currentNodeId = pad3(newNodeId);
@@ -2950,6 +2951,3 @@ async function loadDBTableOptions() {
         console.error('[DB tables]', e);
     }
 }
-window.addEventListener('DOMContentLoaded', () => {
-    loadDBTableOptions();
-});
