@@ -394,22 +394,7 @@
 <section class="admin-panel" id="tab-db" style="display:none;">
     <div class="panel-head">
         <h2 class="chart-title">Database Viewer</h2>
-        <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <select id="db-table-select" class="status-select" onchange="loadDBTable()">
-                <option value="sensor">sensor</option>
-                <option value="sensor_debug">sensor_debug</option>
-                <option value="sensor_hourly">sensor_hourly</option>
-                <option value="aqi_snapshot">aqi_snapshot</option>
-                <option value="nodes">nodes</option>
-                <option value="admin_logs">admin_logs</option>
-                <option value="admin_notes">admin_notes</option>
-                <option value="debug_presets">debug_presets</option>
-                <option value="incidents">incidents</option>
-                <option value="admin_users" class="head-admin-only" style="display:none;">admin_users</option>
-            </select>
-            <input id="db-search" class="status-input" placeholder="Tìm..." oninput="debouncedDBSearch()">
-            <button onclick="loadDBTable()" class="btn-primary">Làm mới</button>
-        </div>
+        <select id="db-table-select" class="status-select" onchange="loadDBTable()"></select>
     </div>
     <div class="debug-notice">Readonly. Không sửa/xóa từ đây. Tối đa 100 dòng/trang. admin_users chỉ head_admin xem được.</div>
     <div class="debug-table-wrap">

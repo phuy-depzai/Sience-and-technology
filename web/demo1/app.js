@@ -2924,3 +2924,32 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     await loadDashboardData();
 });
+async function loadDBTableOptions() {
+    const sel = document.getElementById('db-table-select');
+    if (!sel) return;
+
+    try {
+        const r = await fetch(API + '/api/db/tables', {
+            headers: { 'X-Auth-Token': getToken() }
+        });
+
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+
+        const tables = await r.json();
+
+        sel.innerHTML = tables.map(t =>
+            `<option value="${escapeHTML(t)}">${escapeHTML(t)}</option>`
+        ).join('');
+
+        if (tables.length) {
+            sel.value = tables[0];
+            loadDBTable();
+        }
+    } catch (e) {
+        sel.innerHTML = '<option value="">Lỗi load table</option>';
+        console.error('[DB tables]', e);
+    }
+}
+window.addEventListener('DOMContentLoaded', () => {
+    loadDBTableOptions();
+});
