@@ -2080,7 +2080,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // DB VIEWER
 // ============================================================
 let dbState = { table: 'sensor', offset: 0, limit: 100, total: 0, q: '' };
-//let dbSearchTimer = null;
+let dbSearchTimer = null;
 
 //function debouncedDBSearch() {
     clearTimeout(dbSearchTimer);
