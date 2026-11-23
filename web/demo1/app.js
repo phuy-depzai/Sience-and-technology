@@ -657,11 +657,28 @@ function renderCoChart(data, idPrefix = '', chartCtx = dashCharts) {
 // ============================================================
 // RENDER ALL CHARTS
 // ============================================================
+// ===== HELPER: chèn null vào gap > maxGapMs =====
+function insertGapNulls(points, maxGapMs = 5 * 60 * 1000) {
+    if (!points || points.length < 2) return points || [];
+    const result = [];
+    for (let i = 0; i < points.length; i++) {
+        result.push(points[i]);
+        if (i < points.length - 1) {
+            const gap = points[i + 1].x - points[i].x;
+            if (gap > maxGapMs) {
+                result.push({ x: points[i].x + maxGapMs, y: null });
+            }
+        }
+    }
+    return result;
+}
+
 function renderCharts(data, idPrefix = '', chartCtx = dashCharts) {
     const $ = (id) => document.getElementById(idPrefix + id);
     const envCanvas = $('chart-env');
     if (!envCanvas) return;
 
+    // Xóa chart cũ nếu không có data
     if (!data.length) {
         ['env','pm','volt','curr','co','minmax'].forEach(k => {
             if (chartCtx[k]) { chartCtx[k].destroy(); chartCtx[k] = null; }
@@ -669,52 +686,50 @@ function renderCharts(data, idPrefix = '', chartCtx = dashCharts) {
         return;
     }
 
-    // Lọc bỏ record có timestamp trùng (giữ cái mới nhất)
+    // ===== 1. LỌC TRÙNG & SORT THEO THỜI GIAN =====
     const seen = new Set();
     const clean = [];
-    for (let i = data.length - 1; i >= 0; i--) {
-        const d = data[i];
-        const ts = d.ts || d.recorded_at || d.node_ts;
-        if (!ts || seen.has(ts)) continue;
-        seen.add(ts);
-        clean.unshift(d);
+    for (const d of data) {
+        const key = d.id || d.recorded_at || (d.node_id + '_' + d.ts + '_' + d.recorded_at);
+        if (!key || seen.has(key)) continue;
+        seen.add(key);
+        clean.push(d);
     }
 
-    const s = downsample(clean, 120); // 120 điểm cho mượt hơn 80
-
-    // Helper: base options dùng chung
-    const baseLine = (yTitle, color, yMin, yMax, step) => ({
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: { mode: 'index', intersect: false },
-        spanGaps: false, // QUAN TRỌNG: không nối qua gap
-        plugins: { legend: { labels: { color: getLegendColor() } } },
-        scales: {
-            x: timeScaleX(),
-            y: {
-                min: yMin, max: yMax,
-                ticks: { color, stepSize: step, precision: 0 },
-                grid: { color: getGridColor() },
-                title: { display: true, text: yTitle, color }
-            }
-        }
+    clean.sort((a, b) => {
+        const ax = new Date(a.recorded_at || a.ts).getTime();
+        const bx = new Date(b.recorded_at || b.ts).getTime();
+        return ax - bx;
     });
 
-    // ===== 1. ENV =====
+    // ===== 2. DOWNSAMPLE =====
+    const s = downsample(clean, 150);
+
+    // ===== 3. TẠO POINTS CÓ CHÈN NULL GAP =====
+    const tPoints   = insertGapNulls(toPoints(s, 't'));
+    const hPoints   = insertGapNulls(toPoints(s, 'h'));
+    const pm1Points = insertGapNulls(toPoints(s, 'pm1'));
+    const pm25Points= insertGapNulls(toPoints(s, 'pm25'));
+    const pm10Points= insertGapNulls(toPoints(s, 'pm10'));
+    const vPoints   = insertGapNulls(toPoints(s, 'v'));
+    const iPoints   = insertGapNulls(toPoints(s, 'i', 1000)); // i -> mA
+
+    // ===== 4. CHART MÔI TRƯỜNG =====
     if (chartCtx.env) chartCtx.env.destroy();
     chartCtx.env = new Chart(envCanvas, {
         type: 'line',
         data: { datasets: [
-            { label: 'Nhiệt độ (°C)', data: toPoints(s, 't'), borderColor: '#f44336',
-              backgroundColor: 'rgba(244,67,54,0.1)', tension: 0.2, pointRadius: 2,
-              pointHoverRadius: 5, borderWidth: 2, yAxisID: 'y_temp', spanGaps: false },
-            { label: 'Độ ẩm (%)', data: toPoints(s, 'h'), borderColor: '#2196F3',
-              backgroundColor: 'rgba(33,150,243,0.1)', tension: 0.2, pointRadius: 2,
-              pointHoverRadius: 5, borderWidth: 2, yAxisID: 'y_hum', spanGaps: false }
+            { label: 'Nhiệt độ (°C)', data: tPoints, borderColor: '#f44336',
+              backgroundColor: 'rgba(244,67,54,0.1)', tension: 0.2, pointRadius: 0,
+              borderWidth: 2, yAxisID: 'y_temp', spanGaps: false },
+            { label: 'Độ ẩm (%)', data: hPoints, borderColor: '#2196F3',
+              backgroundColor: 'rgba(33,150,243,0.1)', tension: 0.2, pointRadius: 0,
+              borderWidth: 2, yAxisID: 'y_hum', spanGaps: false }
         ]},
         options: {
             responsive: true, maintainAspectRatio: false,
             interaction: { mode: 'index', intersect: false },
+            spanGaps: false,
             plugins: { legend: { labels: { color: getLegendColor() } } },
             scales: {
                 x: timeScaleX(),
@@ -734,20 +749,20 @@ function renderCharts(data, idPrefix = '', chartCtx = dashCharts) {
         }
     });
 
-    // ===== 2. PM =====
+    // ===== 5. CHART BỤI MỊN =====
     const pmCanvas = $('chart-pm');
     if (pmCanvas) {
         if (chartCtx.pm) chartCtx.pm.destroy();
         chartCtx.pm = new Chart(pmCanvas, {
             type: 'line',
             data: { datasets: [
-                { label: 'PM1.0', data: toPoints(s, 'pm1'), borderColor: '#FFC107',
+                { label: 'PM1.0 (µg/m³)', data: pm1Points, borderColor: '#FFC107',
                   backgroundColor: 'rgba(255,193,7,0.1)', tension: 0.2, pointRadius: 0,
                   borderWidth: 2, yAxisID: 'y_pm', spanGaps: false },
-                { label: 'PM2.5', data: toPoints(s, 'pm25'), borderColor: '#FF5722',
+                { label: 'PM2.5 (µg/m³)', data: pm25Points, borderColor: '#FF5722',
                   backgroundColor: 'rgba(255,87,34,0.1)', tension: 0.2, pointRadius: 0,
                   borderWidth: 2, yAxisID: 'y_pm', spanGaps: false },
-                { label: 'PM10', data: toPoints(s, 'pm10'), borderColor: '#FF9800',
+                { label: 'PM10 (µg/m³)', data: pm10Points, borderColor: '#FF9800',
                   backgroundColor: 'rgba(255,152,0,0.1)', tension: 0.2, pointRadius: 0,
                   borderWidth: 2, yAxisID: 'y_pm', spanGaps: false }
             ]},
@@ -769,10 +784,10 @@ function renderCharts(data, idPrefix = '', chartCtx = dashCharts) {
         });
     }
 
-    // ===== 3. CO =====
-    renderCoChart(clean, idPrefix, chartCtx);
+    // ===== 6. CHART CO =====
+    renderCoChart(s, idPrefix, chartCtx);
 
-    // ===== 4. VOLT / CURR (admin) =====
+    // ===== 7. CHART ĐIỆN ÁP & DÒNG (chỉ admin) =====
     if (!isAdmin() && !idPrefix) return;
 
     const voltCanvas = $('chart-volt');
@@ -780,14 +795,17 @@ function renderCharts(data, idPrefix = '', chartCtx = dashCharts) {
         if (chartCtx.volt) chartCtx.volt.destroy();
         chartCtx.volt = new Chart(voltCanvas, {
             type: 'line',
-            data: { datasets: [{ label: 'Điện áp (V)', data: toPoints(s, 'v'),
+            data: { datasets: [{ label: 'Điện áp (V)', data: vPoints,
                 borderColor: '#FF9800', backgroundColor: 'rgba(255,152,0,0.1)',
                 tension: 0.2, pointRadius: 0, borderWidth: 2,
-                fill: false, // QUAN TRỌNG: tắt fill để không tạo tam giác
-                spanGaps: false }]},
+                fill: false, spanGaps: false }]},
             options: (() => {
-                const o = baseLine('Điện áp (V)', '#FF9800', 0, 6, 1);
+                const o = baseOptions('Điện áp (V)', '#FF9800');
                 o.spanGaps = false;
+                o.scales.y.min = 0;
+                o.scales.y.max = 6;
+                o.scales.y.ticks.stepSize = 1;
+                o.scales.y.ticks.precision = 0;
                 return o;
             })()
         });
@@ -798,19 +816,23 @@ function renderCharts(data, idPrefix = '', chartCtx = dashCharts) {
         if (chartCtx.curr) chartCtx.curr.destroy();
         chartCtx.curr = new Chart(currCanvas, {
             type: 'line',
-            data: { datasets: [{ label: 'Dòng điện (mA)', data: toPoints(s, 'i', 1000),
+            data: { datasets: [{ label: 'Dòng điện (mA)', data: iPoints,
                 borderColor: '#9C27B0', backgroundColor: 'rgba(156,39,176,0.1)',
                 tension: 0.2, pointRadius: 0, borderWidth: 2,
-                fill: false, // TẮT FILL
-                spanGaps: false }]},
+                fill: false, spanGaps: false }]},
             options: (() => {
-                const o = baseLine('Dòng điện (mA)', '#9C27B0', 0, 300, 50);
+                const o = baseOptions('Dòng điện (mA)', '#9C27B0');
                 o.spanGaps = false;
+                o.scales.y.min = 0;
+                o.scales.y.max = 300;
+                o.scales.y.ticks.stepSize = 50;
+                o.scales.y.ticks.precision = 0;
                 return o;
             })()
         });
     }
 
+    // ===== 8. CHART MIN/MAX (nếu có) =====
     renderMinMaxChart(clean[clean.length - 1] || {}, idPrefix, chartCtx);
 }
 // ============================================================
@@ -907,15 +929,68 @@ function updateFromWS(d) {
     setStatus(true);
     addPointToCharts(d);
 }
+function insertGapNulls(points, maxGapMs = 5 * 60 * 1000) {
+    if (points.length < 2) return points;
+    const result = [];
+    for (let i = 0; i < points.length; i++) {
+        result.push(points[i]);
+        if (i < points.length - 1) {
+            const gap = points[i+1].x - points[i].x;
+            if (gap > maxGapMs) {
+                result.push({ x: points[i].x + maxGapMs, y: null });
+            }
+        }
+    }
+    return result;
+}
 
 function addPointToCharts(d) {
     const now = Date.now();
-    if (dashCharts.env) { dashCharts.env.data.datasets[0].data.push({ x: now, y: d.t }); dashCharts.env.data.datasets[1].data.push({ x: now, y: d.h }); if (dashCharts.env.data.datasets[0].data.length > 200) dashCharts.env.data.datasets.forEach(ds => ds.data.shift()); dashCharts.env.update(); }
-    if (dashCharts.pm) { dashCharts.pm.data.datasets[0].data.push({ x: now, y: d.pm1 || 0 }); dashCharts.pm.data.datasets[1].data.push({ x: now, y: d.pm25 || 0 }); dashCharts.pm.data.datasets[2].data.push({ x: now, y: d.pm10 || 0 }); if (dashCharts.pm.data.datasets[0].data.length > 200) dashCharts.pm.data.datasets.forEach(ds => ds.data.shift()); dashCharts.pm.update(); }
-    if (dashCharts.co && d.co !== undefined) { dashCharts.co.data.datasets[0].data.push({ x: now, y: d.co }); if (dashCharts.co.data.datasets[0].data.length > 200) dashCharts.co.data.datasets[0].data.shift(); dashCharts.co.update(); }
+    const MAX_GAP = 5 * 60 * 1000; // 5 phút
+
+    // Helper push data có check gap
+    function pushData(chart, dsIndex, yVal) {
+        if (!chart || !chart.data || !chart.data.datasets[dsIndex]) return;
+        const ds = chart.data.datasets[dsIndex];
+        const last = ds.data[ds.data.length - 1];
+        
+        // Nếu gap > 5 phút, chèn 1 điểm null để ngắt đường
+        if (last && now - last.x > MAX_GAP) {
+            ds.data.push({ x: last.x + MAX_GAP, y: null });
+        }
+        ds.data.push({ x: now, y: yVal });
+        
+        if (ds.data.length > 200) ds.data.shift();
+    }
+
+    if (dashCharts.env) {
+        pushData(dashCharts.env, 0, d.t);
+        pushData(dashCharts.env, 1, d.h);
+        dashCharts.env.update('none'); // 'none' để update mượt, không giật
+    }
+    
+    if (dashCharts.pm) {
+        pushData(dashCharts.pm, 0, d.pm1 || 0);
+        pushData(dashCharts.pm, 1, d.pm25 || 0);
+        pushData(dashCharts.pm, 2, d.pm10 || 0);
+        dashCharts.pm.update('none');
+    }
+    
+    if (dashCharts.co && d.co !== undefined) {
+        pushData(dashCharts.co, 0, d.co);
+        dashCharts.co.update('none');
+    }
+    
     if (!isAdmin()) return;
-    if (dashCharts.volt) { dashCharts.volt.data.datasets[0].data.push({ x: now, y: d.v }); if (dashCharts.volt.data.datasets[0].data.length > 200) dashCharts.volt.data.datasets[0].data.shift(); dashCharts.volt.update(); }
-    if (dashCharts.curr) { dashCharts.curr.data.datasets[0].data.push({ x: now, y: d.i * 1000 }); if (dashCharts.curr.data.datasets[0].data.length > 200) dashCharts.curr.data.datasets[0].data.shift(); dashCharts.curr.update(); }
+    
+    if (dashCharts.volt) {
+        pushData(dashCharts.volt, 0, d.v);
+        dashCharts.volt.update('none');
+    }
+    if (dashCharts.curr) {
+        pushData(dashCharts.curr, 0, d.i * 1000);
+        dashCharts.curr.update('none');
+    }
 }
 setInterval(async () => {
     const di = document.getElementById('date-picker');
