@@ -12,10 +12,10 @@ function updateAuthUI() {
 
     if (isAdmin()) {
         btn.textContent = 'Admin ▾';
-        action.textContent = '🚪 Đăng xuất';
+        action.textContent = ' Đăng xuất';
     } else {
         btn.textContent = 'Guest ▾';
-        action.textContent = '🔑 Đăng nhập';
+        action.textContent = ' Đăng nhập';
     }
 }
 
@@ -93,8 +93,6 @@ function updateThemeLabel() {
 // Login form (chỉ index.html)
 const loginForm = document.getElementById('login-form');
 if (loginForm) {
-    const loginForm = document.getElementById('login-form');
-if (loginForm) {
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const user = document.getElementById('login-user').value.trim();
@@ -136,16 +134,15 @@ if (loginForm) {
             return;
         }
 
-       if (result.data && result.data.need_setup_totp) {
-    closeLogin();
-    openQRSetup(user, pass);
-    return;
-}   
+        if (result.data && result.data.need_setup_totp) {
+            closeLogin();
+            openQRSetup(user, pass);
+            return;
+        }
 
         errEl.textContent = (result.data && result.data.error) || 'Đăng nhập thất bại';
         errEl.style.color = '#f85149';
     });
-};
 }
 // ===== QR SETUP =====
 let _qrUser = '', _qrPass = '';
