@@ -1,0 +1,68 @@
+============================================================
+ESP32 GATEWAY LOG ANALYZER
+============================================================
+File          : /home/phuyy/Documents/test4.jsonl
+
+Total record  : 67150
+JSON error    : 0
+Null record   : 7
+Missing field : 0
+
+Start time    : 09:27:25
+End time      : 04:13:09
+Duration      : 18.76 hour
+Packet/sec    : 0.994
+
+PACKET
+--------------------
+First packet  : 1
+Last packet   : 67292
+Packet loss   : 142
+Reset count   : 0
+
+IMU
+--------------------
+0x69          : 67150
+Wrong         : 0
+
+Temperature
+  Min    : 23.69
+  Max    : 31.33
+  Avg    : 27.11
+  Std    : 2.73
+  Median : 27.56
+
+
+Humidity
+  Min    : 58.30
+  Max    : 93.61
+  Avg    : 81.37
+  Std    : 7.09
+  Median : 84.14
+
+
+RSSI
+  Min    : -57.00
+  Max    : -35.00
+  Avg    : -45.63
+  Std    : 1.93
+  Median : -45.00
+
+
+KEYPAD
+--------------------
+Empty         : 67150
+Pressed       : 0
+
+RSSI Quality  : Excellent
+
+ERROR EVENTS
+--------------------
+LOSS {'from': 2036, 'to': 2039, 'lost': 2, 'time': '10:01:54'}
+LOSS {'from': 2135, 'to': 2204, 'lost': 68, 'time': '10:04:40'}
+LOSS {'from': 11834, 'to': 11903, 'lost': 68, 'time': '12:46:51'}
+LOSS {'from': 49261, 'to': 49265, 'lost': 3, 'time': '23:11:37'}
+LOSS {'from': 49268, 'to': 49270, 'lost': 1, 'time': '23:11:47'}
+
+RESULT : WARNING
+============================================================

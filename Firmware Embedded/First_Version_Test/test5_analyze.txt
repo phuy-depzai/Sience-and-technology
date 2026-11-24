@@ -1,0 +1,73 @@
+============================================================
+ESP32 GATEWAY LOG ANALYZER
+============================================================
+File          : /home/phuyy/Documents/test5.jsonl
+
+Total record  : 72951
+JSON error    : 0
+Null record   : 364
+Missing field : 0
+
+Start time    : 01:03:57
+End time      : 21:45:13
+Duration      : 20.69 hour
+Packet/sec    : 0.980
+
+PACKET
+--------------------
+First packet  : 142
+Last packet   : 31564
+Packet loss   : 61
+Reset count   : 2
+
+IMU
+--------------------
+0x69          : 72951
+Wrong         : 0
+
+Temperature
+  Min    : 24.07
+  Max    : 31.36
+  Avg    : 28.32
+  Std    : 2.60
+  Median : 29.26
+
+
+Humidity
+  Min    : 65.12
+  Max    : 91.00
+  Avg    : 84.56
+  Std    : 5.29
+  Median : 86.67
+
+
+RSSI
+  Min    : -75.00
+  Max    : -23.00
+  Avg    : -47.89
+  Std    : 10.92
+  Median : -41.00
+
+
+KEYPAD
+--------------------
+Empty         : 72951
+Pressed       : 0
+
+RSSI Quality  : Excellent
+
+ERROR EVENTS
+--------------------
+LOSS {'from': 10879, 'to': 10890, 'lost': 10, 'time': '04:06:23'}
+LOSS {'from': 10893, 'to': 10895, 'lost': 1, 'time': '04:06:35'}
+LOSS {'from': 30513, 'to': 30519, 'lost': 5, 'time': '09:34:43'}
+LOSS {'from': 37404, 'to': 37406, 'lost': 1, 'time': '11:29:53'}
+LOSS {'from': 37409, 'to': 37411, 'lost': 1, 'time': '11:30:01'}
+LOSS {'from': 364, 'to': 367, 'lost': 2, 'time': '13:03:35'}
+LOSS {'from': 4157, 'to': 4173, 'lost': 15, 'time': '14:07:14'}
+LOSS {'from': 4391, 'to': 4418, 'lost': 26, 'time': '14:11:19'}
+RESET {'before': 161, 'after': 1, 'time': '01:04:18'}
+RESET {'before': 41428, 'after': 1, 'time': '12:37:11'}
+
+RESULT : WARNING
+============================================================
