@@ -1092,6 +1092,7 @@ async function addNode() {
         customNotify('Thêm node thất bại: ' + e.message, 'error');
     }
 }
+
 async function loadNodes() {
     const box = document.getElementById('nodes-list');
     if (!box) return;
