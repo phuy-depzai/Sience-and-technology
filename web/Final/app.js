@@ -1108,7 +1108,6 @@ async function loadNodes() {
             box.innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-muted);">Chưa có node nào.</div>'; 
             return; 
         }
-        
         const lastData = (data && data.length) ? data[data.length - 1] : null;
         const lastMs = lastData ? tsToMs(lastData.ts) : 0;
         // Vẫn tính diffMin để xác định trạng thái
@@ -1116,7 +1115,6 @@ async function loadNodes() {
         
         // Giữ nguyên logic phát hiện offline
         const status = diffMin < 15 ? 'working' : diffMin < 60 ? 'delayed' : 'offline';
-        
         // Render HTML: Đã xóa thẻ <div class="node-last"> hiển thị thời gian
         box.innerHTML = nodes.map(n => `
             <div class="node-row">
