@@ -1095,19 +1095,46 @@ async function addNode() {
 async function loadNodes() {
     const box = document.getElementById('nodes-list');
     if (!box) return;
+    
     box.innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-muted);">Đang tải...</div>';
+    
     try {
+        // Vẫn phải gọi API data để lấy mốc thời gian cuối cùng
         const [nr, dr] = await Promise.all([fetch(API + '/api/nodes'), fetch(API + '/api/data')]);
         const nodes = await nr.json();
         const data = await dr.json();
-        if (!nodes || !nodes.length) { box.innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-muted);">Chưa có node nào.</div>'; return; }
+        
+        if (!nodes || !nodes.length) { 
+            box.innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-muted);">Chưa có node nào.</div>'; 
+            return; 
+        }
+        
         const lastData = (data && data.length) ? data[data.length - 1] : null;
         const lastMs = lastData ? tsToMs(lastData.ts) : 0;
+        // Vẫn tính diffMin để xác định trạng thái
         const diffMin = lastMs ? Math.floor((Date.now() - lastMs) / 60000) : 99999;
+        
+        // Giữ nguyên logic phát hiện offline
         const status = diffMin < 15 ? 'working' : diffMin < 60 ? 'delayed' : 'offline';
-        box.innerHTML = nodes.map(n => `<div class="node-row"><div class="node-info"><div class="node-name">${escapeHtml(n.name || n.id || 'Node')}</div><div class="node-meta">${(n.lat||0).toFixed(4)}, ${(n.lng||0).toFixed(4)}</div></div><div class="node-status"><span class="status-dot ${status}"></span><span class="status-label ${status}">${status}</span></div><div class="node-last">${diffMin < 99999 ? fmtAgo(diffMin) : 'chưa có data'}</div><button class="node-delete" onclick="deleteNode('${n.id}', '${(n.name || n.id).replace(/'/g, "\\'")}')" title="Xóa node">🗑️</button></div>`).join('');
-       // const u = document.getElementById('updated'); if (u) u.textContent = new Date().toLocaleTimeString('vi-VN');
-    } catch(e) { box.innerHTML = '<div style="color:#f85149; padding:20px;">Lỗi load node: ' + e.message + '</div>'; }
+        
+        // Render HTML: Đã xóa thẻ <div class="node-last"> hiển thị thời gian
+        box.innerHTML = nodes.map(n => `
+            <div class="node-row">
+                <div class="node-info">
+                    <div class="node-name">${escapeHtml(n.name || n.id || 'Node')}</div>
+                    <div class="node-meta">${(n.lat||0).toFixed(4)}, ${(n.lng||0).toFixed(4)}</div>
+                </div>
+                <div class="node-status">
+                    <span class="status-dot ${status}"></span>
+                    <span class="status-label ${status}">${status}</span>
+                </div>
+                <button class="node-delete" onclick="deleteNode('${n.id}', '${(n.name || n.id).replace(/'/g, "\\'")}')" title="Xóa node">🗑️</button>
+            </div>
+        `).join('');
+        
+    } catch(e) { 
+        box.innerHTML = '<div style="color:#f85149; padding:20px;">Lỗi load node: ' + e.message + '</div>'; 
+    }
 }
 
 async function deleteNode(id, name) {
