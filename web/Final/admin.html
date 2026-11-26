@@ -206,17 +206,15 @@
             <div class="field"><label>NOx<span class="hint">0 to 65535</span></label><input id="dbg-nox" type="number" oninput="validateField('nox')"><span class="err" id="err-nox"></span></div>
             <div class="field"><label>VOC %<span class="hint">0 to 999</span></label><input id="dbg-voc_pct" type="number" step="0.1" oninput="validateField('voc_pct')"><span class="err" id="err-voc_pct"></span></div>
             <div class="field"><label>NOx %<span class="hint">0 to 999</span></label><input id="dbg-nox_pct" type="number" step="0.1" oninput="validateField('nox_pct')"><span class="err" id="err-nox_pct"></span></div>
-            <div class="field"><label>SGP OK<span class="hint">0 hoặc 1</span></label>
-                <select id="dbg-sgp" class="status-input"><option value="0">0 — warm-up</option><option value="1">1 — ready</option></select>
             </div>
-            <div class="field full"><label>Test type</label>
+            <div class="field full"><label>Loại test</label>
                 <select id="dbg-test-type" class="status-input">
-                    <option value="manual">manual</option>
-                    <option value="edge">edge</option>
-                    <option value="custom">custom</option>
+                    <option value="manual">Thủ công</option>
+                    <option value="edge">Dữ liệu biên</option>
+                    <option value="custom">Tùy chỉnh</option>
                 </select>
             </div>
-            <div class="field full"><label>Note</label><input id="dbg-note" type="text" placeholder="Ghi chú test case" maxlength="200"><span class="err" id="err-note"></span></div>
+            <div class="field full"><label>Ghi chú</label><input id="dbg-note" type="text" placeholder="Ghi chú test case" maxlength="200"><span class="err" id="err-note"></span></div>
         </div>
         <div class="form-actions">
             <button onclick="saveDebugRecord()" class="btn-primary btn-update" id="btn-save-debug">Lưu (Insert)</button>
