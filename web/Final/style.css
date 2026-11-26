@@ -3849,6 +3849,7 @@ div:has(> .db-table-wrapper) {
 .note-box label {
     color: #4CAF50;
     font-weight: 600;
+    margin-bottom: 8px;
 }
 
 .note-box input:focus {
