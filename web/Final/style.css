@@ -3856,3 +3856,27 @@ div:has(> .db-table-wrapper) {
     border-color: #4CAF50;
     box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
 }
+.note-box input {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #4CAF50;
+    border-radius: 8px;
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.06);
+    color: inherit;
+    font: inherit;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.note-box input::placeholder {
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.note-box input:focus {
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.18);
+    background: rgba(255, 255, 255, 0.08);
+}
