@@ -3847,9 +3847,10 @@ div:has(> .db-table-wrapper) {
 }
 
 .note-box label {
+    display: block;
     color: #4CAF50;
     font-weight: 600;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 
 .note-box input:focus {

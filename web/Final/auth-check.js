@@ -1,6 +1,24 @@
 const API_AUTH = 'https://airwatch.io.vn';
+
 let currentRole = 'guest';
 let currentUsername = '';
+
+function isLocalHost() {
+    return location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+}
+
+function isDevMode() {
+    return isLocalHost() && (
+        localStorage.getItem('dev_mode') === '1' ||
+        new URLSearchParams(location.search).has('dev')
+    );
+}
+
+function setDevMode(enabled) {
+    if (!isLocalHost()) return false; // chỉ cho local
+    localStorage.setItem('dev_mode', enabled ? '1' : '0');
+    return true;
+}
 
 function getToken() {
     return localStorage.getItem('auth_token') || '';
@@ -8,12 +26,21 @@ function getToken() {
 
 async function checkAuth() {
     try {
-        const r = await fetch(API_AUTH + '/api/check', { headers: { 'X-Auth-Token': getToken() } });
+        if (isDevMode()) {
+            currentRole = localStorage.getItem('dev_role') || 'admin';
+            currentUsername = localStorage.getItem('dev_username') || 'dev';
+            return currentRole;
+        }
+
+        const r = await fetch(API_AUTH + '/api/check', {
+            headers: { 'X-Auth-Token': getToken() }
+        });
+
         const data = await r.json();
         currentRole = data.role || 'guest';
         currentUsername = data.username || '';
         return currentRole;
-    } catch(e) {
+    } catch (e) {
         currentRole = 'guest';
         return 'guest';
     }
@@ -29,33 +56,56 @@ function isHeadAdmin() {
 
 async function login(user, pass, otp) {
     try {
+        if (isDevMode()) {
+            localStorage.setItem('auth_token', 'dev_token');
+            localStorage.setItem('admin_user', user || 'dev');
+            localStorage.setItem('admin_displayname', user || 'dev');
+            localStorage.setItem('admin_role', 'admin');
+            currentRole = 'admin';
+            currentUsername = user || 'dev';
+            return {
+                ok: true,
+                data: {
+                    ok: true,
+                    token: 'dev_token',
+                    user: user || 'dev',
+                    displayname: user || 'dev',
+                    role: 'admin'
+                }
+            };
+        }
+
         const body = { user, pass };
         if (otp) body.otp = otp;
+
         const r = await fetch(API_AUTH + '/api/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body)
         });
+
         const data = await r.json();
+
         if (data.ok && data.token) {
             localStorage.setItem('auth_token', data.token);
             localStorage.setItem('admin_user', data.user || user);
-            localStorage.setItem('admin_displayname', data.displayname || data.user); 
+            localStorage.setItem('admin_displayname', data.displayname || data.user);
             currentRole = data.role || 'admin';
+            currentUsername = data.user || user || '';
             return { ok: true, data };
         }
+
         return { ok: false, data };
-    } catch(e) {
+    } catch (e) {
         return { ok: false, data: { error: e.message } };
     }
 }
 
 async function logout() {
-    const token = localStorage.getItem('auth_token'); // Lấy token đúng tên
-    
+    const token = localStorage.getItem('auth_token');
+
     try {
-        // 1. Gọi API báo Backend xóa session trong DB (Node-RED của mày đã có sẵn API này)
-        if (token) {
+        if (token && !isDevMode()) {
             await fetch(API_AUTH + '/api/logout', {
                 method: 'POST',
                 headers: { 'X-Auth-Token': token }
@@ -64,19 +114,16 @@ async function logout() {
     } catch (e) {
         console.error('Lỗi gọi API logout:', e);
     }
-    
-    // 2. Xóa sạch mọi dấu vết dưới máy
+
     localStorage.removeItem('auth_token');
     localStorage.removeItem('admin_user');
     localStorage.removeItem('admin_displayname');
     localStorage.removeItem('admin_role');
     localStorage.removeItem('admin_tab');
-    localStorage.removeItem('terms_agreed_version'); // Bắt tick lại điều khoản
-    
-    // 3. Reset biến toàn cục
+    localStorage.removeItem('terms_agreed_version');
+
     currentRole = 'guest';
     currentUsername = '';
-    
-    // 4. Đá văng về trang chủ (Guest)
+
     window.location.href = '/';
 }

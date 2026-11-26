@@ -143,13 +143,13 @@
             <button onclick="openCloneDialog()" class="btn-mini">Clone từ sensor</button>
         </div>
         <div class="toolbar-group">
-            <label>Simulate:</label>
+            <label>Giả lập:</label>
             <input id="dbg-sim-count" class="status-input mini" type="number" placeholder="10" value="10" min="1" max="50000">
             <button onclick="simulatePackets(false)" class="btn-sim btn-sim-normal" title="Simulate N records bình thường">
-                Simulate
+                Giả lập
             </button>
             <button onclick="simulatePackets(true)" class="btn-sim btn-sim-edge" title="Simulate với edge cases (nhiệt độ âm, PM cao, ...)">
-                Edge Cases
+                Dữ liệu biên
             </button>
         </div>
     </div>
@@ -178,7 +178,6 @@
                     <th>PM1</th><th>PM2.5</th><th>PM10</th>
                     <th>CO</th><th>VOC</th><th>NOx</th>
                     <th>VOC%</th><th>NOx%</th>
-                    <th>SGP</th>
                     <th>Type</th><th>Note</th><th>Actions</th>
                 </tr>
             </thead>
@@ -207,7 +206,8 @@
             <div class="field"><label>VOC %<span class="hint">0 to 999</span></label><input id="dbg-voc_pct" type="number" step="0.1" oninput="validateField('voc_pct')"><span class="err" id="err-voc_pct"></span></div>
             <div class="field"><label>NOx %<span class="hint">0 to 999</span></label><input id="dbg-nox_pct" type="number" step="0.1" oninput="validateField('nox_pct')"><span class="err" id="err-nox_pct"></span></div>
             </div>
-            <div class="field full"><label>Loại test</label>
+            <div class="field full"><label>Loại test </label>
+
                 <select id="dbg-test-type" class="status-input">
                     <option value="manual">Thủ công</option>
                     <option value="edge">Dữ liệu biên</option>
@@ -216,7 +216,7 @@
             </div>
             <div class="field full note-box">
     <label>Ghi chú</label>
-    <input id="dbg-note" type="text" placeholder="Ghi chú test case" maxlength="200">
+    <input id="dbg-note" type="text" placeholder="Vd: test 30/4" maxlength="200">
     <span class="err" id="err-note"></span>
 </div>
         <div class="form-actions">
@@ -226,7 +226,7 @@
         </div>
     </div>
 
-    <h3 class="chart-title" style="margin-top:32px; font-size:18px;">Dashboard Preview <span style="font-size:11px; color:var(--text-muted); font-weight:400;">(render bằng đúng hàm của dashboard, không phải code riêng)</span></h3>
+    <h3 class="chart-title" style="margin-top:32px; font-size:18px;">Dashboard Preview </h3>
 <div class="aqi-banner">
     <div class="aqi-circle-container">
         <svg class="aqi-circle" width="200" height="200">
@@ -242,26 +242,131 @@
     <div id="dbg-aqi-meta" style="font-size:12px; color:var(--text-muted); margin-top:12px;"></div>
 </div>
 
-<div class="grid">
-    <div class="card temp"><div class="label">Nhiệt độ</div><div class="value"><span id="dbg-card-temp">--</span><span class="unit">°C</span></div></div>
-    <div class="card hum"><div class="label">Độ ẩm</div><div class="value"><span id="dbg-card-hum">--</span><span class="unit">%</span></div></div>
-    <div class="card volt"><div class="label">Điện áp</div><div class="value"><span id="dbg-card-volt">--</span><span class="unit">V</span></div></div>
-    <div class="card curr"><div class="label">Dòng điện</div><div class="value"><span id="dbg-card-curr">--</span><span class="unit">mA</span></div></div>
-    <div class="card pm1"><div class="label">PM1.0</div><div class="value"><span id="dbg-card-pm1">--</span><span class="unit">µg/m³</span></div></div>
-    <div class="card pm25"><div class="label">PM2.5</div><div class="value"><span id="dbg-card-pm25">--</span><span class="unit">µg/m³</span></div></div>
-    <div class="card pm10"><div class="label">PM10</div><div class="value"><span id="dbg-card-pm10">--</span><span class="unit">µg/m³</span></div></div>
-    <div class="card co"><div class="label">CO</div><div class="value"><span id="dbg-card-co">--</span><span class="unit">ppm</span></div></div>
-    <div class="card voc"><div class="label">VOC</div><div class="value"><span id="dbg-card-voc_pct">--</span><span class="unit">%</span></div></div>
-    <div class="card nox"><div class="label">NOx</div><div class="value"><span id="dbg-card-nox_pct">--</span><span class="unit">%</span></div></div>
-</div>
+<section class="grid">
+        <div class="card temp">
+            <div class="label">Nhiệt độ</div>
+            <div class="value"><span id="temp">--</span><span class="unit">°C</span></div>
+        </div>
+        <div class="card hum">
+            <div class="label">Độ ẩm</div>
+            <div class="value"><span id="hum">--</span><span class="unit">%</span></div>
+        </div>
+        <div class="card volt admin-only" style="display:none;">
+            <div class="label">Điện áp</div>
+            <div class="value"><span id="volt">--</span><span class="unit">V</span></div>
+        </div>
+        <div class="card curr admin-only" style="display:none;">
+            <div class="label">Dòng điện</div>
+            <div class="value"><span id="curr">--</span><span class="unit">mA</span></div>
+        </div>
+        <div class="card pm1">
+            <div class="label">PM1.0</div>
+            <div class="value"><span id="pm1">--</span><span class="unit">µg/m³</span></div>
+        </div>
+        <div class="card pm25">
+            <div class="label">PM2.5</div>
+            <div class="value"><span id="pm25">--</span><span class="unit">µg/m³</span></div>
+        </div>
+        <div class="card pm10">
+            <div class="label">PM10</div>
+            <div class="value"><span id="pm10">--</span><span class="unit">µg/m³</span></div>
+        </div>
+        <div class="card co">
+            <div class="label">CO</div>
+            <div class="value"><span id="co">--</span><span class="unit">ppm</span></div>
+        </div>
+        <div class="card voc">
+            <div class="label">VOC</div>
+            <div class="value"><span id="voc_pct">--</span><span class="unit">%</span></div>
+        </div>
+        <div class="card nox">
+            <div class="label">NOx</div>
+            <div class="value"><span id="nox_pct">--</span><span class="unit">%</span></div>
+        </div>
+        
+        <!-- THÊM 4 KHỐI MAX/MIN VÀO ĐÂY -->
+        <div class="card maxv admin-only" style="display:none;">
+            <div class="label">Max V</div>
+            <div class="value" style="color: #FF9800;"><span id="maxv">--</span><span class="unit">V</span></div>
+        </div>
+        <div class="card minv admin-only" style="display:none;">
+            <div class="label">Min V</div>
+            <div class="value" style="color: #FFC107;"><span id="minv">--</span><span class="unit">V</span></div>
+        </div>
+        <div class="card maxi admin-only" style="display:none;">
+            <div class="label">Max I</div>
+            <div class="value" style="color: #9C27B0;"><span id="maxi">--</span><span class="unit">mA</span></div>
+        </div>
+        <div class="card mini admin-only" style="display:none;">
+            <div class="label">Min I</div>
+            <div class="value" style="color: #2196F3;"><span id="mini">--</span><span class="unit">mA</span></div>
+        </div>
+    </section>
+    
 
-<div class="chart-container"><h4 class="chart-title" style="font-size:16px;">Môi trường</h4><canvas id="dbg-chart-env"></canvas></div>
-<div class="chart-container"><h4 class="chart-title" style="font-size:16px;">Bụi mịn</h4><canvas id="dbg-chart-pm"></canvas></div>
-<div class="chart-container"><h4 class="chart-title" style="font-size:16px;">Mức độ ô nhiễm khí (VOC & NOx)</h4><canvas id="dbg-chart-gas"></canvas></div>
-<div class="chart-container"><h4 class="chart-title" style="font-size:16px;">Nồng độ CO</h4><canvas id="dbg-chart-co"></canvas></div>
-<div class="chart-container"><h4 class="chart-title" style="font-size:16px;">Điện áp</h4><canvas id="dbg-chart-volt"></canvas></div>
-<div class="chart-container"><h4 class="chart-title" style="font-size:16px;">Dòng điện</h4><canvas id="dbg-chart-curr"></canvas></div>
-</section>
+<section class="chart-container">
+        <h2 class="chart-title">Môi trường</h2>
+        <canvas id="chart-env"></canvas>
+    </section>
+
+    <section class="chart-container">
+        <h2 class="chart-title">Bụi mịn</h2>
+        <canvas id="chart-pm"></canvas>
+    </section>
+
+    <section class="chart-container">
+        <h2 class="chart-title">Mức độ ô nhiễm khí (VOC & NOx)</h2>
+        <canvas id="chart-gas"></canvas>
+    </section>
+
+    <section class="chart-container">
+        <h2 class="chart-title">Nồng độ CO</h2>
+        <canvas id="chart-co"></canvas>
+    </section>
+
+    <section class="chart-container admin-only" style="display:none;">
+        <h2 class="chart-title">Điện áp</h2>
+        <canvas id="chart-volt"></canvas>
+    </section>
+
+    <section class="chart-container admin-only" style="display:none;">
+        <h2 class="chart-title">Dòng điện</h2>
+        <canvas id="chart-curr"></canvas>
+    </section>
+
+    <!-- SỬA LẠI CHO THẲNG HÀNG -->
+    <section class="chart-container admin-only" style="display:none;">
+        <h2 class="chart-title">Min / Max (V & mA)</h2>
+        <canvas id="chart-minmax"></canvas>
+    </section>
+
+    <section class="chart-container admin-only" style="display:none;">
+        <h2 class="chart-title">Dữ liệu hệ thống (Admin)</h2>
+        <div class="grid">
+            <div class="card"><div class="label">Record DB</div><div class="value"><span id="db-count">--</span></div></div>
+            <div class="card"><div class="label">Cập nhật cuối</div><div class="value" style="font-size: 16px;"><span id="last-seen">--</span></div></div>
+            <div class="card"><div class="label">Role</div><div class="value" style="font-size: 20px;"><span id="role-display">--</span></div></div>
+        </div>
+    </section>
+
+    <section class="aqi-table-section">
+        <h2 class="chart-title" style="text-align:center; margin-bottom:20px;">Bảng ngưỡng AQI</h2>
+        <table class="aqi-table">
+            <thead><tr><th>Khoảng AQI</th><th>Mức độ</th><th>Ảnh hưởng sức khỏe</th></tr></thead>
+            <tbody>
+                <tr style="background: rgba(76,175,80,0.1);"><td><span class="aqi-badge" style="background:#4CAF50;">0 – 50</span></td><td><strong>Tốt</strong></td><td>Chất lượng không khí tốt, không ảnh hưởng sức khỏe.</td></tr>
+                <tr style="background: rgba(255,235,59,0.1);"><td><span class="aqi-badge" style="background:#FFEB3B; color:#000;">51 – 100</span></td><td><strong>Trung bình</strong></td><td>Nhóm nhạy cảm (trẻ em, người già, hen suyễn) nên hạn chế hoạt động ngoài trời lâu.</td></tr>
+                <tr style="background: rgba(255,152,0,0.1);"><td><span class="aqi-badge" style="background:#FF9800;">101 – 150</span></td><td><strong>Kém</strong></td><td>Nhóm nhạy cảm bị ảnh hưởng sức khỏe; người khỏe mạnh có thể bị kích ứng mắt, họng.</td></tr>
+                <tr style="background: rgba(244,67,54,0.1);"><td><span class="aqi-badge" style="background:#F44336;">151 – 200</span></td><td><strong>Xấu</strong></td><td>Mọi người bắt đầu bị ảnh hưởng sức khỏe; nhóm nhạy cảm bị ảnh hưởng nghiêm trọng hơn.</td></tr>
+                <tr style="background: rgba(156,39,176,0.1);"><td><span class="aqi-badge" style="background:#9C27B0;">201 – 300</span></td><td><strong>Rất xấu</strong></td><td>Cảnh báo sức khỏe cho toàn bộ cộng đồng; hạn chế ra ngoài.</td></tr>
+                <tr style="background: rgba(123,31,162,0.15);"><td><span class="aqi-badge" style="background:#7B1FA2;">301 – 500</span></td><td><strong>Nguy hại</strong></td><td>Khẩn cấp: ảnh hưởng nghiêm trọng đến toàn bộ dân số, ở trong nhà.</td></tr>
+            </tbody>
+        </table>
+        <div style="text-align:center; margin-top:16px; font-size:12px; color:var(--text-muted);">
+            Tham khảo: <a href="https://sonnmt.langson.gov.vn/upload/105376/20250319/01-btnmt-qc05_c7c2a.pdf" target="_blank" rel="noopener" style="color:var(--accent); text-decoration:underline;">QCVN 05:2023/BTNMT</a>
+        </div>
+    </section>
+
 
 <!-- TAB 4: LOG -->
 <section class="admin-panel" id="tab-log" style="display:none;">
