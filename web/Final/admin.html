@@ -214,8 +214,11 @@
                     <option value="custom">Tùy chỉnh</option>
                 </select>
             </div>
-            <div class="field full"><label>Ghi chú</label><input id="dbg-note" type="text" placeholder="Ghi chú test case" maxlength="200"><span class="err" id="err-note"></span></div>
-        </div>
+            <div class="field full note-box">
+    <label>Ghi chú</label>
+    <input id="dbg-note" type="text" placeholder="Ghi chú test case" maxlength="200">
+    <span class="err" id="err-note"></span>
+</div>
         <div class="form-actions">
             <button onclick="saveDebugRecord()" class="btn-primary btn-update" id="btn-save-debug">Lưu (Insert)</button>
             <button onclick="resetDebugForm()" class="btn-secondary btn-reset">Reset</button>

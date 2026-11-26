@@ -3838,3 +3838,21 @@ div:has(> .db-table-wrapper) {
     border-color: #66BB6A;
   }
 }
+.note-box {
+    border: 1px solid #4CAF50;
+    border-radius: 10px;
+    padding: 12px;
+    background: rgba(76, 175, 80, 0.08);
+    box-shadow: 0 0 0 1px rgba(76, 175, 80, 0.15) inset;
+}
+
+.note-box label {
+    color: #4CAF50;
+    font-weight: 600;
+}
+
+.note-box input:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
