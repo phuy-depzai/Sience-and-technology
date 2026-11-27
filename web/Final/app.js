@@ -2068,11 +2068,25 @@ async function toggleUserActive(id, active) {
 
 async function deleteUser(id, name) {
     if (!(await customConfirm('Xóa user "' + name + '"?\n\nHành động này không thể hoàn tác.'))) return;
+
     try {
-        const r = await fetchWithTOTP(API + '/api/users/' + id, { method: 'DELETE', headers: { 'X-Auth-Token': getToken() } });
-        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const r = await fetchWithTOTP(API + '/api/users/' + id, {
+            method: 'DELETE',
+            headers: {
+                'X-Auth-Token': getToken()
+            }
+        });
+
+        const d = await r.json().catch(() => ({}));
+
+        if (!r.ok) throw new Error(d.error || 'HTTP ' + r.status);
+
         await loadUsers();
-    } catch(e) { if (e.message !== 'Đã hủy') customNotify('Xóa thất bại: ' + e.message, 'error'); }
+    } catch(e) {
+        if (e.message !== 'Đã hủy') {
+            customNotify('Xóa thất bại: ' + e.message, 'error');
+        }
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -2698,19 +2712,10 @@ function customNotify(message, type = 'info', duration = 3500) {
     toast.querySelector('.custom-toast-close').onclick = remove;
     if (duration > 0) setTimeout(remove, duration);
 }
-function dbFirstPage() { 
-    if (dbState.offset === 0) return; 
-    dbState.offset = 0; 
-    loadDBTable(); 
-}
 
-function dbLastPage() { 
-    // Tính offset của trang cuối cùng
-    const lastOffset = Math.floor((dbState.total - 1) / dbState.limit) * dbState.limit;
-    if (dbState.offset === lastOffset) return; 
-    dbState.offset = lastOffset; 
-    loadDBTable(); 
-}
+
+
+
 let currentNodeId = pad3(
     new URLSearchParams(location.search).get('node') ||
     localStorage.getItem('selected_node') ||
