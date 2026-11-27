@@ -730,9 +730,22 @@
 <!-- TOAST CONTAINER -->
 <div id="toast-container" style="position:fixed; top:80px; right:20px; z-index:9999; display:flex; flex-direction:column; gap:12px; max-width:380px;"></div>
 <!-- SCRIPTS -->
-<script src="chart.min.js"></script>
+<!-- Core -->
+<script src="js/core.js"></script>
+
+<!-- Security + Notification -->
+<script src="js/sec.js"></script>
+<script src="js/nofi.js"></script>
+
+<!-- Admin modules -->
+<script src="js/nodes.js"></script>
+<script src="js/debug.js"></script>
+<script src="js/log.js"></script>
+<script src="js/adm_note.js"></script>
+<script src="js/user.js"></script>
+<script src="js/incidents.js"></script>
+<script src="js/DB_View.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
-<script src="auth-check.js"></script>
 <script>
 (async function() {
     if (typeof checkAuth === 'function') { await checkAuth(); }
