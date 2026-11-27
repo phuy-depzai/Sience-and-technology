@@ -20,13 +20,13 @@
             .forEach(el => el.style.display = '');
 
         if (btn) btn.textContent = 'Admin ▾';
-        if (action) action.textContent = '🚪 Đăng xuất';
+        if (action) action.textContent = ' Đăng xuất';
     } else {
         document.querySelectorAll('.admin-only')
             .forEach(el => el.style.display = 'none');
 
         if (btn) btn.textContent = 'Guest ▾';
-        if (action) action.textContent = '🔑 Đăng nhập';
+        if (action) action.textContent = ' Đăng nhập';
     }
 
     applyTheme();
@@ -569,6 +569,16 @@ function renderCharts(data, idPrefix = '', chartCtx = dashCharts) {
             }
         });
     }
+}
+async function loadSystemData() {
+    try {
+        const r = await authFetch(API + '/api/system', { headers: { 'X-Auth-Token': getToken() } });
+        const d = await r.json();
+        const c = document.getElementById('db-count'), s = document.getElementById('last-seen'), ro = document.getElementById('role-display');
+        if (c) c.textContent = d.count || '--';
+        if (s) s.textContent = d.last_seen || '--';
+        if (ro) ro.textContent = currentRole;
+    } catch(e) { console.error('System data fail:', e); }
 }
 // ============================================================
 // LOAD DATA
