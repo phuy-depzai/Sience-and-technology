@@ -14,6 +14,14 @@ async function loadServiceStatus() {
 function setStatus(online) { const s = document.getElementById('status'); if (!s) return; s.className = online ? 'status' : 'status offline'; s.textContent = online ? 'LIVE' : 'OFFLINE'; }
 const STATUS_ICONS = { node: ' NODE', gate: ' GATEWAY', server: ' SERVER' };
 const PRESET_NOTES = { working: 'Hoạt động bình thường', debug: 'Đang debug', attach: 'Đang gắn module/sensor', testing: 'Đang chạy test', maintenance: 'Đang bảo trì', offline: 'Tạm tắt' };
+function applyPreset(status) {
+    document.getElementById('sel-status').value = status;
+    const n = document.getElementById('inp-note'); if (!n.value.trim()) n.value = PRESET_NOTES[status] || '';
+    document.querySelectorAll('.preset-btn').forEach(b => b.style.opacity = '0.5');
+    const btn = document.querySelector(`.preset-btn.${status}`); if (btn) btn.style.opacity = '1';
+    updateServiceStatus();
+}
+
 async function updateServiceStatus() {
     const service = document.getElementById('sel-service').value;
     const status  = document.getElementById('sel-status').value;
