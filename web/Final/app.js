@@ -297,7 +297,7 @@ function updateThemeLabel() { const i = document.getElementById('theme-icon'), l
 
 async function loadSystemData() {
     try {
-        const r = await fetch(API + '/api/system', { headers: { 'X-Auth-Token': getToken() } });
+        const r = await authFetch(API + '/api/system', { headers: { 'X-Auth-Token': getToken() } });
         const d = await r.json();
         const c = document.getElementById('db-count'), s = document.getElementById('last-seen'), ro = document.getElementById('role-display');
         if (c) c.textContent = d.count || '--';
@@ -307,7 +307,7 @@ async function loadSystemData() {
 }
 
 async function fetchDataByDate(dateStr) {
-    try { const r = await fetch(API + '/api/data-by-date?date=' + dateStr); return await r.json(); }
+    try { const r = await authFetch(API + '/api/data-by-date?date=' + dateStr); return await r.json(); }
     catch(e) { console.error('API-by-date fail:', e); return []; }
 }
 
@@ -342,7 +342,7 @@ async function updateAQIFromServer() {
     const aqiEl = document.getElementById('aqi');
     if (!aqiEl) return;
     try {
-        const r = await fetch(API + '/api/aqi/current');
+        const r = await authFetch(API + '/api/aqi/current');
         const d = await r.json();
         const textEl = document.getElementById('aqi-text');
         const progress = document.getElementById('aqi-progress');
@@ -1043,7 +1043,7 @@ async function loadNodesOnMap() {
     adminMarkers.forEach(m => adminMap.removeLayer(m));
     adminMarkers = [];
     try {
-        const r = await fetch(API + '/api/nodes');
+        const r = await authFetch(API + '/api/nodes');
         const nodes = await r.json();
         if (!nodes || !nodes.length) return;
         nodes.forEach(n => {
@@ -1074,7 +1074,7 @@ async function addNode() {
     id = id.padStart(3, '0');
 
     try {
-        const r = await fetch(API + '/api/nodes', {
+        const r = await authFetch(API + '/api/nodes', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-Auth-Token': getToken() },
             body: JSON.stringify({ id, name, lat: parseFloat(lat), lng: parseFloat(lng) })
@@ -1098,7 +1098,7 @@ async function loadNodes() {
     if (!box) return;
     box.innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-muted);">Đang tải...</div>';
     try {
-        const [nr, dr] = await Promise.all([fetch(API + '/api/nodes'), fetch(API + '/api/data')]);
+        const [nr, dr] = await Promise.all([authFetch(API + '/api/nodes'), authFetch(API + '/api/data')]);
         const nodes = await nr.json();
         const data = await dr.json();
         if (!nodes || !nodes.length) { box.innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-muted);">Chưa có node nào.</div>'; return; }
@@ -1117,7 +1117,7 @@ async function loadNodes() {
 async function deleteNode(id, name) {
     if (!await customConfirm(`Xóa node "${name}" (ID: ${id})?\n\nHành động này không thể hoàn tác.`)) return;
     try {
-        const r = await fetch(API + '/api/nodes/' + encodeURIComponent(id), { method: 'DELETE', headers: { 'X-Auth-Token': getToken() } });
+        const r = await authFetch(API + '/api/nodes/' + encodeURIComponent(id), { method: 'DELETE', headers: { 'X-Auth-Token': getToken() } });
         if (!r.ok) throw new Error('HTTP ' + r.status);
         loadNodes();
         loadNodesOnMap();
@@ -1126,7 +1126,7 @@ async function deleteNode(id, name) {
 
 async function loadServiceStatus() {
     try {
-        const r = await fetch(API + '/api/status');
+        const r = await authFetch(API + '/api/status');
         const d = await r.json();
         const grid = document.getElementById('status-grid');
         if (!grid) return;
@@ -1143,7 +1143,7 @@ async function updateServiceStatus() {
     const status  = document.getElementById('sel-status').value;
     const note    = document.getElementById('inp-note').value.trim();
     try {
-        const r = await fetch(API + '/api/set-status', {
+        const r = await authFetch(API + '/api/set-status', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-Auth-Token': getToken() },
             body: JSON.stringify({ service, status, note })
@@ -1161,7 +1161,7 @@ async function updateAllServices() {
     if (!(await customConfirm('Áp dụng trạng thái "' + status + '" cho TẤT CẢ service?\n\n' + services.join(', ')))) return;
     try {
         for (const svc of services) {
-            await fetch(API + '/api/set-status', {
+            await authFetch(API + '/api/set-status', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'X-Auth-Token': getToken() },
                 body: JSON.stringify({ service: svc, status, note })
@@ -1181,7 +1181,7 @@ if (document.getElementById('tab-status')) {
 
 async function logAction(action, target, details, severity) {
     try {
-        await fetch(API + '/api/logs', {
+        await authFetch(API + '/api/logs', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-Auth-Token': getToken() },
             body: JSON.stringify({ action, target: target || '', details: details || '', severity: severity || 'info', author: 'phuyy' })
@@ -1267,7 +1267,7 @@ async function loadDebugData(page) {
     if (!tbody) return;
     tbody.innerHTML = '<tr><td colspan="20" style="text-align:center; padding:20px; color:var(--text-muted);">Đang tải...</td></tr>';
     try {
-        const r = await fetch(API + '/api/debug/data?page=' + debugPage + '&limit=' + DEBUG_LIMIT, { headers: { 'X-Auth-Token': getToken() } });
+        const r = await authFetch(API + '/api/debug/data?page=' + debugPage + '&limit=' + DEBUG_LIMIT, { headers: { 'X-Auth-Token': getToken() } });
         if (!r.ok) throw new Error('HTTP ' + r.status);
         const resp = await r.json();
         if (Array.isArray(resp)) {
@@ -1358,7 +1358,7 @@ function renderDebugTable() {
 // ============================================================
 async function loadPresets() {
     try {
-        const r = await fetch(API + '/api/debug/presets', { headers: { 'X-Auth-Token': getToken() } });
+        const r = await authFetch(API + '/api/debug/presets', { headers: { 'X-Auth-Token': getToken() } });
         if (!r.ok) throw new Error('HTTP ' + r.status);
         presetsList = await r.json();
         const sel = document.getElementById('dbg-preset-select');
@@ -1393,7 +1393,7 @@ async function savePreset() {
     DEBUG_FIELDS.forEach(f => { const el = document.getElementById('dbg-' + f); if (el && el.value.trim() !== '') vals[f] = parseFloat(el.value); });
     const sgp = document.getElementById('dbg-sgp'); if (sgp) vals.sgp_ok = parseInt(sgp.value) || 0;
     try {
-        const r = await fetch(API + '/api/debug/presets', {
+        const r = await authFetch(API + '/api/debug/presets', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-Auth-Token': getToken() },
             body: JSON.stringify({ name: name.trim(), description: desc.trim(), values_json: JSON.stringify(vals) })
@@ -1414,7 +1414,7 @@ async function updateCurrentPreset() {
     DEBUG_FIELDS.forEach(f => { const el = document.getElementById('dbg-' + f); if (el && el.value.trim() !== '') vals[f] = parseFloat(el.value); });
     const sgp = document.getElementById('dbg-sgp'); if (sgp) vals.sgp_ok = parseInt(sgp.value) || 0;
     try {
-        const r = await fetch(API + '/api/debug/presets/' + preset.id, {
+        const r = await authFetch(API + '/api/debug/presets/' + preset.id, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', 'X-Auth-Token': getToken() },
             body: JSON.stringify({ values_json: JSON.stringify(vals) })
@@ -1432,7 +1432,7 @@ async function deleteCurrentPreset() {
     if (!preset) return;
     if (!(await customConfirm('Xóa preset "' + preset.name + '"?'))) return;
     try {
-        const r = await fetch(API + '/api/debug/presets/' + preset.id, { method: 'DELETE', headers: { 'X-Auth-Token': getToken() } });
+        const r = await authFetch(API + '/api/debug/presets/' + preset.id, { method: 'DELETE', headers: { 'X-Auth-Token': getToken() } });
         if (!r.ok) throw new Error('HTTP ' + r.status);
         logAction('preset_deleted', 'preset:' + preset.name, '', 'warn');
         await loadPresets();
@@ -1451,7 +1451,7 @@ async function openCloneDialog() {
     const list = document.getElementById('clone-sensor-list');
     list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted);">Đang tải sensor...</div>';
     try {
-        const r = await fetch(API + '/api/data');
+        const r = await authFetch(API + '/api/data');
         sensorCache = await r.json();
         sensorCache = sensorCache.slice().reverse();
         renderSensorList(sensorCache);
@@ -1482,7 +1482,7 @@ function filterSensorList() {
 async function cloneSensor(sensorId) {
     if (!(await customConfirm('Clone sensor #' + sensorId + ' sang Debug DB?'))) return;
     try {
-        const r = await fetch(API + '/api/debug/clone/' + sensorId, { method: 'POST', headers: { 'X-Auth-Token': getToken() } });
+        const r = await authFetch(API + '/api/debug/clone/' + sensorId, { method: 'POST', headers: { 'X-Auth-Token': getToken() } });
         if (!r.ok) throw new Error('HTTP ' + r.status);
         logAction('debug_cloned', 'sensor#' + sensorId, 'Clone từ sensor thật', 'info');
         closeCloneDialog();
@@ -1499,7 +1499,7 @@ async function simulatePackets(edge) {
     if (count < 1 || count > 50000) { customNotify('Số lượng phải từ 1 đến 50,000', 'warn'); return; }
     if (!(await customConfirm('Simulate ' + count.toLocaleString('vi-VN') + ' packets' + (edge ? ' (có edge cases)' : '') + '?'))) return;
     try {
-        const r = await fetch(API + '/api/debug/simulate', {
+        const r = await authFetch(API + '/api/debug/simulate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-Auth-Token': getToken() },
             body: JSON.stringify({ count, edge })
@@ -1530,7 +1530,7 @@ async function saveDebugRecord() {
     const url = isEdit ? API + '/api/debug/data/' + editingId : API + '/api/debug/data';
     const method = isEdit ? 'PUT' : 'POST';
     try {
-        const r = await fetch(url, {
+        const r = await authFetch(url, {
             method,
             headers: { 'Content-Type': 'application/json', 'X-Auth-Token': getToken() },
             body: JSON.stringify(payload)
@@ -1560,7 +1560,7 @@ function editDebugRecord(id) {
 async function deleteDebugRecord(id) {
     if (!(await customConfirm('Xóa record #' + id + '?'))) return;
     try {
-        const r = await fetch(API + '/api/debug/data/' + id, { method: 'DELETE', headers: { 'X-Auth-Token': getToken() } });
+        const r = await authFetch(API + '/api/debug/data/' + id, { method: 'DELETE', headers: { 'X-Auth-Token': getToken() } });
         if (!r.ok) throw new Error('HTTP ' + r.status);
         logAction('debug_deleted', 'sensor_debug#' + id, 'Xóa record', 'warn');
         selectedRows.delete(id);
@@ -1587,12 +1587,12 @@ async function deleteSelectedDebug() {
     try {
         let r;
         if (isAll) {
-            r = await fetch(API + '/api/debug/data', {
+            r = await authFetch(API + '/api/debug/data', {
                 method: 'DELETE',
                 headers: { 'X-Auth-Token': getToken() }
             });
         } else {
-            r = await fetch(API + '/api/debug/bulk-delete', {
+            r = await authFetch(API + '/api/debug/bulk-delete', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'X-Auth-Token': getToken() },
                 body: JSON.stringify({ ids })
@@ -1643,7 +1643,7 @@ async function clearDebugData() {
 async function restoreDebugRecord(id) {
     if (!(await customConfirm('Restore record #' + id + ' về original_data?'))) return;
     try {
-        const r = await fetch(API + '/api/debug/restore/' + id, { method: 'POST', headers: { 'X-Auth-Token': getToken() } });
+        const r = await authFetch(API + '/api/debug/restore/' + id, { method: 'POST', headers: { 'X-Auth-Token': getToken() } });
         if (!r.ok) throw new Error('HTTP ' + r.status);
         logAction('debug_restored', 'sensor_debug#' + id, 'Restore về original_data', 'warn');
         await loadDebugData();
@@ -1686,7 +1686,7 @@ async function loadLogs() {
         const severity = document.getElementById('log-filter-severity')?.value || '';
         let url = API + '/api/logs?limit=200';
         if (action) url += '&action=' + encodeURIComponent(action);
-        const r = await fetch(url, { headers: { 'X-Auth-Token': getToken() } });
+        const r = await authFetch(url, { headers: { 'X-Auth-Token': getToken() } });
         if (!r.ok) throw new Error('HTTP ' + r.status);
         logsData = await r.json();
         if (severity) logsData = logsData.filter(l => l.severity === severity);
@@ -1749,7 +1749,7 @@ async function submitNewLog() {
     const details = document.getElementById('log-form-details').value.trim();
     const severity = document.getElementById('log-form-severity').value;
     try {
-        const r = await fetch(API + '/api/logs', {
+        const r = await authFetch(API + '/api/logs', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-Auth-Token': getToken() },
             body: JSON.stringify({ action, target, details, severity, author: 'phuyy' })
@@ -1763,7 +1763,7 @@ async function submitNewLog() {
 async function deleteLog(id) {
     if (!(await customConfirm('Xóa log #' + id + '?'))) return;
     try {
-        const r = await fetch(API + '/api/logs/' + id, { method: 'DELETE', headers: { 'X-Auth-Token': getToken() } });
+        const r = await authFetch(API + '/api/logs/' + id, { method: 'DELETE', headers: { 'X-Auth-Token': getToken() } });
         if (!r.ok) throw new Error('HTTP ' + r.status);
         await loadLogs();
     } catch(e) { customNotify('Xóa thất bại: ' + e.message, 'error'); }
@@ -1787,7 +1787,7 @@ async function cloneAllSensors() {
     if (limit < 1 || limit > 50000) { customNotify('Số lượng phải từ 1 đến 50,000', 'warn'); return; }
     if (!(await customConfirm('Clone ' + limit + ' sensor mới nhất sang Debug DB?\n\nHành động này có thể tạo nhiều records.'))) return;
     try {
-        const r = await fetch(API + '/api/debug/clone-all', {
+        const r = await authFetch(API + '/api/debug/clone-all', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-Auth-Token': getToken() },
             body: JSON.stringify({ limit })
@@ -1819,7 +1819,7 @@ async function loadNotes() {
         let url = API + '/api/notes?';
         if (author) url += 'author=' + encodeURIComponent(author) + '&';
         if (tag) url += 'tag=' + encodeURIComponent(tag);
-        const r = await fetch(url, { headers: { 'X-Auth-Token': getToken() } });
+        const r = await authFetch(url, { headers: { 'X-Auth-Token': getToken() } });
         if (!r.ok) throw new Error('HTTP ' + r.status);
         notesData = await r.json();
         notesFiltered = notesData;
@@ -1906,7 +1906,7 @@ async function submitNote() {
         const method = isEdit ? 'PUT' : 'POST';
         const body = isEdit ? { title, content, tag } : { title, content, tag, author };
         if (tag === 'fatal') body.pinned = 1;
-        const r = await fetch(url, {
+        const r = await authFetch(url, {
             method,
             headers: { 'Content-Type': 'application/json', 'X-Auth-Token': getToken() },
             body: JSON.stringify(body)
@@ -1921,7 +1921,7 @@ async function submitNote() {
 async function deleteNote(id) {
     if (!(await customConfirm('Xóa ghi chú #' + id + '?'))) return;
     try {
-        const r = await fetch(API + '/api/notes/' + id, { method: 'DELETE', headers: { 'X-Auth-Token': getToken() } });
+        const r = await authFetch(API + '/api/notes/' + id, { method: 'DELETE', headers: { 'X-Auth-Token': getToken() } });
         if (!r.ok) throw new Error('HTTP ' + r.status);
         logAction('note_deleted', 'note#' + id, '', 'warn');
         await loadNotes();
@@ -1930,7 +1930,7 @@ async function deleteNote(id) {
 
 async function togglePinNote(id, pinned) {
     try {
-        const r = await fetch(API + '/api/notes/' + id, {
+        const r = await authFetch(API + '/api/notes/' + id, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', 'X-Auth-Token': getToken() },
             body: JSON.stringify({ pinned: pinned })
@@ -1951,7 +1951,7 @@ async function loadUsers() {
     if (!tbody) return;
     tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:var(--text-muted);">Đang tải...</td></tr>';
     try {
-        const r = await fetch(API + '/api/users', { headers: { 'X-Auth-Token': getToken() } });
+        const r = await authFetch(API + '/api/users', { headers: { 'X-Auth-Token': getToken() } });
         if (!r.ok) throw new Error('HTTP ' + r.status);
         usersData = await r.json();
         renderUsersTable();
@@ -2085,7 +2085,7 @@ document.addEventListener('DOMContentLoaded', () => {
 async function loadNoteComments(noteId, container) {
     container.innerHTML = '<div style="font-size:12px; color:var(--text-muted);">Đang tải...</div>';
     try {
-        const r = await fetch(API + '/api/notes/' + noteId + '/comments');
+        const r = await authFetch(API + '/api/notes/' + noteId + '/comments');
         const list = await r.json();
         renderNoteComments(noteId, container, list);
     } catch(e) { container.innerHTML = '<div style="font-size:12px; color:var(--red);">Lỗi: ' + e.message + '</div>'; }
@@ -2128,7 +2128,7 @@ async function submitNoteComment(noteId) {
     const content = (input.value || '').trim();
     if (!content) return;
     try {
-        const r = await fetch(API + '/api/notes/' + noteId + '/comments', {
+        const r = await authFetch(API + '/api/notes/' + noteId + '/comments', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-Auth-Token': getToken() },
             body: JSON.stringify({ content })
@@ -2142,7 +2142,7 @@ async function submitNoteComment(noteId) {
 async function delNoteComment(id, noteId) {
     if (!(await customConfirm('Xóa comment này?'))) return;
     try {
-        const r = await fetch(API + '/api/comments/' + id, { method: 'DELETE', headers: { 'X-Auth-Token': getToken() } });
+        const r = await authFetch(API + '/api/comments/' + id, { method: 'DELETE', headers: { 'X-Auth-Token': getToken() } });
         if (!r.ok) throw new Error('HTTP ' + r.status);
         await loadNoteComments(noteId, document.getElementById('nc-wrap-' + noteId));
     } catch(e) { customNotify('Lỗi: ' + e.message, 'error'); }
@@ -2166,7 +2166,7 @@ async function loadIncidents() {
     if (!tbody) return;
     tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:var(--text-muted);">Đang tải...</td></tr>';
     try {
-        const r = await fetch(API + '/api/incidents?days=90');
+        const r = await authFetch(API + '/api/incidents?days=90');
         incidentsData = await r.json();
         if (!incidentsData.length) {
             tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px; color:var(--text-muted);">Chưa có sự cố nào</td></tr>';
@@ -2237,7 +2237,7 @@ async function submitIncident() {
     const url = isEdit ? API + '/api/incidents/' + editingIncidentId : API + '/api/incidents';
     const method = isEdit ? 'PUT' : 'POST';
     try {
-        const r = await fetch(url, {
+        const r = await authFetch(url, {
             method,
             headers: { 'Content-Type': 'application/json', 'X-Auth-Token': getToken() },
             body: JSON.stringify({
@@ -2258,7 +2258,7 @@ async function submitIncident() {
 async function deleteIncident(id) {
     if (!(await customConfirm('Xóa sự cố #' + id + '?'))) return;
     try {
-        const r = await fetch(API + '/api/incidents/' + id, { method: 'DELETE', headers: { 'X-Auth-Token': getToken() } });
+        const r = await authFetch(API + '/api/incidents/' + id, { method: 'DELETE', headers: { 'X-Auth-Token': getToken() } });
         if (!r.ok) throw new Error('HTTP ' + r.status);
         await loadIncidents();
     } catch(e) { customNotify('Lỗi: ' + e.message, 'error'); }
@@ -2272,7 +2272,7 @@ let lastSeenLogId = parseInt(localStorage.getItem('last_seen_log_id') || '0');
 async function checkNewNotifications() {
     if (!isAdmin()) return;
     try {
-        const r = await fetch(API + '/api/logs?limit=10', { headers: { 'X-Auth-Token': getToken() } });
+        const r = await authFetch(API + '/api/logs?limit=10', { headers: { 'X-Auth-Token': getToken() } });
         if (!r.ok) return;
         const logs = await r.json();
         if (!Array.isArray(logs) || !logs.length) return;
@@ -2452,7 +2452,7 @@ async function loadTrustedIPs() {
     const tbody = document.getElementById('trusted-tbody');
     if (!tbody) return;
     try {
-        const r = await fetch(API + '/api/trusted-ips', { headers: { 'X-Auth-Token': getToken() } });
+        const r = await authFetch(API + '/api/trusted-ips', { headers: { 'X-Auth-Token': getToken() } });
         if (!r.ok) throw new Error('HTTP ' + r.status);
         const d = await r.json();
         const rows = d.rows || [];
@@ -2481,7 +2481,7 @@ async function loadSessions() {
     const tbody = document.getElementById('sessions-tbody');
     if (!tbody) return;
     try {
-        const r = await fetch(API + '/api/sessions', { headers: { 'X-Auth-Token': getToken() } });
+        const r = await authFetch(API + '/api/sessions', { headers: { 'X-Auth-Token': getToken() } });
         if (!r.ok) throw new Error('HTTP ' + r.status);
         const d = await r.json();
         const rows = d.rows || [];
@@ -2509,7 +2509,7 @@ async function loadSensitiveActions() {
     const tbody = document.getElementById('sensitive-tbody');
     if (!tbody) return;
     try {
-        const r = await fetch(API + '/api/sensitive-actions?limit=50', { headers: { 'X-Auth-Token': getToken() } });
+        const r = await authFetch(API + '/api/sensitive-actions?limit=50', { headers: { 'X-Auth-Token': getToken() } });
         if (!r.ok) throw new Error('HTTP ' + r.status);
         const d = await r.json();
         const rows = d.rows || [];
@@ -2578,7 +2578,7 @@ async function deleteTrustedIP(ip) {
 async function revokeToken(token) {
     if (!(await customConfirm('Revoke session này?'))) return;
     try {
-        const r = await fetch(API + '/api/revoke', {
+        const r = await authFetch(API + '/api/revoke', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-Auth-Token': getToken() },
             body: JSON.stringify({ by: 'token', value: token })
@@ -2592,7 +2592,7 @@ async function revokeAllSessions() {
     if (!await customConfirm('⚠️ Revoke TẤT CẢ session (BAO GỒM session hiện tại)?')) return;
     if (!(await customConfirm('Xác nhận lần 2: BẠN SẼ BỊ ĐĂNG XUẤT NGAY LẬP TỨC sau khi bấm OK.'))) return;
     try {
-        const r = await fetch(API + '/api/revoke', {
+        const r = await authFetch(API + '/api/revoke', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-Auth-Token': getToken() },
             body: JSON.stringify({ by: 'all' })
@@ -2732,7 +2732,7 @@ async function loadNodeMenu() {
     select.disabled = true;
 
     try {
-        const res = await fetch('/api/nodes');
+        const res = await authFetch('/api/nodes');
         const nodes = await res.json();
 
         if (!Array.isArray(nodes) || nodes.length === 0) {
@@ -2775,7 +2775,7 @@ function onNodeChange(newNodeId) {
 // ===== Load data của node hiện tại =====
 async function loadDashboardData() {
     try {
-        const res = await fetch(`/api/data?node_id=${currentNodeId}&limit=100`);
+        const res = await authFetch(`/api/data?node_id=${currentNodeId}&limit=100`);
         const data = await res.json();
 
         updateCards(data);
@@ -2834,7 +2834,7 @@ async function loadDBTable() {
             q: dbState.q
         });
 
-        const r = await fetch(
+        const r = await authFetch(
             API + '/api/db/' + encodeURIComponent(dbState.table) + '?' + params.toString(),
             { headers: { 'X-Auth-Token': getToken() } }
         );

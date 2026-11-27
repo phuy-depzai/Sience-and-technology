@@ -24,6 +24,29 @@ function getToken() {
     return localStorage.getItem('auth_token') || '';
 }
 
+function authFetch(url, options = {}) {
+    const token = getToken();
+    const headers = new Headers(options.headers || {});
+
+    if (!headers.has('X-Auth-Token') && token) {
+        headers.set('X-Auth-Token', token);
+    }
+
+    const isForm = options.body instanceof FormData
+                || options.body instanceof Blob
+                || options.body instanceof URLSearchParams;
+    if (options.body && !isForm && !headers.has('Content-Type')) {
+        headers.set('Content-Type', 'application/json');
+    }
+
+    return fetch(url, { ...options, headers, credentials: 'same-origin' })
+        .then(res => {
+            if (res.status === 401) {
+                console.warn('[authFetch] 401 →', url, '| token?', !!token);
+            }
+            return res;
+        });
+}
 async function checkAuth() {
     try {
         if (isDevMode()) {
