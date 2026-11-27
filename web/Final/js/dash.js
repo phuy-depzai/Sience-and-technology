@@ -1,3 +1,57 @@
+// ============================================================
+// DASHBOARD INIT
+// ============================================================
+(async () => {
+    await checkAuth();
+
+    const btn = document.getElementById('auth-btn');
+    const action = document.getElementById('auth-action');
+
+    if (typeof isHeadAdmin === 'function' && isHeadAdmin()) {
+        document.querySelectorAll('.head-admin-only')
+            .forEach(el => el.style.display = '');
+    } else {
+        document.querySelectorAll('.head-admin-only')
+            .forEach(el => el.style.display = 'none');
+    }
+
+    if (isAdmin()) {
+        document.querySelectorAll('.admin-only')
+            .forEach(el => el.style.display = '');
+
+        if (btn) btn.textContent = 'Admin ▾';
+        if (action) action.textContent = '🚪 Đăng xuất';
+    } else {
+        document.querySelectorAll('.admin-only')
+            .forEach(el => el.style.display = 'none');
+
+        if (btn) btn.textContent = 'Guest ▾';
+        if (action) action.textContent = '🔑 Đăng nhập';
+    }
+
+    applyTheme();
+
+    const today = getLocalDate();
+    const dateInput = document.getElementById('date-picker');
+    if (dateInput) dateInput.value = today;
+
+    const data = await fetchDataByDate(today);
+
+    updateCards(data);
+
+    if (typeof Chart !== 'undefined' &&
+        document.getElementById('chart-env')) {
+        renderCharts(data);
+    }
+
+    updateAQIFromServer();
+
+    setInterval(updateAQIFromServer, 5 * 60 * 1000);
+
+    if (document.getElementById('chart-env')) {
+        connectWebSocket();
+    }
+})();
 function calcSubIndex(c, bp) {
     if (c <= bp[0][0]) return bp[0][2];
     for (let i = 0; i < bp.length; i++) {

@@ -10,7 +10,17 @@ function checkTermsAgreement() {
     }
     return true;
 }
-
+async function fetchDataByDate(dateStr) {
+    try {
+        const r = await authFetch(
+            API + '/api/data-by-date?date=' + dateStr
+        );
+        return await r.json();
+    } catch (e) {
+        console.error('API-by-date fail:', e);
+        return [];
+    }
+}
 // ============================================================
 // HTML ESCAPE (XSS SAFE)
 // ============================================================
@@ -23,6 +33,7 @@ function escapeHTML(value) {
         "'": '&#39;'
     })[char]);
 }
+window.escapeHTML = escapeHtml;
 function showTermsModal() {
     let overlay = document.getElementById('terms-overlay');
     if (!overlay) {
