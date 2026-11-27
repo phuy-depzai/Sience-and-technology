@@ -11,7 +11,18 @@ function checkTermsAgreement() {
     return true;
 }
 
-
+// ============================================================
+// HTML ESCAPE (XSS SAFE)
+// ============================================================
+function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, char => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    })[char]);
+}
 function showTermsModal() {
     let overlay = document.getElementById('terms-overlay');
     if (!overlay) {
@@ -251,9 +262,7 @@ function tsToMs(ts) {
     if (!ts) return 0;
     return new Date(String(ts).replace(' ', 'T')).getTime();
 }
-function escapeHtml(s) {
-    return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-}
+
 // ============================================================
 // STEP-UP AUTH — Yêu cầu TOTP khi backend trả 403
 // ============================================================
