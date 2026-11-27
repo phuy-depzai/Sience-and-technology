@@ -803,7 +803,6 @@ const observer = new IntersectionObserver((entries) => {
 }, { threshold: 0.1 });
 document.querySelectorAll('.admin-panel, .admin-header').forEach(el => observer.observe(el));
 </script>
-<script src="app.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
     if (typeof initNodesMap === 'function') setTimeout(initNodesMap, 300);
