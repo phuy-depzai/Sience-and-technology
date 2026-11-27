@@ -14,7 +14,7 @@ function checkTermsAgreement() {
 // ============================================================
 // HTML ESCAPE (XSS SAFE)
 // ============================================================
-function escapeHtml(value) {
+function escapeHTML(value) {
     return String(value ?? '').replace(/[&<>"']/g, char => ({
         '&': '&amp;',
         '<': '&lt;',
