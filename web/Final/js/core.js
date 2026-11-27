@@ -259,9 +259,6 @@ function fmtAgo(min) {
     const h = Math.floor((min % 1440) / 60);
     return h > 0 ? d + 'd ' + h + 'h trước' : d + ' ngày trước';
 }
-
-const dashCharts  = { env: null, volt: null, curr: null, pm: null, gas: null, co: null, minmax: null };
-const debugCharts = { env: null, volt: null, curr: null, pm: null, gas: null, co: null, minmax: null };
 function getLocalDate() {
     const now = new Date();
     const vnTime = new Date(now.getTime() + (7 * 3600 * 1000));
