@@ -22,6 +22,7 @@ async function fetchDataByDate(dateStr) {
     }
 }
 function applyTheme() { const s = localStorage.getItem('theme') || 'dark'; if (s === 'light') document.body.classList.add('light'); else document.body.classList.remove('light'); updateThemeLabel(); }
+function updateThemeLabel() { const i = document.getElementById('theme-icon'), l = document.getElementById('theme-label'); if (!i || !l) return; if (document.body.classList.contains('light')) { i.textContent = '☀️'; l.textContent = 'Chế độ sáng'; } else { i.textContent = '🌙'; l.textContent = 'Chế độ tối'; } }
 // ============================================================
 // HTML ESCAPE (XSS SAFE)
 // ============================================================
