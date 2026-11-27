@@ -12,7 +12,8 @@ async function loadServiceStatus() {
     } catch(e) { console.error('[STATUS]', e); }
 }
 function setStatus(online) { const s = document.getElementById('status'); if (!s) return; s.className = online ? 'status' : 'status offline'; s.textContent = online ? 'LIVE' : 'OFFLINE'; }
-
+const STATUS_ICONS = { node: ' NODE', gate: ' GATEWAY', server: ' SERVER' };
+const PRESET_NOTES = { working: 'Hoạt động bình thường', debug: 'Đang debug', attach: 'Đang gắn module/sensor', testing: 'Đang chạy test', maintenance: 'Đang bảo trì', offline: 'Tạm tắt' };
 async function updateServiceStatus() {
     const service = document.getElementById('sel-service').value;
     const status  = document.getElementById('sel-status').value;
