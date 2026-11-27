@@ -20,7 +20,7 @@ async function loadTrustedIPs() {
         tbody.innerHTML = rows.map(x => `
             <tr>
                 <td><code>${x.ip}</code>${x.ip === d.current_ip ? ' <span style="color:#3fb950;">(bạn)</span>' : ''}</td>
-                <td>${escapeHtml(x.name)}</td>
+                <td>${escapeHTML(x.name)}</td>
                 <td>${x.session_days || 365}</td>
                 <td>${x.active ? '✅' : '❌'}</td>
                 <td style="font-size:11px;">${x.added_at || '—'}</td>

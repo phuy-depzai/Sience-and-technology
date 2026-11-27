@@ -13,7 +13,7 @@ const FIELD_RULES = {
     voc_pct: { min: 0, max: 999,  label: 'VOC %' },
     nox_pct: { min: 0, max: 999,  label: 'NOx %' }
 };
-
+const debugCharts = { env: null, volt: null, curr: null, pm: null, gas: null, co: null, minmax: null };
 let debugData = [];
 let debugPage = 1;
 let debugTotal = 0;
@@ -146,7 +146,7 @@ function renderDebugTable() {
             <td>${(d.nox_pct||0).toFixed(1)}</td>
             <td>${d.sgp_ok||0}</td>
             <td><span class="type-badge ${type}">${type}</span></td>
-            <td title="${(d.note||'').replace(/"/g,'&quot;')}" style="max-width:180px; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(d.note||'—')}</td>
+            <td title="${(d.note||'').replace(/"/g,'&quot;')}" style="max-width:180px; overflow:hidden; text-overflow:ellipsis;">${escapeHTML(d.note||'—')}</td>
             <td>
                 <button class="action-btn edit" onclick="editDebugRecord(${d.id})" title="Sửa">✏️</button>
                 <button class="action-btn restore" onclick="restoreDebugRecord(${d.id})" title="Restore">↺</button>
@@ -170,7 +170,7 @@ async function loadPresets() {
         const sel = document.getElementById('dbg-preset-select');
         if (!sel) return;
         const current = sel.value;
-        sel.innerHTML = '<option value="">-- Chọn preset --</option>' + presetsList.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
+        sel.innerHTML = '<option value="">-- Chọn preset --</option>' + presetsList.map(p => `<option value="${p.id}">${escapeHTML(p.name)}</option>`).join('');
         if (current) sel.value = current;
     } catch(e) { console.error('[PRESETS]', e); }
 }
@@ -274,7 +274,7 @@ function renderSensorList(list) {
         <div class="clone-item" onclick="cloneSensor(${s.id})">
             <div class="clone-item-id">#${s.id}</div>
             <div class="clone-item-info">T=${(s.t||0).toFixed(2)}°C · H=${(s.h||0).toFixed(1)}% · PM2.5=${s.pm25||0} · V=${(s.v||0).toFixed(3)}V</div>
-            <div class="clone-item-ts">${escapeHtml(s.ts || '--')}</div>
+            <div class="clone-item-ts">${escapeHTML(s.ts || '--')}</div>
         </div>
     `).join('');
 }

@@ -52,6 +52,8 @@
         connectWebSocket();
     }
 })();
+
+const dashCharts  = { env: null, volt: null, curr: null, pm: null, gas: null, co: null, minmax: null };
 function calcSubIndex(c, bp) {
     if (c <= bp[0][0]) return bp[0][2];
     for (let i = 0; i < bp.length; i++) {

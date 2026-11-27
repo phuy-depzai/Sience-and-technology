@@ -21,6 +21,7 @@ async function fetchDataByDate(dateStr) {
         return [];
     }
 }
+function applyTheme() { const s = localStorage.getItem('theme') || 'dark'; if (s === 'light') document.body.classList.add('light'); else document.body.classList.remove('light'); updateThemeLabel(); }
 // ============================================================
 // HTML ESCAPE (XSS SAFE)
 // ============================================================
@@ -33,7 +34,7 @@ function escapeHTML(value) {
         "'": '&#39;'
     })[char]);
 }
-window.escapeHTML = escapeHtml;
+window.escapeHTML = escapeHTML;
 function showTermsModal() {
     let overlay = document.getElementById('terms-overlay');
     if (!overlay) {
@@ -363,7 +364,7 @@ function customConfirm(message, options = {}) {
         overlay.innerHTML = `
             <div class="custom-confirm-modal">
                 <h3 class="custom-confirm-title">${title}</h3>
-                <p class="custom-confirm-message">${escapeHtml(message)}</p>
+                <p class="custom-confirm-message">${escapeHTML(message)}</p>
                 <div class="custom-confirm-actions">
                     <button class="cc-btn cc-cancel">${cancelText}</button>
                     <button class="cc-btn cc-ok ${danger ? 'cc-danger' : ''}">${okText}</button>
@@ -399,7 +400,7 @@ function customNotify(message, type = 'info', duration = 3500) {
     toast.style.setProperty('--toast-color', colors[type] || colors.info);
     toast.innerHTML = `
         <span class="custom-toast-icon">${icons[type] || icons.info}</span>
-        <span class="custom-toast-msg">${escapeHtml(message)}</span>
+        <span class="custom-toast-msg">${escapeHTML(message)}</span>
         <button class="custom-toast-close" aria-label="Đóng">×</button>
     `;
     document.body.appendChild(toast);

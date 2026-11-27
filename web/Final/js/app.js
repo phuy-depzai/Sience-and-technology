@@ -1047,7 +1047,7 @@ async function loadNodesOnMap() {
         const nodes = await r.json();
         if (!nodes || !nodes.length) return;
         nodes.forEach(n => {
-            const m = L.circleMarker([n.lat, n.lng], { radius: 9, fillColor: '#4CAF50', color: '#fff', weight: 2, fillOpacity: 0.9 }).addTo(adminMap).bindPopup('<strong>' + escapeHtml(n.name || n.id) + '</strong><br><small>' + n.lat.toFixed(4) + ', ' + n.lng.toFixed(4) + '</small>');
+            const m = L.circleMarker([n.lat, n.lng], { radius: 9, fillColor: '#4CAF50', color: '#fff', weight: 2, fillOpacity: 0.9 }).addTo(adminMap).bindPopup('<strong>' + escapeHTML(n.name || n.id) + '</strong><br><small>' + n.lat.toFixed(4) + ', ' + n.lng.toFixed(4) + '</small>');
             adminMarkers.push(m);
         });
     } catch(e) { console.error('[MAP]', e); }
@@ -1109,7 +1109,7 @@ async function loadNodes() {
         const status = diffMin < 15 ? 'working' : diffMin < 60 ? 'delayed' : 'offline';
         
         // ĐÃ XÓA THẺ <div class="node-last">...</div> Ở ĐÂY
-        box.innerHTML = nodes.map(n => `<div class="node-row"><div class="node-info"><div class="node-name">${escapeHtml(n.name || n.id || 'Node')}</div><div class="node-meta">${(n.lat||0).toFixed(4)}, ${(n.lng||0).toFixed(4)}</div></div><div class="node-status"><span class="status-dot ${status}"></span><span class="status-label ${status}">${status}</span></div><button class="node-delete" onclick="deleteNode('${n.id}', '${(n.name || n.id).replace(/'/g, "\\'")}')" title="Xóa node">🗑️</button></div>`).join('');
+        box.innerHTML = nodes.map(n => `<div class="node-row"><div class="node-info"><div class="node-name">${escapeHTML(n.name || n.id || 'Node')}</div><div class="node-meta">${(n.lat||0).toFixed(4)}, ${(n.lng||0).toFixed(4)}</div></div><div class="node-status"><span class="status-dot ${status}"></span><span class="status-label ${status}">${status}</span></div><button class="node-delete" onclick="deleteNode('${n.id}', '${(n.name || n.id).replace(/'/g, "\\'")}')" title="Xóa node">🗑️</button></div>`).join('');
        
     } catch(e) { box.innerHTML = '<div style="color:#f85149; padding:20px;">Lỗi load node: ' + e.message + '</div>'; }
 }
@@ -1340,7 +1340,7 @@ function renderDebugTable() {
             <td>${(d.nox_pct||0).toFixed(1)}</td>
             <td>${d.sgp_ok||0}</td>
             <td><span class="type-badge ${type}">${type}</span></td>
-            <td title="${(d.note||'').replace(/"/g,'&quot;')}" style="max-width:180px; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(d.note||'—')}</td>
+            <td title="${(d.note||'').replace(/"/g,'&quot;')}" style="max-width:180px; overflow:hidden; text-overflow:ellipsis;">${escapeHTML(d.note||'—')}</td>
             <td>
                 <button class="action-btn edit" onclick="editDebugRecord(${d.id})" title="Sửa">✏️</button>
                 <button class="action-btn restore" onclick="restoreDebugRecord(${d.id})" title="Restore">↺</button>
@@ -1364,7 +1364,7 @@ async function loadPresets() {
         const sel = document.getElementById('dbg-preset-select');
         if (!sel) return;
         const current = sel.value;
-        sel.innerHTML = '<option value="">-- Chọn preset --</option>' + presetsList.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
+        sel.innerHTML = '<option value="">-- Chọn preset --</option>' + presetsList.map(p => `<option value="${p.id}">${escapeHTML(p.name)}</option>`).join('');
         if (current) sel.value = current;
     } catch(e) { console.error('[PRESETS]', e); }
 }
@@ -1468,7 +1468,7 @@ function renderSensorList(list) {
         <div class="clone-item" onclick="cloneSensor(${s.id})">
             <div class="clone-item-id">#${s.id}</div>
             <div class="clone-item-info">T=${(s.t||0).toFixed(2)}°C · H=${(s.h||0).toFixed(1)}% · PM2.5=${s.pm25||0} · V=${(s.v||0).toFixed(3)}V</div>
-            <div class="clone-item-ts">${escapeHtml(s.ts || '--')}</div>
+            <div class="clone-item-ts">${escapeHTML(s.ts || '--')}</div>
         </div>
     `).join('');
 }
@@ -1706,7 +1706,7 @@ function renderLogs() {
         <div class="log-entry severity-${l.severity || 'info'}">
             <div class="log-header">
                 <div>
-                    <span class="log-action">${escapeHtml(l.action)}</span>
+                    <span class="log-action">${escapeHTML(l.action)}</span>
                     <span class="log-severity-badge ${l.severity || 'info'}">${sevIcon[l.severity] || ''} ${l.severity || 'info'}</span>
                 </div>
                 <button class="log-delete-btn" onclick="deleteLog(${l.id})" title="Xóa log">🗑️</button>
@@ -1714,10 +1714,10 @@ function renderLogs() {
             <div class="log-meta">
                 <span>🕐 ${l.ts || '--'}</span>
                 <span>👤 ${l.author || 'admin'}</span>
-                ${l.target ? '<span>🎯 ' + escapeHtml(l.target) + '</span>' : ''}
+                ${l.target ? '<span>🎯 ' + escapeHTML(l.target) + '</span>' : ''}
                 ${l.ip && l.ip !== 'unknown' ? '<span>🌐 ' + l.ip + '</span>' : ''}
             </div>
-            ${l.details ? '<div class="log-details">' + escapeHtml(l.details) + '</div>' : ''}
+            ${l.details ? '<div class="log-details">' + escapeHTML(l.details) + '</div>' : ''}
         </div>
     `).join('');
 }
@@ -1840,7 +1840,7 @@ function renderNoteList() {
                 <div class="note-title-wrap">
                     ${n.pinned ? '<span class="note-pin">📌</span>' : ''}
                     <span class="note-tag tag-${n.tag}">${tagIcon[n.tag] || '📝'} ${n.tag}</span>
-                    <h3 class="note-title">${escapeHtml(n.title)}</h3>
+                    <h3 class="note-title">${escapeHTML(n.title)}</h3>
                 </div>
                 <div class="note-actions">
                     <button class="note-btn" onclick="togglePinNote(${n.id}, ${n.pinned ? 0 : 1})" title="${n.pinned ? 'Bỏ pin' : 'Pin'}">${n.pinned ? '📌' : '📍'}</button>
@@ -1848,7 +1848,7 @@ function renderNoteList() {
                     <button class="note-btn note-btn-del" onclick="deleteNote(${n.id})" title="Xóa">🗑️</button>
                 </div>
             </div>
-            <div class="note-content">${escapeHtml(n.content)}</div>
+            <div class="note-content">${escapeHTML(n.content)}</div>
             <div class="note-footer">
                 <span>👤 <strong>${n.author}</strong></span>
                 <span>🕐 ${n.ts || '--'}</span>
@@ -1965,9 +1965,9 @@ function renderUsersTable() {
     tbody.innerHTML = usersData.map(u => `
         <tr>
             <td>${u.id}</td>
-            <td><strong>${escapeHtml(u.username)}</strong></td>
-            <td>${escapeHtml(u.displayname || u.username)}</td>
-            <td><span class="type-badge ${u.role === 'head_admin' ? 'edge' : 'manual'}">${escapeHtml(u.role)}</span></td>
+            <td><strong>${escapeHTML(u.username)}</strong></td>
+            <td>${escapeHTML(u.displayname || u.username)}</td>
+            <td><span class="type-badge ${u.role === 'head_admin' ? 'edge' : 'manual'}">${escapeHTML(u.role)}</span></td>
             <td>${u.active ? '<span style="color:#3fb950;">✓ Active</span>' : '<span style="color:#f85149;">✗ Disabled</span>'}</td>
             <td>${u.totp_enabled ? '✓' : '—'}</td>
             <td style="font-size:11px;">${u.last_login || '—'}</td>
@@ -1975,7 +1975,7 @@ function renderUsersTable() {
             <td>
                 <button class="action-btn edit" onclick="editUser(${u.id})" title="Sửa pass/role">✏️</button>
                 <button class="action-btn ${u.active ? 'del' : 'restore'}" onclick="toggleUserActive(${u.id}, ${u.active ? 0 : 1})" title="${u.active ? 'Disable' : 'Enable'}">${u.active ? '🔒' : '🔓'}</button>
-                <button class="action-btn del" onclick="deleteUser(${u.id}, '${escapeHtml(u.username).replace(/'/g, "\\'")}')" title="Xóa">🗑️</button>
+                <button class="action-btn del" onclick="deleteUser(${u.id}, '${escapeHTML(u.username).replace(/'/g, "\\'")}')" title="Xóa">🗑️</button>
             </td>
         </tr>
     `).join('');
@@ -2119,7 +2119,7 @@ function renderNoteComments(noteId, container, list) {
                         <span class="comment-time">${c.created_at || '--'}</span>
                         ${canDel ? `<button class="comment-del" onclick="delNoteComment(${c.id}, ${noteId}, this)" title="Xóa">🗑️</button>` : ''}
                     </div>
-                    <div class="comment-content">${escapeHtml(c.content)}</div>
+                    <div class="comment-content">${escapeHTML(c.content)}</div>
                 </div>
             </div>
         `;
@@ -2133,7 +2133,7 @@ function renderNoteComments(noteId, container, list) {
     `;
 }
 
-function escapeHtml(s) {
+function escapeHTML(s) {
     return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
@@ -2189,12 +2189,12 @@ async function loadIncidents() {
         tbody.innerHTML = incidentsData.map(i => `
             <tr>
                 <td>${i.id}</td>
-                <td>${escapeHtml(i.service)}</td>
-                <td><span class="type-badge ${i.status === 'offline' ? 'edge' : 'manual'}">${escapeHtml(i.status)}</span></td>
+                <td>${escapeHTML(i.service)}</td>
+                <td><span class="type-badge ${i.status === 'offline' ? 'edge' : 'manual'}">${escapeHTML(i.status)}</span></td>
                 <td style="font-size:11px;">${i.started_at || '—'}</td>
                 <td style="font-size:11px; color:#d29922;">${i.eta || '—'}</td>
                 <td style="font-size:11px; color:#3fb950;">${i.resolved_at || '—'}</td>
-                <td>${escapeHtml(i.note || '—')}</td>
+                <td>${escapeHTML(i.note || '—')}</td>
                 <td>
                     <button class="action-btn edit" onclick="editIncident(${i.id})" title="Sửa">✏️</button>
                     <button class="action-btn del" onclick="deleteIncident(${i.id})" title="Xóa">🗑️</button>
@@ -2477,7 +2477,7 @@ async function loadTrustedIPs() {
         tbody.innerHTML = rows.map(x => `
             <tr>
                 <td><code>${x.ip}</code>${x.ip === d.current_ip ? ' <span style="color:#3fb950;">(bạn)</span>' : ''}</td>
-                <td>${escapeHtml(x.name)}</td>
+                <td>${escapeHTML(x.name)}</td>
                 <td>${x.session_days || 365}</td>
                 <td>${x.active ? '✅' : '❌'}</td>
                 <td style="font-size:11px;">${x.added_at || '—'}</td>
@@ -2663,7 +2663,7 @@ function customConfirm(message, options = {}) {
         overlay.innerHTML = `
             <div class="custom-confirm-modal">
                 <h3 class="custom-confirm-title">${title}</h3>
-                <p class="custom-confirm-message">${escapeHtml(message)}</p>
+                <p class="custom-confirm-message">${escapeHTML(message)}</p>
                 <div class="custom-confirm-actions">
                     <button class="cc-btn cc-cancel">${cancelText}</button>
                     <button class="cc-btn cc-ok ${danger ? 'cc-danger' : ''}">${okText}</button>
@@ -2699,7 +2699,7 @@ function customNotify(message, type = 'info', duration = 3500) {
     toast.style.setProperty('--toast-color', colors[type] || colors.info);
     toast.innerHTML = `
         <span class="custom-toast-icon">${icons[type] || icons.info}</span>
-        <span class="custom-toast-msg">${escapeHtml(message)}</span>
+        <span class="custom-toast-msg">${escapeHTML(message)}</span>
         <button class="custom-toast-close" aria-label="Đóng">×</button>
     `;
     document.body.appendChild(toast);

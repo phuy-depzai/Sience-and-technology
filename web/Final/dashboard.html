@@ -197,20 +197,34 @@
         <span>© 2026 AirWatch</span>
     </footer>
 
-    <!-- Core -->
+<!-- Core -->
 <script src="js/core.js"></script>
 
 <!-- Node selector -->
 <script src="js/nodes.js"></script>
 
+<!-- Chart library -->
+<script src="js/chart.min.js"></script>
+<script src="js/chartjs-adapter-date-fns.bundle.min.js"></script>
+
 <!-- Dashboard -->
 <script src="js/dash.js"></script>
-<script src="js/chart.min.js"></script>
-    <script src="js/chartjs-adapter-date-fns.bundle.min.js"></script>
-    <script>
-        function toggleMenu(e) { e.stopPropagation(); document.getElementById('dropdown-menu').classList.toggle('open'); }
-        document.addEventListener('click', () => { const m = document.getElementById('dropdown-menu'); if (m) m.classList.remove('open'); });
-        function handleAuthAction() { if (isAdmin()) logout(); else window.location.href = '/'; }
-    </script>
+
+<script>
+function toggleMenu(e) {
+    e.stopPropagation();
+    document.getElementById('dropdown-menu').classList.toggle('open');
+}
+
+document.addEventListener('click', () => {
+    const m = document.getElementById('dropdown-menu');
+    if (m) m.classList.remove('open');
+});
+
+function handleAuthAction() {
+    if (isAdmin()) logout();
+    else window.location.href = '/';
+}
+</script>
 </body>
 </html>

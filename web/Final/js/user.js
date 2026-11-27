@@ -23,9 +23,9 @@ function renderUsersTable() {
     tbody.innerHTML = usersData.map(u => `
         <tr>
             <td>${u.id}</td>
-            <td><strong>${escapeHtml(u.username)}</strong></td>
-            <td>${escapeHtml(u.displayname || u.username)}</td>
-            <td><span class="type-badge ${u.role === 'head_admin' ? 'edge' : 'manual'}">${escapeHtml(u.role)}</span></td>
+            <td><strong>${escapeHTML(u.username)}</strong></td>
+            <td>${escapeHTML(u.displayname || u.username)}</td>
+            <td><span class="type-badge ${u.role === 'head_admin' ? 'edge' : 'manual'}">${escapeHTML(u.role)}</span></td>
             <td>${u.active ? '<span style="color:#3fb950;">✓ Active</span>' : '<span style="color:#f85149;">✗ Disabled</span>'}</td>
             <td>${u.totp_enabled ? '✓' : '—'}</td>
             <td style="font-size:11px;">${u.last_login || '—'}</td>
@@ -33,7 +33,7 @@ function renderUsersTable() {
             <td>
                 <button class="action-btn edit" onclick="editUser(${u.id})" title="Sửa pass/role">✏️</button>
                 <button class="action-btn ${u.active ? 'del' : 'restore'}" onclick="toggleUserActive(${u.id}, ${u.active ? 0 : 1})" title="${u.active ? 'Disable' : 'Enable'}">${u.active ? '🔒' : '🔓'}</button>
-                <button class="action-btn del" onclick="deleteUser(${u.id}, '${escapeHtml(u.username).replace(/'/g, "\\'")}')" title="Xóa">🗑️</button>
+                <button class="action-btn del" onclick="deleteUser(${u.id}, '${escapeHTML(u.username).replace(/'/g, "\\'")}')" title="Xóa">🗑️</button>
             </td>
         </tr>
     `).join('');

@@ -40,7 +40,7 @@ function renderNoteList() {
                 <div class="note-title-wrap">
                     ${n.pinned ? '<span class="note-pin">📌</span>' : ''}
                     <span class="note-tag tag-${n.tag}">${tagIcon[n.tag] || '📝'} ${n.tag}</span>
-                    <h3 class="note-title">${escapeHtml(n.title)}</h3>
+                    <h3 class="note-title">${escapeHTML(n.title)}</h3>
                 </div>
                 <div class="note-actions">
                     <button class="note-btn" onclick="togglePinNote(${n.id}, ${n.pinned ? 0 : 1})" title="${n.pinned ? 'Bỏ pin' : 'Pin'}">${n.pinned ? '📌' : '📍'}</button>
@@ -48,7 +48,7 @@ function renderNoteList() {
                     <button class="note-btn note-btn-del" onclick="deleteNote(${n.id})" title="Xóa">🗑️</button>
                 </div>
             </div>
-            <div class="note-content">${escapeHtml(n.content)}</div>
+            <div class="note-content">${escapeHTML(n.content)}</div>
             <div class="note-footer">
                 <span>👤 <strong>${n.author}</strong></span>
                 <span>🕐 ${n.ts || '--'}</span>
@@ -165,7 +165,7 @@ function renderNoteComments(noteId, container, list) {
                         <span class="comment-time">${c.created_at || '--'}</span>
                         ${canDel ? `<button class="comment-del" onclick="delNoteComment(${c.id}, ${noteId}, this)" title="Xóa"/button>` : ''}
                     </div>
-                    <div class="comment-content">${escapeHtml(c.content)}</div>
+                    <div class="comment-content">${escapeHTML(c.content)}</div>
                 </div>
             </div>
         `;

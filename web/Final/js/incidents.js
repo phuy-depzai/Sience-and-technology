@@ -18,12 +18,12 @@ async function loadIncidents() {
         tbody.innerHTML = incidentsData.map(i => `
             <tr>
                 <td>${i.id}</td>
-                <td>${escapeHtml(i.service)}</td>
-                <td><span class="type-badge ${i.status === 'offline' ? 'edge' : 'manual'}">${escapeHtml(i.status)}</span></td>
+                <td>${escapeHTML(i.service)}</td>
+                <td><span class="type-badge ${i.status === 'offline' ? 'edge' : 'manual'}">${escapeHTML(i.status)}</span></td>
                 <td style="font-size:11px;">${i.started_at || '—'}</td>
                 <td style="font-size:11px; color:#d29922;">${i.eta || '—'}</td>
                 <td style="font-size:11px; color:#3fb950;">${i.resolved_at || '—'}</td>
-                <td>${escapeHtml(i.note || '—')}</td>
+                <td>${escapeHTML(i.note || '—')}</td>
                 <td>
                     <button class="action-btn edit" onclick="editIncident(${i.id})" title="Sửa">✏️</button>
                     <button class="action-btn del" onclick="deleteIncident(${i.id})" title="Xóa">🗑️</button>

@@ -28,7 +28,7 @@ async function loadNodesOnMap() {
         const nodes = await r.json();
         if (!nodes || !nodes.length) return;
         nodes.forEach(n => {
-            const m = L.circleMarker([n.lat, n.lng], { radius: 9, fillColor: '#4CAF50', color: '#fff', weight: 2, fillOpacity: 0.9 }).addTo(adminMap).bindPopup('<strong>' + escapeHtml(n.name || n.id) + '</strong><br><small>' + n.lat.toFixed(4) + ', ' + n.lng.toFixed(4) + '</small>');
+            const m = L.circleMarker([n.lat, n.lng], { radius: 9, fillColor: '#4CAF50', color: '#fff', weight: 2, fillOpacity: 0.9 }).addTo(adminMap).bindPopup('<strong>' + escapeHTML(n.name || n.id) + '</strong><br><small>' + n.lat.toFixed(4) + ', ' + n.lng.toFixed(4) + '</small>');
             adminMarkers.push(m);
         });
     } catch(e) { console.error('[MAP]', e); }
@@ -90,7 +90,7 @@ async function loadNodes() {
         const status = diffMin < 15 ? 'working' : diffMin < 60 ? 'delayed' : 'offline';
         
         // ĐÃ XÓA THẺ <div class="node-last">...</div> Ở ĐÂY
-        box.innerHTML = nodes.map(n => `<div class="node-row"><div class="node-info"><div class="node-name">${escapeHtml(n.name || n.id || 'Node')}</div><div class="node-meta">${(n.lat||0).toFixed(4)}, ${(n.lng||0).toFixed(4)}</div></div><div class="node-status"><span class="status-dot ${status}"></span><span class="status-label ${status}">${status}</span></div><button class="node-delete" onclick="deleteNode('${n.id}', '${(n.name || n.id).replace(/'/g, "\\'")}')" title="Xóa node">🗑️</button></div>`).join('');
+        box.innerHTML = nodes.map(n => `<div class="node-row"><div class="node-info"><div class="node-name">${escapeHTML(n.name || n.id || 'Node')}</div><div class="node-meta">${(n.lat||0).toFixed(4)}, ${(n.lng||0).toFixed(4)}</div></div><div class="node-status"><span class="status-dot ${status}"></span><span class="status-label ${status}">${status}</span></div><button class="node-delete" onclick="deleteNode('${n.id}', '${(n.name || n.id).replace(/'/g, "\\'")}')" title="Xóa node">🗑️</button></div>`).join('');
        
     } catch(e) { box.innerHTML = '<div style="color:#f85149; padding:20px;">Lỗi load node: ' + e.message + '</div>'; }
 }

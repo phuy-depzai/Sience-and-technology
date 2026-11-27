@@ -50,7 +50,7 @@ function renderLogs() {
         <div class="log-entry severity-${l.severity || 'info'}">
             <div class="log-header">
                 <div>
-                    <span class="log-action">${escapeHtml(l.action)}</span>
+                    <span class="log-action">${escapeHTML(l.action)}</span>
                     <span class="log-severity-badge ${l.severity || 'info'}">${sevIcon[l.severity] || ''} ${l.severity || 'info'}</span>
                 </div>
                 <button class="log-delete-btn" onclick="deleteLog(${l.id})" title="Xóa log">🗑️</button>
@@ -58,10 +58,10 @@ function renderLogs() {
             <div class="log-meta">
                 <span>🕐 ${l.ts || '--'}</span>
                 <span>👤 ${l.author || 'admin'}</span>
-                ${l.target ? '<span>🎯 ' + escapeHtml(l.target) + '</span>' : ''}
+                ${l.target ? '<span>🎯 ' + escapeHTML(l.target) + '</span>' : ''}
                 ${l.ip && l.ip !== 'unknown' ? '<span>🌐 ' + l.ip + '</span>' : ''}
             </div>
-            ${l.details ? '<div class="log-details">' + escapeHtml(l.details) + '</div>' : ''}
+            ${l.details ? '<div class="log-details">' + escapeHTML(l.details) + '</div>' : ''}
         </div>
     `).join('');
 }
