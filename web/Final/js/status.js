@@ -11,6 +11,7 @@ async function loadServiceStatus() {
         const u = document.getElementById('status-updated'); if (u) u.textContent = new Date().toLocaleTimeString('vi-VN');
     } catch(e) { console.error('[STATUS]', e); }
 }
+function setStatus(online) { const s = document.getElementById('status'); if (!s) return; s.className = online ? 'status' : 'status offline'; s.textContent = online ? 'LIVE' : 'OFFLINE'; }
 
 async function updateServiceStatus() {
     const service = document.getElementById('sel-service').value;
